@@ -1,0 +1,760 @@
+**********************************************************************
+NGShelper v0.47 - build-allele-frequency.py
+
+Description: This program builds the allele frequency from a VCF file in the format required by SimHyb application.
+
+Usage: build-allele-frequency.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf VCF_FILE        Path of input VCF file (mandatory).
+  --samples SAMPLE_FILE
+                        Path of the sample file in the following record
+                        format: "sample_id;species_id;mother_id" (mandatory).
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --outdir OUTPUT_DIR   Path of output directoty where files for SimHyb
+                        application are saved (mandatory).
+  --varnum VARIANT_NUMBER_PER_FILE
+                        Variant number per file, the allele frequency data
+                        will be splitted in several if the total variant
+                        number is greater than this argument; default: 1000.
+  --trans ALLELE_TRANSFORMATION
+                        Transformation of the allele symbol: ADD100 (add 100
+                        to allele symbol when it is numeric) or NONE; default:
+                        NONE.
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tvi TVI_LIST        Variant identification list to trace with format
+                        seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n or
+                        NONE; default: NONE.
+
+**********************************************************************
+NGShelper v0.47 - build-haplotype.py
+
+Description: This program builds the haplotype of a sample set from a VCF file.
+
+Usage: build-haplotype.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf INPUT_VCF_FILE  Path of the VCF file (mandatory).
+  --samples SAMPLE_FILE
+                        Path of the sample file in the following record
+                        format: "sample_id;species_id;mother_id" (mandatory).
+  --imd_id IMPUTED_MD_ID
+                        Identification of the alternative allele for imputed
+                        missing data; default 99
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --out HAPLOTYPE_FILE  Path of the haplotype file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tvi TVI_LIST        Variant identification list to trace with format
+                        seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n or
+                        NONE; default: NONE.
+
+**********************************************************************
+NGShelper v0.47 - extract-fasta-seqs.py
+
+Description: This program extracts sequences from a FASTA file.
+
+Usage: extract-fasta-seqs.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --fasta FASTA_FILE    Path of FASTA file (mandatory)
+  --id ID_FILE          Path of the sequence identification file in plane text
+                        (mandatory)
+  --type ID_TYPE        Type of the identification: ['LITERAL', 'REGEX'];
+                        default: LITERAL.
+  --extract EXTRACT_FILE
+                        Path of extracted FASTA file (mandatory)
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - extract-gff-features.py
+
+Description: This program extracts genomic features from a GFF file corresponding to the variant of a VCF file.
+
+Usage: extract-gff-features.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --gff INPUT_GFF_FILE  Path of the GFF file (mandatory).
+  --format GFF_FORMAT   The format of the transcript GFF file: GFF3; default:
+                        GFF3.
+  --vcf VCF_FILE        Path of the VCF file (mandatory).
+  --out OUTPUT_GFF_FILE
+                        Path of the output GFF file with the selected features
+                        (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - extract-gff-rnas.py
+
+Description: This program extracts RNA sequences from a GFF file and its corresponding genome FASTA file.
+
+Usage: extract-gff-rnas.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --gff GFF_FILE        Path of the GFF file (mandatory).
+  --format GFF_FORMAT   The format of the transcript GFF file: GFF3; default:
+                        GFF3.
+  --genome GENOME_FILE  Path of the FASTA genome file (mandatory)
+  --out RNA_FILE        Path of the output FASTA file with the RNA sequences
+                        in cDNA format (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tvi TVI_LIST        Genomic sequence identification list to trace with
+                        format seq_id_1,seq_id_2,...,seq_id_n or NONE;
+                        default: NONE.
+
+**********************************************************************
+NGShelper v0.47 - extract-vcf-seqs.py
+
+Description: This program extracts sequences from a VCF file.
+
+Usage: extract-vcf-seqs.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf VCF_FILE        Path of input VCF file (mandatory).
+  --id ID_FILE          Path of the sequence identification file in plane text
+                        (mandatory)
+  --extract EXTRACT_FILE
+                        Path of extracted VCF file (mandatory)
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - filter-fasta.py
+
+Description: This program filters a FASTA file according to the sequence length.
+
+Usage: filter-fasta.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --fasta FASTA_FILE    Path of FASTA file (mandatory)
+  --output OUTPUT_FILE  Path of a output file where filtered transcripts will
+                        be saved.
+  --minlen MINLEN       Transcript with length values less than this value
+                        will be filtered (default: 200).
+  --maxlen MAXLEN       Transcript with length values greater than this value
+                        will be filtered (default: 10000).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - impute-adults.py
+
+Description: This program imputes genotypes with missing data of adult individuals in a VCF
+file generated in a hybridization studies of two parental species, hybrids and their half-sib
+progenies, based on the relative frequencies of missing data in the adults of both parental
+species.
+
+Usage: impute-adults.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf INPUT_VCF_FILE  Path of input VCF file (mandatory).
+  --samples SAMPLE_FILE
+                        Path of the sample file in the following record
+                        format: "sample_id;species_id;mother_id" (mandatory).
+  --fix FIX             Fix the reference base(s) when there are not samples
+                        with this reference (mandatory): Y (yes) or N (no).
+  --scenario SCENARIO   Scenario (mandatory): 0 (no imputation) or 1
+                        (standard) or 2 (maximum possible imputation) or 3
+                        (maximum possible missing data).
+  --min_aa MIN_AA_PERCENTAGE
+                        Minimum percentage of alternative alleles per species
+                        (mandatory).
+  --min_mdi MIN_MD_IMPUTATION_PERCENTAGE
+                        Minimum percentage of missing data imputation to a new
+                        alternative allele per species (mandatory).
+  --imd_id IMPUTED_MD_ID
+                        Identification of the alternative allele for imputed
+                        missing data; default 99
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp1_max_md SP1_MAX_MD_PERCENTAGE
+                        Maximum percentage of missing data of the first
+                        species (mandatory).
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --sp2_max_md SP2_MAX_MD_PERCENTAGE
+                        Maximum percentage of missing data of the second
+                        species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --maf MIN_AFR_PERCENTAGE
+                        Minimum percentage of allele frequency per species
+                        (mandatory).
+  --dp MIN_DEPTH        Minimum combined depth across samples; default: 1.
+  --out OUTPUT_VCF_FILE
+                        Path of output VCF file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tvi TVI_LIST        Variant identification list to trace with format
+                        seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n or
+                        NONE; default: NONE.
+
+**********************************************************************
+NGShelper v0.47 - impute-progenies.py
+
+Description: This program treats the VCF output file of impute-adults.py, checks the genotype
+compatibility between each mother and its progeny, and imputes missing data of progeny genotypes
+according to the selected imputation scenario.
+
+Usage: impute-progenies.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf INPUT_VCF_FILE  Path of input VCF file (mandatory).
+  --samples SAMPLE_FILE
+                        Path of the sample file in the following record
+                        format: "sample_id;species_id;mother_id" (mandatory).
+  --scenario SCENARIO   Scenario (mandatory): 0 (no imputation) or 1
+                        (standard) or 2 (maximum possible imputation) or 3
+                        (maximum possible missing data).
+  --imd_id IMPUTED_MD_ID
+                        Identification of the alternative allele for imputed
+                        missing data; default 99
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --out OUTPUT_VCF_FILE
+                        Path of output VCF file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tvi TVI_LIST        Variant identification list to trace with format
+                        seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n or
+                        NONE; default: NONE.
+
+**********************************************************************
+NGShelper v0.47 - get-exon-data.py
+
+Description: This program parses a GAMP alignment in order to get data about the coverage, identity and coordinates of exons.
+
+Usage: get-exon-data.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --alignment ALIGNMENT_FILE
+                        Path of GMAP alignment file (mandatory)
+  --outdir OUTPUT_DIR   Path of output directoty where files with exons data
+                        are saved (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - get-flanking-regions.py
+
+Description: This program builds a FASTA file with the flanking genomic region of variants contained in a VCF file.
+
+Usage: get-flanking-regions.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf VCF_FILE        Path of the VCF file (mandatory).
+  --genome GENOME_FILE  Path of the FASTA genome file (mandatory)
+  --out FLANKING_REGION_FILE
+                        Path of the output FASTA file with flanking regions
+                        (mandatory).
+  --nucleotides NUCLEOTIDE_NUMBER
+                        Nucleotide number to get in both sides of each
+                        variant; default: 25.
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - load-annotations.py
+
+Description: This program loads annotation data from a TOA annotation file into NGShelper database.
+
+Usage: load-annotations.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db NGSHELPER_DATABASE
+                        Path of the NGShelper database (mandatory).
+  --annotation ANNOTATION_FILE
+                        Path of the TOA annotation file in CSV format
+                        (mandatory).
+  --type TOA_FILE_TYPE  Type of the TOA annotation file (mandatory): PLAZA or
+                        REFSEQ or NT or NR or MERGER.
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - load-gene-info.py
+
+Description: This program loads gene infomation included in a file of ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/GENE_INFO/
+into NGShelper database.
+
+Usage: load-gene-info.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db NGSHELPER_DATABASE
+                        Path of the NGShelper database (mandatory).
+  --gene GENE_INFO_FILE
+                        Path of the gene info file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - load-genomic-features.py
+
+Description: This program loads genomic features from a GFF file into NGShelper database.
+
+Usage: load-genomic-features.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db NGSHELPER_DATABASE
+                        Path of the NGShelper database (mandatory).
+  --gene GENE_INFO_FILE
+                        Path of the gene info file (mandatory).
+  --gff GFF_FILE        Path of the GFF file (mandatory).
+  --format GFF_FORMAT   The format of the GFF file: GFF3; default: GFF3.
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - load-vcf-data.py
+
+Description: This program loads data of a VCF file into NGShelper database.
+
+Usage: load-vcf-data.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db NGSHELPER_DATABASE
+                        Path of the NGShelper database (mandatory).
+  --vcf VCF_FILE        Path of input VCF file (mandatory).
+  --samples SAMPLE_FILE
+                        Path of the sample file in the following record
+                        format: "sample_id;species_id;mother_id" (mandatory).
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --new_mdi NEW_MD_ID   New identification of missing data which will replace
+                        "."); default: U.
+  --imd_id IMPUTED_MD_ID
+                        Identification of the alternative allele for imputed
+                        missing data; default 99
+  --trans ALLELE_TRANSFORMATION
+                        Transformation of the allele symbol: ADD100 (add 100
+                        to allele symbol when it is numeric) or NONE; default:
+                        NONE.
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tvi TVI_LIST        Variant identification list to trace with format
+                        seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n or
+                        NONE; default: NONE.
+
+**********************************************************************
+NGShelper v0.47 - loci2nexus.py
+
+Description: This program builds a Nexus file from a ypirad loci file
+for a determinated loci set to be used by BEAST software.
+
+Usage: loci2nexus.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  -l SELECTION_LOCI_ID_FILE_PATH, --loci_id_file SELECTION_LOCI_ID_FILE_PATH
+                        loci id file path to select (mandatory)
+  -c COMPLETE_LOCI_FILE_PATH, --complete_loci_file COMPLETE_LOCI_FILE_PATH
+                        complete loci file path (mandatory)
+  -s SELECTED_LOCI_FILE_PATH, --selected_loci_file SELECTED_LOCI_FILE_PATH
+                        selected loci file path (mandatory)
+  -n NEXUS_FILE_PATH, --nexus_file NEXUS_FILE_PATH
+                        Nexus file path (mandatory)
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - locistats.py
+
+Description: This program calculates haplotype statistics per locus from a ipyrad loci file.
+
+Usage: locistats.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --loci_file LOCI_FILE_PATH
+                        loci file path (mandatory)
+  --stats_file STATS_FILE_PATH
+                        statistics file path in CSV format (mandatory)
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - phase2structure.py
+
+Description: This program converts a output PHASE files to the input Structure format in two lines.
+
+Usage: phase2structure.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --phasedir PHASE_DIR  Path of the PHASE file directory (mandatory).
+  --phaseext PHASE_EXTENSION
+                        Extension of PHASE files (mandatory).
+  --samples SAMPLE_FILE
+                        Path of the sample file in the following record
+                        format: "sample_id;species_id;mother_id" (mandatory).
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --structure STRUCTURE_FILE
+                        Path of the converted Structure file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - print-vcf-variants.py
+
+Description: This program prints data of a selected variant list.
+
+Usage: print-vcf-variants.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf INPUT_VCF_FILE  Path of input VCF file (mandatory).
+  --samples SAMPLE_FILE
+                        Path of the sample file in the following record
+                        format: "sample_id;species_id;mother_id" (mandatory).
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --variants VARIANT_LIST
+                        Variant identification list to print with format
+                        seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n.
+  --outdir OUTPUT_DIR   Path of output directoty where files with selected
+                        variant data are saved (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - purge-structure.py
+
+Description: This program purges a Structure file.
+
+Usage: purge-structure.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --structure INPUT_STRUCTURE_FILE
+                        Path of the Structure file (mandatory).
+  --type STRUCTURE_FILE_TYPE
+                        Type of the Structure file (mandatory): 0 (Structure
+                        format in two lines).
+  --operation PURGE_OPERATION
+                        Purge operation (mandatory): CHAVAL (change a value by
+                        a new value) or DELCOL (delete columns containing a
+                        determined value).
+  --value VALUE         value to operate (mandatory)
+  --nvalue NEW_VALUE    new value that replaces value when operation in CHAVAL
+                        (mandatory); else NONE (default)
+  --out OUTPUT_PURGED_FILE
+                        Path of the purged file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - purge-vcf.py
+
+Description: This program purges a VCF file.
+
+Usage: purge-vcf.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf INPUT_VCF_FILE  Path of input VCF file (mandatory).
+  --operation PURGE_OPERATION
+                        Purge operation (mandatory): CHAVAL (change a value by
+                        a new value) or FILVAR (filter variants containing a
+                        determined value).
+  --value VALUE         value to operate (mandatory)
+  --nvalue NEW_VALUE    new value that replaces value when operation in CHAVAR
+                        (mandatory); else NONE (default)
+  --out OUTPUT_PURGED_FILE
+                        Path of the purged file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - query-data2scenarioX.py
+
+Description: This program lists data of variants and alleles and variant identifications to the scenario X.
+
+Usage: query-data2scenarioX.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db NGSHELPER_DATABASE
+                        Path of the NGShelper database (mandatory).
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --imd_id IMPUTED_MD_ID
+                        Identification of the alternative allele for imputed
+                        missing data; default 99
+  --maxsep MAX_SEPARATION
+                        Maximum separation between variants of the same
+                        intergenic fragment (mandatory).
+  --outdir OUTPUT_DIR   Path of output directoty where files with allele data
+                        about scenario X are saved (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tsi TSI_LIST        Sequence identification list to trace with format
+                        seq_id,seq_id_2,...,seq_id_n or NONE; default: NONE.
+
+**********************************************************************
+NGShelper v0.47 - simhyb2structure.py
+
+Description: This program converts a output SimHyb file to the input Structure format in two lines.
+
+Usage: simhyb2structure.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --simhyb SIMHYB_FILE  Path of the SimHyb file in TSV format (mandatory).
+  --headernum HEADER_ROW_NUMBER
+                        Number of the header rows in the SimHyb file
+                        (mandatory).
+  --structure STRUCTURE_FILE
+                        Path of the converted Structure file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+NGShelper v0.47 - simNGS-read-fixing.py
+
+Description: This program fixes sequence identifiers of a read file generated by simNGS to compatible format with CASAVA.
+
+Usage: simNGS-read-fixing.py arguments
+
+Arguments:
+  -h, --help           show this help message and exit
+  --filenum FILENUM    1: in SE file or the first file in PE files; 2: the
+                       second file in PE files
+  --readfile READFILE  Path of a read file generated by simNGS in FASTQ format
+
+**********************************************************************
+NGShelper v0.47 - transcript-filter.py
+
+Description: This program filters transcripts according to their length, FPKM and TPM calculated by DETONATE.
+
+Usage: transcript-filter.py arguments
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --assembler ASSEMBLY_SOFTWARE_CODE
+                        trinity (Trinity) or sdnt (SOAPdenovo-Trans).
+  --transcriptome TRANSCRIPTOME_FILE
+                        Path of a transcriptome file in FASTA format generated
+                        by Trinity.
+  --score SCORE_FILE    Path of a score file where DETONATE saved the score of
+                        the transcriptome file.
+  --output OUTPUT_FILE  Path of a output file where filtered transcripts will
+                        be saved.
+  --minlen MINLEN       Transcript with length values less than this value
+                        will be filtered (default: 200).
+  --maxlen MAXLEN       Transcript with length values greater than this value
+                        will be filtered (default: 10000).
+  --minFPKM MINFPKM     Transcript with FPKM values less than this value will
+                        be filtered (default: 1.0).
+  --minTPM MINTPM       Transcript with TPM values less than this value will
+                        be filtered (default: 1.0).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+Usage: transcriptome-blastx.py [options]
+
+Options:
+  -h, --help            show this help message and exit
+  -m MACHINE_TYPE, --machine_type=MACHINE_TYPE
+                        Machine type: local or ngscloud (default: local)
+  -n NODE_NUMBER, --node_number=NODE_NUMBER
+                        Node number (default: 1; it must be 1 if machine type
+                        is local)
+  -t BLASTX_THREAD_NUMBER, --blastx_thread_number=BLASTX_THREAD_NUMBER
+                        Threads number using by blastx in every node (default:
+                        1)
+  -d BLAST_DB, --blast_db=BLAST_DB
+                        Path of the protein data base directory
+  -p PROTEIN_DATABASE_NAME, --protein_database_name=PROTEIN_DATABASE_NAME
+                        Protein database name
+  -i TRANSCRIPTOME_FILE, --transcriptome=TRANSCRIPTOME_FILE
+                        Path of a transcriptome file in FASTA format
+  -e E_VALUE, --e_value=E_VALUE
+                        Expectation value (E-value) threshold for saving hits
+                        (default: 1e-06)
+  -s MAX_TARGET_SEQS, --max_target_seqs=MAX_TARGET_SEQS
+                        Maximum number of aligned sequences to keep (default:
+                        10)
+  -x MAX_HSPS, --max_hsps=MAX_HSPS
+                        Maximum number of HSPs per subject sequence to save
+                        for each query (default: 999999)
+  -c QCOV_HSP_PERC, --qcov_hsp_perc=QCOV_HSP_PERC
+                        Aligments below the specified query coverage per HSPs
+                        are removed (default: 0.0)
+  -o OUTPUT_DIRECTORY, --output=OUTPUT_DIRECTORY
+                        Path of a directory where the results will be saved
+  -l EMAIL, --email=EMAIL
+                        Email direction to send warnings
+  -v VERBOSE, --verbose=VERBOSE
+                        Additional job status info during the run (y: YES; n:
+                        NO, default: N).
+
+**********************************************************************
+NGShelper v0.47 - transcriptome-stats.py
+
+Description: This program calculates statistics of a transcriptome.
+
+Usage: transcriptome-stats.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --transcriptome TRANSCRIPTOME_FILE
+                        Path of a transcriptome file in FASTA format
+                        (mandatory)
+  --output OUTPUT_DIRECTORY
+                        Path of a directory where the results will be saved
+                        (mandatory)
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.47 - vcf2phase.py
+
+Description: This program converts a VCF file to the PHASE input format.
+
+Usage: vcf2phase.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf VCF_FILE        Path of the VCF file (mandatory).
+  --samples SAMPLE_FILE
+                        Path of the sample file in the following record
+                        format: "sample_id;species_id;mother_id" (mandatory).
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --imd_id IMPUTED_MD_ID
+                        Identification of the alternative allele for imputed
+                        missing data; default 99
+  --trans ALLELE_TRANSFORMATION
+                        Transformation of the allele symbol: ADD100 (add 100
+                        to allele symbol when it is numeric) or NONE; default:
+                        NONE.
+  --outdir OUTPUT_DIR   Path of output directoty where files for PHASE
+                        application are saved (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tvi TVI_LIST        Variant identification list to trace with format
+                        seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n or
+                        NONE; default: NONE.
+
+**********************************************************************
+NGShelper v0.47 - vcf2structure.py
+
+Description: This program converts a VCF file to the Structure input formats.
+
+Usage: vcf2structure.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --vcf VCF_FILE        Path of the VCF file (mandatory).
+  --samples SAMPLE_FILE
+                        Path of the sample file in the following record
+                        format: "sample_id;species_id;mother_id" (mandatory).
+  --sp1_id SP1_ID       Identification of the first species (mandatory)
+  --sp2_id SP2_ID       Identification of the second species (mandatory).
+  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
+  --imd_id IMPUTED_MD_ID
+                        Identification of the alternative allele for imputed
+                        missing data; default 99
+  --new_mdi NEW_MD_ID   New identification of missing data which will replace
+                        "."); default: U.
+  --trans ALLELE_TRANSFORMATION
+                        Transformation of the allele symbol: ADD100 (add 100
+                        to allele symbol when it is numeric) or NONE; default:
+                        NONE.
+  --type STRUCTURE_FILE_TYPE
+                        Type of the Structure file (mandatory): 0 (Structure
+                        format in two lines).
+  --out OUTPUT_CONVERTED_FILE
+                        Path of the converted file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tvi TVI_LIST        Variant identification list to trace with format
+                        seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n or
+                        NONE; default: NONE.
+
+**********************************************************************
+

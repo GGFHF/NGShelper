@@ -1,6 +1,9 @@
 # NGShelper
 
-NGShelper is a set of tools useful to performance some tasks related to NGS analysis.
+NGShelper is a set of Python programs useful to perform some tasks related to NGS analysis:
+extracts subsets, perform format conversion, filter, impute and extract statistics from VCF
+and transcriptome FASTA files, etc. (see details in help.txt file). The package contains some
+Bash (Linux) and Bat (Windows) scripts to facilitate running the Python programs.
 
 This software has been developed by:
 
@@ -10,4 +13,3 @@ This software has been developed by:
     Universidad Politécnica de Madrid
     
     http://gfhforestal.com/
-    https://github.com/ggfhf/
