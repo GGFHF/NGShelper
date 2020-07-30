@@ -168,13 +168,13 @@ def load_annotations(conn, annotation_file, toa_file_type):
             raise xlib.ProgramException(e, 'F001', annotation_file)
 
     # read head record of the annotation file
-    (record, key, data_dict) = xlib.read_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
+    (record, key, data_dict) = xlib.read_toa_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
 
     # add 1 to record counter
     record_counter += 1
 
     # read the first data record of the annotation file
-    (record, key, data_dict) = xlib.read_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
+    (record, key, data_dict) = xlib.read_toa_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
 
     # while there are records
     while record != '':
@@ -202,7 +202,7 @@ def load_annotations(conn, annotation_file, toa_file_type):
                 description = data_dict['desc'].replace("'", '´').replace(';', ',')
 
             # read the next record
-            (record, key, data_dict) = xlib.read_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
+            (record, key, data_dict) = xlib.read_toa_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
 
         # insert data into the table "annotations"
         row_dict = {'seq_id': seq_id, 'description': description}

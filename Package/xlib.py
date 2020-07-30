@@ -55,7 +55,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.48'
+    return '0.51'
 
 #-------------------------------------------------------------------------------
 
@@ -608,11 +608,11 @@ def get_toa_file_type_code_list_text():
 
 #-------------------------------------------------------------------------------
 
-def read_annotation_record(file_name, file_id, type, record_counter):
+def read_toa_annotation_record(file_name, file_id, type, record_counter):
     '''
     '''
 
-    # initialize the data dictionary
+# initialize the data dictionary
     data_dict = {}
 
     # initialize the key
@@ -631,7 +631,7 @@ def read_annotation_record(file_name, file_id, type, record_counter):
         if type.upper() == 'PLAZA':
 
             # extract data 
-            # PLAZA record format:  "seq_id";"iteration_iter_num";"hit_num";"hit_accession";"hsp_num";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases";"go_id";"go_desc";"interpro_id";"interpro_desc";"mapman_id";"mapman_desc";"ec_id";"kegg_id";"metacyc_id"
+            # PLAZA record format: "seq_id";"nt_seq_id";"aa_seq_id";"hit_num";"hsp_num";"iteration_iter_num";"hit_accession";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases";"go_id";"go_desc";"interpro_id";"interpro_desc";"mapman_id";"mapman_desc";"ec_id";"kegg_id";"metacyc_id"
             data_list = []
             start = 0
             for end in [i for i, chr in enumerate(record) if chr == ';']:
@@ -640,46 +640,48 @@ def read_annotation_record(file_name, file_id, type, record_counter):
             data_list.append(record[start:].strip('\n').strip('"'))
             try:
                 seq_id = data_list[0]
-                iteration_iter_num = data_list[1]
-                hit_num = data_list[2]
-                hit_accession = data_list[3]
+                nt_seq_id = data_list[1]
+                aa_seq_id = data_list[2]
+                hit_num = data_list[3]
                 hsp_num = data_list[4]
-                hsp_evalue = data_list[5]
-                hsp_identity = data_list[6]
-                hsp_positive = data_list[7]
-                hsp_gaps = data_list[8]
-                hsp_align_len = data_list[9]
-                hsp_qseq = data_list[10]
-                species = data_list[11]
-                family = data_list[12]
-                phylum = data_list[13]
-                kingdom = data_list[14]
-                superkingdom = data_list[15]
-                desc = data_list[16]
-                databases = data_list[17]
-                go_id = data_list[18]
-                go_desc = data_list[19]
-                interpro_id = data_list[20]
-                interpro_desc = data_list[21]
-                mapman_id = data_list[22]
-                mapman_desc = data_list[23]
-                ec_id = data_list[24]
-                kegg_id = data_list[25]
-                metacyc_id = data_list[26]
+                iteration_iter_num = data_list[5]
+                hit_accession = data_list[6]
+                hsp_evalue = data_list[7]
+                hsp_identity = data_list[8]
+                hsp_positive = data_list[9]
+                hsp_gaps = data_list[10]
+                hsp_align_len = data_list[11]
+                hsp_qseq = data_list[12]
+                species = data_list[13]
+                family = data_list[14]
+                phylum = data_list[15]
+                kingdom = data_list[16]
+                superkingdom = data_list[17]
+                desc = data_list[18]
+                databases = data_list[19]
+                go_id = data_list[20]
+                go_desc = data_list[21]
+                interpro_id = data_list[22]
+                interpro_desc = data_list[23]
+                mapman_id = data_list[24]
+                mapman_desc = data_list[25]
+                ec_id = data_list[26]
+                kegg_id = data_list[27]
+                metacyc_id = data_list[28]
             except Exception as e:
-                raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+                raise ProgramException('F006', os.path.basename(file_name), record_counter)
 
             # set the key
-            key = f'{seq_id}'
+            key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
 
             # get the record data dictionary
-            data_dict = {'seq_id': seq_id, 'iteration_iter_num': iteration_iter_num, 'hit_num': hit_num, 'hit_accession': hit_accession, 'hsp_num': hsp_num, 'hsp_evalue': hsp_evalue, 'hsp_identity': hsp_identity, 'hsp_positive': hsp_positive, 'hsp_gaps': hsp_gaps, 'hsp_align_len': hsp_align_len, 'hsp_qseq': hsp_qseq, 'species': species, 'family': family, 'phylum': phylum, 'kingdom': kingdom, 'superkingdom': superkingdom, 'desc': desc, 'databases': databases, 'go_id': go_id, 'go_desc': go_desc, 'interpro_id': interpro_id, 'interpro_desc': interpro_desc, 'mapman_id': mapman_id, 'mapman_desc': mapman_desc, 'ec_id': ec_id, 'kegg_id': kegg_id, 'metacyc_id': metacyc_id}
+            data_dict = {'seq_id': seq_id, 'nt_seq_id': nt_seq_id, 'aa_seq_id': aa_seq_id, 'hit_num': hit_num, 'hsp_num': hsp_num, 'iteration_iter_num': iteration_iter_num, 'hit_accession': hit_accession, 'hsp_evalue': hsp_evalue, 'hsp_identity': hsp_identity, 'hsp_positive': hsp_positive, 'hsp_gaps': hsp_gaps, 'hsp_align_len': hsp_align_len, 'hsp_qseq': hsp_qseq, 'species': species, 'family': family, 'phylum': phylum, 'kingdom': kingdom, 'superkingdom': superkingdom, 'desc': desc, 'databases': databases, 'go_id': go_id, 'go_desc': go_desc, 'interpro_id': interpro_id, 'interpro_desc': interpro_desc, 'mapman_id': mapman_id, 'mapman_desc': mapman_desc, 'ec_id': ec_id, 'kegg_id': kegg_id, 'metacyc_id': metacyc_id}
 
         # if type is REFSEQ
         elif type.upper() == 'REFSEQ':
 
             # extract data 
-            # REFSEQ record format:  "seq_id";"iteration_iter_num";"hit_num";"hit_id";"hsp_num";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases";"gene_id";"status";"rna_nucleotide_accession";"protein_accession";"genomic_nucleotide_accession";"gene_symbol";"go_id";"evidence";"go_term";"category";"interpro_id";"interpro_desc";"ec_id";"kegg_id";"metacyc_id"
+            # REFSEQ record format: "seq_id";"nt_seq_id";"aa_seq_id";"hit_num";"hsp_num";"iteration_iter_num";"hit_id";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases";"gene_id";"status";"rna_nucleotide_accession";"protein_accession";"genomic_nucleotide_accession";"gene_symbol";"go_id";"evidence";"go_term";"category";"interpro_id";"interpro_desc";"ec_id";"kegg_id";"metacyc_id"
             data_list = []
             start = 0
             for end in [i for i, chr in enumerate(record) if chr == ';']:
@@ -688,52 +690,54 @@ def read_annotation_record(file_name, file_id, type, record_counter):
             data_list.append(record[start:].strip('"').strip('\n'))
             try:
                 seq_id = data_list[0]
-                iteration_iter_num = data_list[1]
-                hit_num = data_list[2]
-                hit_id = data_list[3]
+                nt_seq_id = data_list[1]
+                aa_seq_id = data_list[2]
+                hit_num = data_list[3]
                 hsp_num = data_list[4]
-                hsp_evalue = data_list[5]
-                hsp_identity = data_list[6]
-                hsp_positive = data_list[7]
-                hsp_gaps = data_list[8]
-                hsp_align_len = data_list[9]
-                hsp_qseq = data_list[10]
-                species = data_list[11]
-                family = data_list[12]
-                phylum = data_list[13]
-                kingdom = data_list[14]
-                superkingdom = data_list[15]
-                desc = data_list[16]
-                databases = data_list[17]
-                gene_id = data_list[18]
-                status = data_list[19]
-                rna_nucleotide_accession = data_list[20]
-                protein_accession = data_list[21]
-                genomic_nucleotide_accession = data_list[22]
-                gene_symbol = data_list[23]
-                go_id = data_list[24]
-                evidence = data_list[25]
-                go_term = data_list[26]
-                category = data_list[27]
-                interpro_id = data_list[28]
-                interpro_desc = data_list[29]
-                ec_id = data_list[30]
-                kegg_id = data_list[31]
-                metacyc_id = data_list[32]
+                iteration_iter_num = data_list[5]
+                hit_id = data_list[6]
+                hsp_evalue = data_list[7]
+                hsp_identity = data_list[8]
+                hsp_positive = data_list[9]
+                hsp_gaps = data_list[10]
+                hsp_align_len = data_list[11]
+                hsp_qseq = data_list[12]
+                species = data_list[13]
+                family = data_list[14]
+                phylum = data_list[15]
+                kingdom = data_list[16]
+                superkingdom = data_list[17]
+                desc = data_list[18]
+                databases = data_list[19]
+                gene_id = data_list[20]
+                status = data_list[21]
+                rna_nucleotide_accession = data_list[22]
+                protein_accession = data_list[23]
+                genomic_nucleotide_accession = data_list[24]
+                gene_symbol = data_list[25]
+                go_id = data_list[26]
+                evidence = data_list[27]
+                go_term = data_list[28]
+                category = data_list[29]
+                interpro_id = data_list[30]
+                interpro_desc = data_list[31]
+                ec_id = data_list[32]
+                kegg_id = data_list[33]
+                metacyc_id = data_list[34]
             except Exception as e:
-                raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+                raise ProgramException('F006', os.path.basename(file_name), record_counter)
 
             # set the key
-            key = f'{seq_id}'
+            key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
 
             # get the record data dictionary
-            data_dict = {'seq_id': seq_id, 'iteration_iter_num': iteration_iter_num, 'hit_num': hit_num, 'hit_id': hit_id, 'hsp_num': hsp_num,  'hsp_evalue': hsp_evalue,  'hsp_identity': hsp_identity, 'hsp_positive': hsp_positive, 'hsp_gaps': hsp_gaps, 'hsp_align_len': hsp_align_len, 'hsp_qseq': hsp_qseq, 'species': species, 'family': family, 'phylum': phylum, 'kingdom': kingdom, 'superkingdom': superkingdom, 'desc': desc, 'databases': databases, 'gene_id': gene_id, 'status': status, 'rna_nucleotide_accession': rna_nucleotide_accession, 'protein_accession': protein_accession, 'genomic_nucleotide_accession': genomic_nucleotide_accession, 'gene_symbol': gene_symbol, 'go_id': go_id, 'evidence': evidence, 'go_term': go_term, 'category':category, 'interpro_id': interpro_id, 'interpro_desc': interpro_desc, 'ec_id': ec_id, 'kegg_id': kegg_id, 'metacyc_id': metacyc_id}
+            data_dict = {'seq_id': seq_id, 'nt_seq_id': nt_seq_id, 'aa_seq_id': aa_seq_id, 'hit_num': hit_num, 'hsp_num': hsp_num, 'iteration_iter_num': iteration_iter_num, 'hit_id': hit_id,  'hsp_evalue': hsp_evalue,  'hsp_identity': hsp_identity, 'hsp_positive': hsp_positive, 'hsp_gaps': hsp_gaps, 'hsp_align_len': hsp_align_len, 'hsp_qseq': hsp_qseq, 'species': species, 'family': family, 'phylum': phylum, 'kingdom': kingdom, 'superkingdom': superkingdom, 'desc': desc, 'databases': databases, 'gene_id': gene_id, 'status': status, 'rna_nucleotide_accession': rna_nucleotide_accession, 'protein_accession': protein_accession, 'genomic_nucleotide_accession': genomic_nucleotide_accession, 'gene_symbol': gene_symbol, 'go_id': go_id, 'evidence': evidence, 'go_term': go_term, 'category':category, 'interpro_id': interpro_id, 'interpro_desc': interpro_desc, 'ec_id': ec_id, 'kegg_id': kegg_id, 'metacyc_id': metacyc_id}
 
         # if type is NT o NR
         if type.upper() in ['NT', 'NR']:
 
             # extract data 
-            # PLAZA record format:  "seq_id";"iteration_iter_num";"hit_num";"hit_id";"hsp_num";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases"
+            # PLAZA record format: "seq_id";"nt_seq_id";"aa_seq_id";"hit_num";"hsp_num";"iteration_iter_num";"hit_id";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases"
             data_list = []
             start = 0
             for end in [i for i, chr in enumerate(record) if chr == ';']:
@@ -742,34 +746,36 @@ def read_annotation_record(file_name, file_id, type, record_counter):
             data_list.append(record[start:].strip('"'))
             try:
                 seq_id = data_list[0]
-                iteration_iter_num = data_list[12]
-                hit_num = data_list[2]
-                hit_id = data_list[3]
+                nt_seq_id = data_list[1]
+                aa_seq_id = data_list[2]
+                hit_num = data_list[3]
                 hsp_num = data_list[4]
-                hsp_evalue = data_list[5]
-                hsp_identity = data_list[6]
-                hsp_positive = data_list[7]
-                hsp_gaps = data_list[8]
-                hsp_align_len = data_list[9]
-                hsp_qseq = data_list[10]
-                species = data_list[11]
-                family = data_list[12]
-                phylum = data_list[13]
-                kingdom = data_list[14]
-                superkingdom = data_list[15]
-                desc = data_list[16]
-                databases = data_list[17]
+                iteration_iter_num = data_list[5]
+                hit_id = data_list[6]
+                hsp_evalue = data_list[7]
+                hsp_identity = data_list[8]
+                hsp_positive = data_list[9]
+                hsp_gaps = data_list[10]
+                hsp_align_len = data_list[11]
+                hsp_qseq = data_list[12]
+                species = data_list[13]
+                family = data_list[14]
+                phylum = data_list[15]
+                kingdom = data_list[16]
+                superkingdom = data_list[17]
+                desc = data_list[18]
+                databases = data_list[19]
             except Exception as e:
-                raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+                raise ProgramException('F006', os.path.basename(file_name), record_counter)
 
             # set the key
-            key = 'f{seq_id}'
+            key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
 
             # get the record data dictionary
-            data_dict = {'seq_id': seq_id, 'iteration_iter_num': iteration_iter_num, 'hit_num': hit_num, 'hit_id': hit_id, 'hsp_num': hsp_num, 'hsp_evalue': hsp_evalue, 'hsp_identity': hsp_identity, 'hsp_positive': hsp_positive, 'hsp_gaps': hsp_gaps, 'hsp_align_len': hsp_align_len, 'hsp_qseq': hsp_qseq, 'species': species, 'family': family, 'phylum': phylum, 'kingdom': kingdom, 'superkingdom': superkingdom, 'desc': desc, 'databases': databases}
+            data_dict = {'seq_id': seq_id, 'nt_seq_id': nt_seq_id, 'aa_seq_id': aa_seq_id, 'hit_num': hit_num, 'hsp_num': hsp_num, 'iteration_iter_num': iteration_iter_num, 'hit_id': hit_id, 'hsp_evalue': hsp_evalue, 'hsp_identity': hsp_identity, 'hsp_positive': hsp_positive, 'hsp_gaps': hsp_gaps, 'hsp_align_len': hsp_align_len, 'hsp_qseq': hsp_qseq, 'species': species, 'family': family, 'phylum': phylum, 'kingdom': kingdom, 'superkingdom': superkingdom, 'desc': desc, 'databases': databases}
 
         # if type is MERGER
-        # MERGER record format:  "seq_id";"hit_num";"hit_id";"hsp_num";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases";"go_id";"go_desc";"interpro_id";"interpro_desc";"mapman_id";"mapman_desc";"refseq_gene_id";"refseq_desc";"refseq_status";"refseq_protein_accession";"refseq_genomic_nucleotide_accession";"refseq_gene_symbol"
+        # MERGER record format: "seq_id";"nt_seq_id";"aa_seq_id";"hit_num";"hsp_num";"hit_id";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases";"go_id";"go_desc";"interpro_id";"interpro_desc";"mapman_id";"mapman_desc";"refseq_gene_id";"refseq_desc";"refseq_status";"refseq_protein_accession";"refseq_genomic_nucleotide_accession";"refseq_gene_symbol"
         elif type.upper() == 'MERGER':
 
             # extract data 
@@ -781,46 +787,48 @@ def read_annotation_record(file_name, file_id, type, record_counter):
             data_list.append(record[start:].strip('"').strip('\n'))
             try:
                 seq_id = data_list[0]
-                hit_num = data_list[1]
-                hit_id = data_list[2]
-                hsp_num = data_list[3]
-                hsp_evalue = data_list[4]
-                hsp_identity = data_list[5]
-                hsp_positive = data_list[6]
-                hsp_gaps = data_list[7]
-                hsp_align_len = data_list[8]
-                hsp_qseq = data_list[9]
-                species = data_list[10]
-                family = data_list[11]
-                phylum = data_list[12]
-                kingdom = data_list[13]
-                superkingdom = data_list[14]
-                desc = data_list[15]
-                databases = data_list[16]
-                go_id = data_list[17]
-                go_desc = data_list[18]
-                interpro_id = data_list[19]
-                interpro_desc = data_list[20]
-                mapman_id = data_list[21]
-                mapman_desc = data_list[22]
-                ec_id = data_list[23]
-                kegg_id = data_list[24]
-                metacyc_id = data_list[25]
-                refseq_gene_id = data_list[26]
-                refseq_desc = data_list[27]
-                refseq_status = data_list[28]
-                refseq_rna_nucleotide_accession = data_list[29]
-                refseq_protein_accession = data_list[30]
-                refseq_genomic_nucleotide_accession = data_list[31]
-                refseq_gene_symbol = data_list[32]
+                nt_seq_id = data_list[1]
+                aa_seq_id = data_list[2]
+                hit_num = data_list[3]
+                hsp_num = data_list[4]
+                hit_id = data_list[5]
+                hsp_evalue = data_list[6]
+                hsp_identity = data_list[7]
+                hsp_positive = data_list[8]
+                hsp_gaps = data_list[9]
+                hsp_align_len = data_list[10]
+                hsp_qseq = data_list[11]
+                species = data_list[12]
+                family = data_list[13]
+                phylum = data_list[14]
+                kingdom = data_list[15]
+                superkingdom = data_list[16]
+                desc = data_list[17]
+                databases = data_list[18]
+                go_id = data_list[19]
+                go_desc = data_list[20]
+                interpro_id = data_list[21]
+                interpro_desc = data_list[22]
+                mapman_id = data_list[23]
+                mapman_desc = data_list[24]
+                ec_id = data_list[25]
+                kegg_id = data_list[26]
+                metacyc_id = data_list[27]
+                refseq_gene_id = data_list[28]
+                refseq_desc = data_list[29]
+                refseq_status = data_list[30]
+                refseq_rna_nucleotide_accession = data_list[31]
+                refseq_protein_accession = data_list[32]
+                refseq_genomic_nucleotide_accession = data_list[33]
+                refseq_gene_symbol = data_list[34]
             except Exception as e:
-                raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+                raise ProgramException('F006', os.path.basename(file_name), record_counter)
 
             # set the key
-            key = f'{seq_id}'
+            key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
     
             # get the record data dictionary
-            data_dict = {'seq_id': seq_id, 'hit_num': hit_num, 'hsp_num': hsp_num, 'hit_id': hit_id, 'hsp_evalue': hsp_evalue,  'hsp_identity': hsp_identity, 'hsp_positive': hsp_positive, 'hsp_gaps': hsp_gaps, 'hsp_align_len': hsp_align_len, 'hsp_qseq': hsp_qseq, 'species': species, 'family': family, 'phylum': phylum, 'kingdom': kingdom, 'superkingdom': superkingdom, 'desc': desc, 'databases': databases, 'go_id': go_id, 'go_desc': go_desc, 'interpro_id': interpro_id, 'interpro_desc': interpro_desc, 'mapman_id': mapman_id, 'mapman_desc': mapman_desc, 'ec_id': ec_id, 'kegg_id': kegg_id, 'metacyc_id': metacyc_id, 'refseq_gene_id': refseq_gene_id, 'refseq_desc': refseq_desc, 'refseq_status': refseq_status, 'refseq_rna_nucleotide_accession': refseq_rna_nucleotide_accession, 'refseq_protein_accession': refseq_protein_accession, 'refseq_genomic_nucleotide_accession': refseq_genomic_nucleotide_accession, 'refseq_gene_symbol': refseq_gene_symbol}
+            data_dict = {'seq_id': seq_id, 'nt_seq_id': nt_seq_id, 'aa_seq_id': aa_seq_id, 'hit_num': hit_num, 'hsp_num': hsp_num, 'hit_id': hit_id, 'hsp_evalue': hsp_evalue,  'hsp_identity': hsp_identity, 'hsp_positive': hsp_positive, 'hsp_gaps': hsp_gaps, 'hsp_align_len': hsp_align_len, 'hsp_qseq': hsp_qseq, 'species': species, 'family': family, 'phylum': phylum, 'kingdom': kingdom, 'superkingdom': superkingdom, 'desc': desc, 'databases': databases, 'go_id': go_id, 'go_desc': go_desc, 'interpro_id': interpro_id, 'interpro_desc': interpro_desc, 'mapman_id': mapman_id, 'mapman_desc': mapman_desc, 'ec_id': ec_id, 'kegg_id': kegg_id, 'metacyc_id': metacyc_id, 'refseq_gene_id': refseq_gene_id, 'refseq_desc': refseq_desc, 'refseq_status': refseq_status, 'refseq_rna_nucleotide_accession': refseq_rna_nucleotide_accession, 'refseq_protein_accession': refseq_protein_accession, 'refseq_genomic_nucleotide_accession': refseq_genomic_nucleotide_accession, 'refseq_gene_symbol': refseq_gene_symbol}
 
     # if there is not record 
     else:
@@ -830,6 +838,375 @@ def read_annotation_record(file_name, file_id, type, record_counter):
 
     # return the record, key and data dictionary
     return record, key, data_dict
+
+#-------------------------------------------------------------------------------
+
+def read_blast2go_annotation_record(file_name, file_id, record_counter):
+    '''
+    '''
+
+    # initialize the data dictionary
+    data_dict = {}
+
+    # initialize the key
+    key = None
+
+    # read next record
+    record = file_id.readline()
+
+    # if there is record 
+    if record != '':
+
+        # remove EOL
+        record = record.strip('\n')
+
+        # extract data 
+        # Blast2GO record format: unknown	Tags	SeqName	Description	Length	#Hits	e-Value	sim mean	#GO	GO IDs	GO Names	Enzyme Codes	Enzyme Names	InterPro IDs	InterPro GO IDs	InterPro GO Names
+        data_list = []
+        start = 0
+        for end in [i for i, chr in enumerate(record) if chr == '\t']:
+            data_list.append(record[start:end])
+            start = end + 1
+        data_list.append(record[start:].strip('\n'))
+        try:
+            selected_seq = data_list[0]
+            tags = data_list[1]
+            seq_name = data_list[2]
+            description = data_list[3]
+            length = data_list[4]
+            hit_counter = data_list[5]
+            e_value = data_list[6]
+            sim_mean = data_list[7]
+            go_counter = data_list[8]
+            go_ids = data_list[9]
+            go_names = data_list[10]
+            enzyme_codes = data_list[11]
+            enzyme_names = data_list[12]
+            interpro_ids = data_list[13]
+            interpro_go_ids = data_list[14]
+            interpro_go_names = data_list[15]
+        except Exception as e:
+            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+
+        # get the record data dictionary
+        data_dict = {'tags': tags, 'seq_name': seq_name, 'description': description, 'length': length, 'hit_counter': hit_counter, 'e_value': e_value, 'sim_mean': sim_mean, 'go_counter': go_counter, 'go_ids': go_ids, 'go_names': go_names, 'enzyme_codes': enzyme_codes, 'enzyme_names': enzyme_names, 'interpro_ids': interpro_ids, 'interpro_go_ids': interpro_go_ids, 'interpro_go_names': interpro_go_names}
+
+    # if there is not record 
+    else:
+
+        # set the key
+        key = bytes.fromhex('7E').decode('utf-8')
+
+    # return the record, key and data dictionary
+    return record, key, data_dict
+
+#-------------------------------------------------------------------------------
+
+def read_entap_annotation_record(file_name, file_id, record_counter):
+    '''
+    '''
+
+    # initialize the data dictionary
+    data_dict = {}
+
+    # initialize the key
+    key = None
+
+    # read next record
+    record = file_id.readline()
+
+    # if there is record 
+    if record != '':
+
+        # remove EOL
+        record = record.strip('\n')
+
+        # extract data 
+        # EnTAP record format: Query Sequence	Subject Sequence	Percent Identical	Alignment Length	Mismatches	Gap Openings	Query Start	Query End	Subject Start	Subject End	E Value	Coverage	Description	Species	Taxonomic Lineage	Origin Database	Contaminant	Informative	Seed Ortholog	Seed E-Value	Seed Score	Predicted Gene	Tax Scope	Tax Scope Max	Member OGs	KEGG Terms	GO Biological	GO Cellular	GO Molecular	
+        data_list = []
+        start = 0
+        for end in [i for i, chr in enumerate(record) if chr == '\t']:
+            data_list.append(record[start:end])
+            start = end + 1
+        data_list.append(record[start:].strip('\n'))
+        try:
+            query_sequence = data_list[0]
+            subject_sequence = data_list[1]
+            percent_identical = data_list[2]
+            alignment_length = data_list[3]
+            mismatches = data_list[4]
+            gap_openings = data_list[5]
+            query_start = data_list[6]
+            query_end = data_list[7]
+            subject_start = data_list[8]
+            subject_end = data_list[9]
+            e_value = data_list[10]
+            coverage = data_list[11]
+            description = data_list[12]
+            species = data_list[13]
+            taxonomic_lineage = data_list[14]
+            origin_database = data_list[15]
+            contaminant = data_list[16]
+            informative = data_list[17]
+            seed_ortholog = data_list[18]
+            seed_e_value = data_list[19]
+            seed_score = data_list[20]
+            predicted_gene = data_list[21]
+            tax_scope = data_list[22]
+            tax_scope_max = data_list[23]
+            member_ogs = data_list[24]
+            kegg_terms = data_list[25]
+            go_biological = data_list[26]
+            go_cellular = data_list[27]
+            go_molecular = data_list[28]
+        except Exception as e:
+            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+
+        # get the record data dictionary
+        data_dict = {'query_sequence': query_sequence, 'subject_sequence': subject_sequence, 'percent_identical': percent_identical, 'alignment_length': alignment_length, 'mismatches': mismatches, 'gap_openings': gap_openings, 'query_start': query_start, 'query_end': query_end, 'subject_start': subject_start, 'subject_end': subject_end, 'e_value': e_value, 'coverage': coverage, 'description': description, 'species': species, 'taxonomic_lineage': taxonomic_lineage, 'origin_databasem': origin_database, 'contaminant': contaminant, 'informative': informative, 'seed_ortholog': seed_ortholog, 'seed_e_value': seed_e_value, 'seed_score': seed_score, 'predicted_gene': predicted_gene, 'tax_scope': tax_scope, 'tax_scope_max': tax_scope_max, 'member_ogs': member_ogs, 'kegg_terms': kegg_terms, 'go_biological': go_biological, 'go_cellular': go_cellular, 'go_molecular': go_molecular}
+
+    # if there is not record 
+    else:
+
+        # set the key
+        key = bytes.fromhex('7E').decode('utf-8')
+
+    # return the record, key and data dictionary
+    return record, key, data_dict
+
+#-------------------------------------------------------------------------------
+
+def read_trapid_annotation_record(file_name, file_id, record_counter):
+    '''
+    '''
+
+    # initialize the data dictionary
+    data_dict = {}
+
+    # initialize the key
+    key = None
+
+    # read next record
+    record = file_id.readline()
+
+    # if there is record 
+    if record != '':
+
+        # remove EOL
+        record = record.strip('\n')
+
+        # extract data 
+        # TRAPID record format: counter	transcript_id	go	evidence_code	is_hidden	description
+        data_list = []
+        start = 0
+        for end in [i for i, chr in enumerate(record) if chr == '\t']:
+            data_list.append(record[start:end])
+            start = end + 1
+        data_list.append(record[start:].strip('\n'))
+        try:
+            counter = data_list[0]
+            transcript_id = data_list[1]
+            go = data_list[2]
+            evidence_code = data_list[3]
+            is_hidden = data_list[4]
+            description = data_list[5]
+        except Exception as e:
+            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+
+        # get the record data dictionary
+        data_dict = {'counter': counter, 'transcript_id': transcript_id, 'go': go, 'evidence_code': evidence_code, 'is_hidden': is_hidden, 'description': description}
+
+    # if there is not record 
+    else:
+
+        # set the key
+        key = bytes.fromhex('7E').decode('utf-8')
+
+    # return the record, key and data dictionary
+    return record, key, data_dict
+
+#-------------------------------------------------------------------------------
+
+def read_trinotate_annotation_record(file_name, file_id, record_counter):
+    '''
+    '''
+
+    # initialize the data dictionary
+    data_dict = {}
+
+    # initialize the key
+    key = None
+
+    # read next record
+    record = file_id.readline()
+
+    # if there is record 
+    if record != '':
+
+        # remove EOL
+        record = record.strip('\n')
+
+        # extract data 
+        # Trinotate record format: True	Tags	SeqName	Description	Length	#Hits	e-Value	sim mean	#GO	GO IDs	GO Names	Enzyme Codes	Enzyme Names	InterPro IDs	InterPro GO IDs	InterPro GO Names
+        data_list = []
+        start = 0
+        for end in [i for i, chr in enumerate(record) if chr == '\t']:
+            data_list.append(record[start:end])
+            start = end + 1
+        data_list.append(record[start:].strip('\n'))
+        try:
+            gene_id = data_list[0]
+            transcript_id = data_list[1]
+            sprot_top_blastx_hit = data_list[2]
+            rnammer = data_list[3]
+            prot_id = data_list[4]
+            prot_coords = data_list[5]
+            sprot_top_blastp_hit = data_list[6]
+            pfam = data_list[7]
+            signalp = data_list[8]
+            tmhmmx = data_list[9]
+            eggnog = data_list[10]
+            kegg = data_list[11]
+            gene_ontology_blastx = data_list[12]
+            gene_ontology_blastp = data_list[13]
+            gene_ontology_pfam = data_list[14]
+            transcript = data_list[15]
+            peptide = data_list[16]
+        except Exception as e:
+            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+
+        # get the record data dictionary
+        data_dict = {'gene_id': gene_id, 'transcript_id': transcript_id, 'sprot_top_blastx_hit': sprot_top_blastx_hit, 'rnammer': rnammer, 'prot_id': prot_id, 'prot_coords': prot_coords, 'sprot_top_blastp_hit': sprot_top_blastp_hit, 'pfam': pfam, 'signalp': signalp, 'tmhmmx': tmhmmx, 'eggnog': eggnog, 'kegg': kegg, 'gene_ontology_blastx': gene_ontology_blastx, 'gene_ontology_blastp': gene_ontology_blastp, 'gene_ontology_pfam': gene_ontology_pfam, 'transcript': transcript, 'peptide': peptide}
+
+    # if there is not record 
+    else:
+
+        # set the key
+        key = bytes.fromhex('7E').decode('utf-8')
+
+    # return the record, key and data dictionary
+    return record, key, data_dict
+
+#-------------------------------------------------------------------------------
+
+def build_go_ontology_dict(ontology_file):
+    '''
+    Build the dictionary of GO ontology data from a GO ontology data.
+    '''
+
+    # initialize the dictionary of GO ontology data
+    go_ontology_dict = NestedDefaultDict()
+
+    # open the ontology file
+    if ontology_file.endswith('.gz'):
+        try:
+            ontology_file_id = gzip.open(ontology_file, mode='rt', encoding='iso-8859-1')
+        except Exception as e:
+            raise ProgramException(e, 'F002', ontology_file)
+    else:
+        try:
+            ontology_file_id = open(ontology_file, mode='r', encoding='iso-8859-1')
+        except Exception as e:
+            raise ProgramException(e, 'F001', ontology_file)
+
+    # initialize the GO term counter
+    go_term_counter = 0
+
+    # initialize the record counter
+    record_counter = 0
+
+    # read the first record
+    record = ontology_file_id.readline()
+
+    # while there are records and they are the header
+    while record != '' and not record.startswith('[Term]'):
+
+        # add 1 to record counter
+        record_counter += 1
+
+        # print record counter
+        Message.print('verbose', f'\rOntology file: {record_counter} processed records - # GO terms: {go_term_counter}.')
+
+        # read the next record
+        record = ontology_file_id.readline()
+
+    # if there is a first term block
+    if record.startswith('[Term]'):
+
+        # while there are records
+        while record != '':
+
+            # add 1 to record counter
+            record_counter += 1
+
+            # print record counter
+            Message.print('verbose', f'\rOntology file: {record_counter} processed records - # GO terms: {go_term_counter}.')
+
+            # read the next record
+            record = ontology_file_id.readline()
+
+            # initialize go term data
+            go_id = ''
+            go_name = ''
+            namespace = ''
+            alt_id_list = []
+
+            # while there are records and they are term details
+            while record != '' and not record.startswith('[Term]'):
+
+                # add 1 to record counter
+                record_counter += 1
+
+                # get the GO identification
+                if record.startswith('id:'):
+                    go_id = record[len('id:'):].strip()
+
+                # get the GO name
+                if record.startswith('name:'):
+                    go_name = record[len('name:'):].strip()
+
+                    # change semicolons in go_name
+                    go_name = go_name.replace(';', ',')
+
+                # get the namespace
+                if record.startswith('namespace:'):
+                    namespace = record[len('namespace:'):].strip()
+
+                # get the alternative identificationnamespace
+                if record.startswith('alt_id:'):
+                    alt_id_list.append(record[len('alt_id:'):].strip())
+
+                # print record counter
+                Message.print('verbose', f'\rOntology file: {record_counter} processed records - # GO terms: {go_term_counter}.')
+
+                # read the next record
+                record = ontology_file_id.readline()
+
+                # break the loop when typedef sections start
+                if record.startswith('[Typedef]'):
+                    break
+
+            # insert data into the dictionary of GO ontology data
+            go_ontology_dict[go_id] = {'go_id': go_id, 'go_name': go_name, 'namespace': namespace}
+            go_term_counter += 1
+            for alt_id in alt_id_list:
+                go_ontology_dict[alt_id] = {'go_id': alt_id, 'go_name': go_name, 'namespace': namespace}
+                go_term_counter += 1
+
+            # print record counter
+            Message.print('verbose', f'\rOntology file: {record_counter} processed records - # GO terms: {go_term_counter}.')
+
+            # break the loop when typedef sections start
+            if record.startswith('[Typedef]'):
+                break
+
+    Message.print('verbose', '\n')
+
+    # close ontology file
+    ontology_file_id.close()
+
+    # return the dictionary of GO ontology data
+    return go_ontology_dict
 
 #-------------------------------------------------------------------------------
 
@@ -985,6 +1362,24 @@ def get_structure_purge_code_list_text():
     return 'CHAVAL (change a value by a new value) or DELCOL (delete columns containing a determined value)'
 
 #-------------------------------------------------------------------------------
+    
+def get_go_app_code_list():
+    '''
+    Get the code list of applications with GO terms statistics.
+    '''
+
+    return ['Blast2GO', 'EnTAP', 'TOA', 'TRAPID', 'Trinotate']
+
+#-------------------------------------------------------------------------------
+    
+def get_go_app_code_list_text():
+    '''
+    Get the code list of applications with GO terms statistics as text.
+    '''
+
+    return str(get_go_app_code_list()).strip('[]').replace('\'', '').replace(',', ' or')
+
+#-------------------------------------------------------------------------------
 
 def get_trace_code_list():
     '''
@@ -1057,6 +1452,23 @@ class Const():
     DEFAULT_TRACE = 'N'
     DEFAULT_VARIANT_NUMBER_PER_FILE = 1000
     DEFAULT_VERBOSE = 'N'
+
+    #---------------
+
+    FRAGPROB_LOWEST = 0.0
+    FRAGPROB_UPPEST = 1.0
+    INDELPROB_LOWEST = 0.0
+    INDELPROB_UPPEST = 1.0
+    MAXFRAGNUM_LOWEST = 2
+    MAXFRAGNUM_UPPEST = 5
+    MAXMUTNUM_LOWEST = 1
+    MAXMUTNUM_UPPEST = 10
+    MAXMUTSIZE_LOWEST = 1
+    MAXMUTSIZE_UPPEST = 30
+    MAXSHORTENING_LOWEST = 0
+    MAXSHORTENING_UPPEST = 10
+    MUTPROB_LOWEST = 0.0
+    MUTPROB_UPPEST = 1.0
 
     #---------------
 
