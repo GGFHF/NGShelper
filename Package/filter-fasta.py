@@ -98,6 +98,7 @@ def check_args(args):
             if not os.path.exists(os.path.dirname(args.output_file)):
                 os.makedirs(os.path.dirname(args.output_file))
         except Exception as e:
+            xlib.Message.print('error', f'*** EXCEPTION: "{e}".')
             xlib.Message.print('error', f'*** The directory {os.path.dirname(args.output_file)} of the file {args.output_file} is not valid.')
             OK = False
 

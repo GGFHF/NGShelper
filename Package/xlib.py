@@ -28,6 +28,7 @@ import collections
 import gzip
 import os
 import re
+import requests
 import sys
 
 #-------------------------------------------------------------------------------
@@ -55,7 +56,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.51'
+    return '0.52'
 
 #-------------------------------------------------------------------------------
 
@@ -525,7 +526,7 @@ def get_sample_data(sample_file, sp1_id, sp2_id, hybrid_id):
         raise ProgramException(e, 'L001')
 
     # check the mother identification exists when it is not equal to NONE
-    for key, value in sample_dict.items():
+    for _, value in sample_dict.items():
         if value['mother_id'] != 'NONE':
             if sample_dict.get(value['mother_id'], {}) == {}:
                 raise ProgramException('L002', value['mother_id'])
@@ -605,6 +606,51 @@ def get_toa_file_type_code_list_text():
     '''
 
     return str(get_toa_file_type_code_list()).strip('[]').replace('\'', '').replace(',', ' or')
+
+#-------------------------------------------------------------------------------
+
+def get_taxonomy_server():
+    '''
+    Get the taxonomy server URL.
+    '''
+    return 'https://taxonomy.jgi-psf.org/'
+
+#-------------------------------------------------------------------------------
+
+def get_taxonomy_dict(type, value):
+    '''
+    Get a taxonomy dictionary with the a species data downloaded from the taxonomy server.
+    '''
+
+    # initialize the taxonomy dictionary
+    taxonomy_dict = {}
+
+    # set the taxonomy server
+    taxonomy_server = get_taxonomy_server()
+
+    # replace spaces by underscores in value
+    value = value.strip().replace(' ', '_')
+
+    # inquire the taxonomy data to the server
+    try:
+        r = requests.get(f'{taxonomy_server}/{type}/{value}')
+    except requests.exceptions.ConnectionError:
+        raise ProgramException('W002', taxonomy_server)
+    except Exception as e:
+        raise ProgramException('W001', taxonomy_server)
+
+    # build the taxonomy dictionary
+    if r.status_code == requests.codes.ok: #pylint: disable=no-member
+        try:
+            if r.json()[value].get('error','OK') == 'OK' :
+                taxonomy_dict = r.json()[value]
+        except Exception as e:
+            pass
+    else:
+        raise ProgramException('W003', taxonomy_server, r.status_code)
+
+    # return taxonomy dictionary
+    return taxonomy_dict
 
 #-------------------------------------------------------------------------------
 
@@ -869,7 +915,7 @@ def read_blast2go_annotation_record(file_name, file_id, record_counter):
             start = end + 1
         data_list.append(record[start:].strip('\n'))
         try:
-            selected_seq = data_list[0]
+            # -- selected_seq = data_list[0]
             tags = data_list[1]
             seq_name = data_list[2]
             description = data_list[3]
