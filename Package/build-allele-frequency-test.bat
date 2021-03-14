@@ -46,17 +46,31 @@ rem ----------------------------------------------------------------------------
 
 rem Execute the program build-allele-frequency.py
 
+rem python.exe %PYTHON_OPTIONS% build-allele-frequency.py ^
+rem     --vcf=%DATA_DIR%\concatenated_imputed_progenies-6000DP-scenario2.vcf ^
+rem     --samples=%DATA_DIR%\IDs-total.txt ^
+rem     --sp1_id=AL ^
+rem     --sp2_id=EN ^
+rem     --hyb_id=HY ^
+rem     --outdir=%OUTPUT_DIR% ^
+rem     --varnum=1000 ^
+rem     --trans=ADD100 ^
+rem     --verbose=Y ^
+rem     --trace=N ^
+rem     --tvi=NONE
+rem if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
+
 python.exe %PYTHON_OPTIONS% build-allele-frequency.py ^
-    --vcf=%DATA_DIR%\concatenated_imputed_progenies-6000DP-scenario2.vcf ^
-    --samples=%DATA_DIR%\IDs-total.txt ^
+    --vcf=%DATA_DIR%\Selected-for-simhyb.recode.vcf ^
+    --samples=%DATA_DIR%\keep-adults-simhyb.txt ^
     --sp1_id=AL ^
     --sp2_id=EN ^
-    --hyb_id=HY ^
+    --hyb_id=NONE ^
     --outdir=%OUTPUT_DIR% ^
     --varnum=1000 ^
-    --trans=ADD100 ^
-    --verbose=Y ^
-    --trace=N ^
+    --trans=ATCG ^
+    --verbose=N ^
+    --trace=Y ^
     --tvi=NONE
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 

@@ -26,11 +26,14 @@ set ERROR=0
 
 set PYTHONPATH=.
 set PYTHON_OPTIONS=
-set ARGV=
 
-set TOA_DIR=%TOA%
+set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
+set DATA_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\data"
+set OUTPUT_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\output"
 
-cd %TOA_DIR%
+if not exist %OUTPUT_DIR% (mkdir %OUTPUT_DIR%)
+
+cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 

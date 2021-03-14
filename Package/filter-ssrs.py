@@ -280,7 +280,7 @@ def filter_ssrs(cos_file, ssr_file, output_file):
                 raise xlib.ProgramException(e, 'F006', os.path.basename(cos_file), cos_record_counter)
  
             # get COS data of the contig
-            cos_data_dict = contig_dict[contig_name]
+            cos_data_dict = contig_dict.get(contig_name, {})
 
             # write the SSR when it is into a COS
             for _, cos_data_dict in cos_data_dict.items():

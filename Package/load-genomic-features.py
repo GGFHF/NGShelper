@@ -69,7 +69,6 @@ def build_parser():
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'
     parser.add_argument('--db', dest='ngshelper_database', help='Path of the NGShelper database (mandatory).')
-    parser.add_argument('--gene', dest='gene_info_file', help='Path of the gene info file (mandatory).')
     parser.add_argument('--gff', dest='gff_file', help='Path of the GFF file (mandatory).')
     parser.add_argument('--format', dest='gff_format', help='The format of the GFF file: GFF3; default: GFF3.')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')

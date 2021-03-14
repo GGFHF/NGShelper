@@ -207,6 +207,11 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
     allele_frequency_dict_1 = {}
     allele_frequency_dict_2 = {}
 
+    # initialize ATCG conversión dictionary
+    # A -> 1; T -> 2; C -> 3; G -> 4
+    atcg = 'ATCG'
+    atcg_conversion_dict = {}
+
     # open the input VCF file
     if vcf_file.endswith('.gz'):
         try:
@@ -290,6 +295,21 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
 
             # build the alternative alleles list from field ALT
             alternative_allele_list = data_dict['alt'].split(',')
+
+            # build ATCG conversion list
+            atcg_conversion_list = []
+            index = atcg.find(reference_bases.upper())
+            if index == -1:
+                raise xlib.ProgramException('', 'L016')
+            else:
+                atcg_conversion_list.append(index + 1)
+            for i in range(len(alternative_allele_list)):
+                index = atcg.find(alternative_allele_list[i].upper())
+                if index == -1:
+                    raise xlib.ProgramException('', 'L016')
+                else:
+                    atcg_conversion_list.append(index + 1)
+            atcg_conversion_dict[total_variant_counter] = atcg_conversion_list
 
             # get the position of the genotype (subfield GT) in the field FORMAT
             format_subfield_list = data_dict['format'].upper().split(':')
@@ -442,6 +462,8 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
                         allele_frequency = variant_data_dict[allele]
                         if allele_transformation == 'ADD100' and xlib.check_int(allele):
                             allele = int(allele) + 100
+                        elif allele_transformation == 'ATCG':
+                            allele = atcg_conversion_dict[j][int(allele)]
                     else:
                         allele = 0
                         allele_frequency = 0
@@ -469,6 +491,8 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
                         allele_frequency = variant_data_dict[allele]
                         if allele_transformation == 'ADD100' and xlib.check_int(allele):
                             allele = int(allele) + 100
+                        elif allele_transformation == 'ATCG':
+                            allele = atcg_conversion_dict[j][int(allele)]
                     else:
                         allele = 0
                         allele_frequency = 0

@@ -56,7 +56,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.52'
+    return '0.53'
 
 #-------------------------------------------------------------------------------
 
@@ -523,13 +523,13 @@ def get_sample_data(sample_file, sp1_id, sp2_id, hybrid_id):
        sp2_id not in species_id_list or \
        hybrid_id == 'NONE' and len(species_id_list) != 2 or \
        hybrid_id != 'NONE' and (hybrid_id not in species_id_list or len(species_id_list) != 3):
-        raise ProgramException(e, 'L001')
+        raise ProgramException('','L001')
 
     # check the mother identification exists when it is not equal to NONE
     for _, value in sample_dict.items():
         if value['mother_id'] != 'NONE':
             if sample_dict.get(value['mother_id'], {}) == {}:
-                raise ProgramException('L002', value['mother_id'])
+                raise ProgramException('', 'L002', value['mother_id'])
 
     # return the sample dictonary and species name list
     return sample_dict
@@ -635,9 +635,9 @@ def get_taxonomy_dict(type, value):
     try:
         r = requests.get(f'{taxonomy_server}/{type}/{value}')
     except requests.exceptions.ConnectionError:
-        raise ProgramException('W002', taxonomy_server)
+        raise ProgramException('', 'W002', taxonomy_server)
     except Exception as e:
-        raise ProgramException('W001', taxonomy_server)
+        raise ProgramException(e, 'W001', taxonomy_server)
 
     # build the taxonomy dictionary
     if r.status_code == requests.codes.ok: #pylint: disable=no-member
@@ -647,7 +647,7 @@ def get_taxonomy_dict(type, value):
         except Exception as e:
             pass
     else:
-        raise ProgramException('W003', taxonomy_server, r.status_code)
+        raise ProgramException('', 'W003', taxonomy_server, r.status_code)
 
     # return taxonomy dictionary
     return taxonomy_dict
@@ -715,7 +715,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
                 kegg_id = data_list[27]
                 metacyc_id = data_list[28]
             except Exception as e:
-                raise ProgramException('F006', os.path.basename(file_name), record_counter)
+                raise ProgramException(e, 'F006', os.path.basename(file_name), record_counter)
 
             # set the key
             key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
@@ -1360,7 +1360,7 @@ def get_allele_transformation_code_list():
     Get the code list of "allele_transformation".
     '''
 
-    return ['ADD100', 'NONE']
+    return ['ADD100', 'ATCG', 'NONE']
 
 #-------------------------------------------------------------------------------
 
@@ -1369,7 +1369,7 @@ def get_allele_transformation_code_list_text():
     Get the code list of "allele_transformation" as text.
     '''
 
-    return 'ADD100 (add 100 to allele symbol when it is numeric) or NONE'
+    return 'ADD100 (add 100 to allele symbol when it is numeric) OR ATCG (A->1;T->2;C->3;G->4) or NONE'
 
 #-------------------------------------------------------------------------------
 
@@ -1657,6 +1657,8 @@ class ProgramException(Exception):
             Message.print('error', f'*** ERROR {code_exception}: There are samples with different variant number.')
         elif code_exception == 'L015':
             Message.print('error', f'*** ERROR {code_exception}: Transcript id or lenght or FPKM data have not been found out in score file.')
+        elif code_exception == 'L016':
+            Message.print('error', f'*** ERROR {code_exception}: An allele is not A, T, C or G.')
         elif code_exception == 'P001':
             Message.print('error', f'*** ERROR {code_exception}: The program has parameters with invalid values.')
         elif code_exception == 'P002':
