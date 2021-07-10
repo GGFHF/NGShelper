@@ -14,7 +14,7 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script executes a test of the program get-exon-data.py
+rem This script executes a test of the program collapse-vcf-indels.py
 rem in a Windows environment.
 
 rem ----------------------------------------------------------------------------
@@ -44,13 +44,20 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program get-exon-data.py
+rem Execute the program collapse-vcf-indels.py
 
-python.exe %PYTHON_OPTIONS% get-exon-data.py ^
-    --alignment=%DATA_DIR%\alignment.log.gz ^
-    --outdir=%OUTPUT_DIR% ^
+python.exe %PYTHON_OPTIONS% collapse-vcf-indels.py ^
+    --vcf=%DATA_DIR%\NW_019805635.1.vcf ^
+    --samples=%DATA_DIR%\IDs-total.txt ^
+    --imd_id=99 ^
+    --sp1_id=AL ^
+    --sp2_id=EN ^
+    --hyb_id=HY ^
+    --out=%OUTPUT_DIR%\NW_019805635.1-collapsed.vcf ^
+    --stats=%OUTPUT_DIR%\NW_019805635.1-stats.txt ^
     --verbose=Y ^
-    --trace=N
+    --trace=N ^
+    --tvi=NONE
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 
 rem ----------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 #-------------------------------------------------------------------------------
@@ -14,8 +15,8 @@
 
 #-------------------------------------------------------------------------------
 
-# This script executes a test of the get-exon-data.py in a Linux
-# environment.
+# This script executes a test of the program  a extract-vcf-genotypes.py 
+# in a Linux environment.
 
 #-------------------------------------------------------------------------------
 
@@ -37,14 +38,16 @@ cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
 
-# Execute the program get-exon-data.py
+# Execute the program extract-vcf-genotypes.py
 
 /usr/bin/time \
-    ./get-exon-data.py \
-        --alignment=$DATA_DIR/alignment.log.gz \
-        --outdir=$OUTPUT_DIR \
-        --verbose=Y  \
-        --trace=N
+    ./extract-vcf-genotypes.py \
+        --vcf=$DATA_DIR/EFS.vcf \
+        --imd_id=99 \
+        --out=$OUTPUT_DIR/EFS-genotypes.csv \
+        --verbose=Y \
+        --trace=N \
+        --tvi=NONE
 if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
 
 #-------------------------------------------------------------------------------

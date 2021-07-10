@@ -14,14 +14,7 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script executes a test of the program get-exon-data.py
-rem in a Windows environment.
-
-rem ----------------------------------------------------------------------------
-
-rem Control parameters
-
-if not "%*" == "" (set ERROR=1 & goto END)
+rem This script the collapses variant records corresponding to an indel in a VCF file.
 
 rem ----------------------------------------------------------------------------
 
@@ -33,25 +26,18 @@ set ERROR=0
 
 set PYTHONPATH=.
 set PYTHON_OPTIONS=
+set ARGV=
 
 set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
-set DATA_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\data"
-set OUTPUT_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\output"
-
-if not exist %OUTPUT_DIR% (mkdir %OUTPUT_DIR%)
 
 cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program get-exon-data.py
+rem Execute the program collapse-vcf-indels.py
 
-python.exe %PYTHON_OPTIONS% get-exon-data.py ^
-    --alignment=%DATA_DIR%\alignment.log.gz ^
-    --outdir=%OUTPUT_DIR% ^
-    --verbose=Y ^
-    --trace=N
-if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
+python.exe %PYTHON_OPTIONS% collapse-vcf-indels.py %* %ARGV%
+if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------
 
@@ -62,12 +48,6 @@ if %ERROR% equ 0 (
 )
 
 if %ERROR% equ 1 (
-    echo *** ERROR: This script does not have input parameters.
-    rem -- pause
-    rem -- exit %RC%
-)
-
-if %ERROR% equ 2 (
     echo *** ERROR: The program ended with return code %RC%.
     rem -- pause
     rem -- exit %RC%

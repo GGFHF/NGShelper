@@ -56,7 +56,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.53'
+    return '0.56'
 
 #-------------------------------------------------------------------------------
 
@@ -1624,7 +1624,9 @@ class ProgramException(Exception):
         elif code_exception == 'F009':
             Message.print('error', f'*** ERROR {code_exception}: The record format in record {param2} of the file {param1} is wrong.')
         elif code_exception == 'F010':
-            Message.print('error', f'*** ERROR {code_exception}: The {param1} data is wrong in the assembly identification {param2}.')
+            Message.print('error', f'*** ERROR {code_exception}: The {param1} data is wrong in the transcript {param2}.')
+        elif code_exception == 'F011':
+            Message.print('error', f'*** ERROR {code_exception}: The chimeric data format is wrong in the transcript {param1}.')
         elif code_exception == 'I001':
             Message.print('error', f'*** ERROR {code_exception}: The infrastructure software is not setup.')
         elif code_exception == 'L001':

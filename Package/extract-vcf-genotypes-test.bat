@@ -14,7 +14,7 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script executes a test of the program get-exon-data.py
+rem This script executes a test of the program extract-vcf-genotypes.py
 rem in a Windows environment.
 
 rem ----------------------------------------------------------------------------
@@ -44,13 +44,15 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program get-exon-data.py
+rem Execute the program extract-vcf-genotypes.py
 
-python.exe %PYTHON_OPTIONS% get-exon-data.py ^
-    --alignment=%DATA_DIR%\alignment.log.gz ^
-    --outdir=%OUTPUT_DIR% ^
+python.exe %PYTHON_OPTIONS% extract-vcf-genotypes.py ^
+    --vcf=%DATA_DIR%\EFS.vcf ^
+    --imd_id=99 ^
+    --out=%OUTPUT_DIR%\EFS-genotypes.csv ^
     --verbose=Y ^
-    --trace=N
+    --trace=N ^
+    --tvi=NONE
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 
 rem ----------------------------------------------------------------------------
