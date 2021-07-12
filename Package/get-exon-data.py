@@ -465,10 +465,20 @@ def get_exon_data(alignment_file, output_dir):
                 print(f'len_2: {len_2} - len(seq_2): {len(seq_2)}')
                 raise xlib.ProgramException('', 'F011', assembly_id)
             # write the FASTA sequences
-            chimera_fasta_file_id.write(f'>{assembly_id}-{pos_1}\n')
-            chimera_fasta_file_id.write(f'{seq_1}\n')
-            chimera_fasta_file_id.write(f'>{assembly_id}-{pos_2}\n')
-            chimera_fasta_file_id.write(f'{seq_2}\n')
+            if assembly_id.startswith('TRINITY'):
+                isoform_pos = assembly_id.find('_i')
+                space_pos = assembly_id.find(' ')
+                assembly_id_1 = f'{assembly_id[:isoform_pos]}-1{assembly_id[isoform_pos:space_pos]}'
+                chimera_fasta_file_id.write(f'>{assembly_id_1}\n')
+                chimera_fasta_file_id.write(f'{seq_1}\n')
+                assembly_id_2 = f'{assembly_id[:isoform_pos]}-2{assembly_id[isoform_pos:space_pos]}'
+                chimera_fasta_file_id.write(f'>{assembly_id_2}\n')
+                chimera_fasta_file_id.write(f'{seq_2}\n')
+            else:
+                chimera_fasta_file_id.write(f'>{assembly_id}-{pos_1}\n')
+                chimera_fasta_file_id.write(f'{seq_1}\n')
+                chimera_fasta_file_id.write(f'>{assembly_id}-{pos_2}\n')
+                chimera_fasta_file_id.write(f'{seq_2}\n')
             # write the assembly identification
             assembly_ids_chimeras_file_id.write(f'{assembly_id}\n')
         else:
