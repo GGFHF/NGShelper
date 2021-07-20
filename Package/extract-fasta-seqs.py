@@ -141,7 +141,7 @@ def extract_sequences(fasta_file, id_file, id_type, extract_file):
     '''
 
     # get the identification data
-    (id_list, id_dict) = get_id_data(id_file)
+    (id_list, _) = get_id_data(id_file)
 
     # open the FASTA file
     if fasta_file.endswith('.gz'):

@@ -29,6 +29,7 @@ import gzip
 import os
 import re
 import requests
+import subprocess
 import sys
 
 #-------------------------------------------------------------------------------
@@ -56,7 +57,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.56'
+    return '0.57'
 
 #-------------------------------------------------------------------------------
 
@@ -358,6 +359,59 @@ def get_nucleotide_list_symbol(nucleotide_list):
 
     # return the symbol
     return symbol
+
+#-------------------------------------------------------------------------------
+
+def run_command(command, log, is_script):
+    '''
+    Run a Bash shell command and redirect stdout and stderr to log.
+    '''
+
+    # prepare the command to be execuete in WSL
+    if sys.platform.startswith('win32'):
+        if is_script:
+            command = command.replace('&','')
+            command = f'wsl bash -c "nohup {command} &>/dev/null"'
+        else:
+            command = command.replace(':$PATH','')
+            command = f'wsl bash -c "{command}"'
+
+    # run the command
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    for line in iter(process.stdout.readline, b''):
+        # replace non-ASCII caracters by one blank space
+        line = re.sub(b'[^\x00-\x7F]+', b' ', line)
+        # create a string from the bytes literal
+        line = line.decode('utf-8')
+        # write the line in log
+        log.write(line)
+    rc = process.wait()
+
+    # return the return code of the command run
+    return rc
+
+#-------------------------------------------------------------------------------
+
+def get_wsl_envvar(envvar):
+    '''
+    Get the value of a varible environment from WSL.
+    '''
+
+    # initialice the environment variable value
+    envvar_value = get_na()
+
+    # build the command
+    command = f'wsl bash -c "echo ${envvar}"'
+
+    # run the command
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    for line in iter(process.stdout.readline, b''):
+        envvar_value = line.decode('utf-8').replace('\n','')
+        break
+    rc = process.wait()
+
+    # return the environment variable value
+    return envvar_value
 
 #-------------------------------------------------------------------------------
 
@@ -1472,6 +1526,24 @@ def get_na():
 
 #-------------------------------------------------------------------------------
 
+class DevNull(object):
+    '''
+    This class is used when it is necessary do not write a output
+    '''
+
+    #---------------
+
+    def write(self, *_):
+        '''
+        Do not write anything.
+        '''
+
+        pass
+
+    #---------------
+
+#-------------------------------------------------------------------------------
+
 class Const():
     '''
     This class has attributes with values will be used as constants.
@@ -1495,6 +1567,7 @@ class Const():
     DEFAULT_NODE_NUMBER = 1
     DEFAULT_NUCLEOTIDE_NUMBER = 25
     DEFAULT_QCOV_HSP_PERC = 0.0
+    DEFAULT_PROCESSES_NUMBER = 4
     DEFAULT_TRACE = 'N'
     DEFAULT_VARIANT_NUMBER_PER_FILE = 1000
     DEFAULT_VERBOSE = 'N'

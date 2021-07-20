@@ -161,7 +161,7 @@ def extract_ff_features(input_gff_file, gff_format, vcf_file, output_gff_file):
     variant_counter = 0
 
     # read the first record of VCF file
-    (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number=0, check_sample_number=False)
+    (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number=0, check_sample_number=False)
 
     # while there are records in the VCF file
     while record != '':
@@ -176,7 +176,7 @@ def extract_ff_features(input_gff_file, gff_format, vcf_file, output_gff_file):
             xlib.Message.print('verbose', f'\rProcessed VCF records ... {record_counter:8d} - Variants ... {variant_counter:8d}')
 
             # read the next record of the VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number=0, check_sample_number=False)
+            (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number=0, check_sample_number=False)
 
         # process the column description record
         if record.startswith('#CHROM'):
@@ -188,7 +188,7 @@ def extract_ff_features(input_gff_file, gff_format, vcf_file, output_gff_file):
             xlib.Message.print('verbose', f'\rProcessed VCF records ... {record_counter:8d} - Variants ... {variant_counter:8d}')
 
             # read the next record of the VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number=0, check_sample_number=False)
+            (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number=0, check_sample_number=False)
 
         # process variant records
         while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
@@ -212,7 +212,7 @@ def extract_ff_features(input_gff_file, gff_format, vcf_file, output_gff_file):
             xlib.Message.print('verbose', f'\rProcessed VCF records ... {record_counter:8d} - Variants ... {variant_counter:8d}')
 
             # read the next record of the VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number=0, check_sample_number=False)
+            (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number=0, check_sample_number=False)
 
     xlib.Message.print('verbose', '\n')
 

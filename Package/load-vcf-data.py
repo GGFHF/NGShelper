@@ -72,7 +72,7 @@ def build_parser():
     parser.add_argument('--sp1_id', dest='sp1_id', help='Identification of the first species (mandatory)')
     parser.add_argument('--sp2_id', dest='sp2_id', help='Identification of the second species (mandatory).')
     parser.add_argument('--hyb_id', dest='hybrid_id', help='Identification of the hybrid or NONE; default NONE.')
-    parser.add_argument('--new_mdi', dest='new_md_id', help=f'New identification of missing data which will replace "."); default: {xlib.Const.DEFAULT_NEW_MD_ID}.')
+    parser.add_argument('--new_mdi', dest='new_md_id', help=f'New identification of missing data which will replace "."; default: {xlib.Const.DEFAULT_NEW_MD_ID}.')
     parser.add_argument('--imd_id', dest='imputed_md_id', help=f'Identification of the alternative allele for imputed missing data; default {xlib.Const.DEFAULT_IMPUTED_MD_ID}')
     parser.add_argument('--trans', dest='allele_transformation', help=f'Transformation of the allele symbol: {xlib.get_allele_transformation_code_list_text()}; default: NONE.')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')

@@ -18,7 +18,7 @@ Licence: GNU General Public Licence Version 3.
 #-------------------------------------------------------------------------------
 
 '''
-This program parses a GAMP alignment (-n 0) in order to get data about the coverage, identity and coordinates of exons.
+This program parses a GAMP alignment (-n 0 -m) in order to get data about the coverage, identity and coordinates of exons.
 '''
 
 #-------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ def build_parser():
     '''
 
     # create the parser and add arguments
-    description = 'Description: This program parses a GAMP alignment (-n 0) in order to get data about the coverage, identity and coordinates of exons.'
+    description = 'Description: This program parses a GAMP alignment (-n 0 -m) in order to get data about the coverage, identity and coordinates of exons.'
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
@@ -137,7 +137,7 @@ def get_exon_data(alignment_file, output_dir):
             raise xlib.ProgramException(e, 'F001', alignment_file)
 
     # set the exon data file
-    exon_data_file = f'{output_dir}/exon-data.csv'
+    exon_data_file = f'{output_dir}{os.sep}exon-data.csv'
 
     # open the exon data file
     try:
@@ -146,7 +146,7 @@ def get_exon_data(alignment_file, output_dir):
         raise xlib.ProgramException(e, 'F003', exon_data_file)
 
     # write head record of the exon data file
-    exon_data_file_id.write('"assembly_id";"genomic_seq_id";"assembly_coverage";"exon";"exon_strand";"exon_coordinates";"exon_percent_identity"\n')
+    exon_data_file_id.write('"assembly_id";"genomic_seq_id";"coverage";"exon";"exon_strand";"exon_coordinates";"exon_percent_identity"\n')
 
     # set the chimera FASTA file
     chimera_fasta_file = f'{output_dir}/chimeras.fasta'
@@ -157,41 +157,56 @@ def get_exon_data(alignment_file, output_dir):
     except Exception as e:
         raise xlib.ProgramException(e, 'F003', chimera_fasta_file)
 
-    # set the file of assembly identification with chimeras
-    assembly_ids_chimeras_file = f'{output_dir}/assembly-ids-chimeras.txt'
+    # set the head record of files with assembly identification
+    head_record = 'assembly_id;position;length;genomic_seq_id;coverage;percent_identity;mapped_genes'
 
-    # open the file of assembly identification with 0 paths
+    # set the file of assembly identifications of chimeras
+    assembly_ids_chimeras_file = f'{output_dir}{os.sep}assembly-ids-chimeras.csv'
+
+    # open the file of assembly identifications of chimeras
     try:
         assembly_ids_chimeras_file_id = open(assembly_ids_chimeras_file, mode='w', encoding='iso-8859-1', newline='\n')
     except Exception as e:
         raise xlib.ProgramException(e, 'F003', assembly_ids_chimeras_file)
 
-    # set the file of assembly identification with 0 paths
-    assembly_ids_0paths_file = f'{output_dir}/assembly-ids-0paths.txt'
+    # write head record of the file of assembly identifications of chimeras
+    assembly_ids_chimeras_file_id.write(f'{head_record}\n')
 
-    # open the file of assembly identification with 0 paths
+    # set the file of assembly identifications with 0 paths
+    assembly_ids_0paths_file = f'{output_dir}{os.sep}assembly-ids-0paths.csv'
+
+    # open the file of assembly identifications with 0 paths
     try:
         assembly_ids_0paths_file_id = open(assembly_ids_0paths_file, mode='w', encoding='iso-8859-1', newline='\n')
     except Exception as e:
         raise xlib.ProgramException(e, 'F003', assembly_ids_0paths_file)
 
-    # set the file of assembly identification with 1 path
-    assembly_ids_1path_file = f'{output_dir}/assembly-ids-1path.txt'
+    # write head record of the file of assembly identifications with 0 paths
+    assembly_ids_0paths_file_id.write(f'{head_record}\n')
 
-    # open the file of assembly identification with 1 path
+    # set the file of assembly identifications with 1 path
+    assembly_ids_1path_file = f'{output_dir}{os.sep}assembly-ids-1path.csv'
+
+    # open the file of assembly identifications with 1 path
     try:
         assembly_ids_1path_file_id = open(assembly_ids_1path_file, mode='w', encoding='iso-8859-1', newline='\n')
     except Exception as e:
         raise xlib.ProgramException(e, 'F003', assembly_ids_1path_file)
 
-    # set the file of assembly identification with n paths (n > 1)
-    assembly_ids_npaths_file = f'{output_dir}/assembly-ids-npaths.txt'
+    # write head record of the file of assembly identifications with 1 paths
+    assembly_ids_1path_file_id.write(f'{head_record}\n')
 
-    # open the file of assembly identification with n paths
+    # set the file of assembly identifications with n paths (n > 1)
+    assembly_ids_npaths_file = f'{output_dir}{os.sep}assembly-ids-npaths.csv'
+
+    # open the file of assembly identifications with n paths
     try:
         assembly_ids_npaths_file_id = open(assembly_ids_npaths_file, mode='w', encoding='iso-8859-1', newline='\n')
     except Exception as e:
         raise xlib.ProgramException(e, 'F003', assembly_ids_npaths_file)
+
+    # write head record of the file of assembly identifications with n paths
+    assembly_ids_npaths_file_id.write(f'{head_record}\n')
 
     # initialize record counters
     alignment_counter = 0
@@ -209,24 +224,37 @@ def get_exon_data(alignment_file, output_dir):
             # add 1 to the alignment counter
             alignment_counter += 1
 
-            # initialize the chimera control variable and chimera data
+            # initialize the chimera control variable
             is_chimera = False
-            pos_1 = ''
-            seq_1 = ''
-            len_1 = 0
-            pos_2 = ''
-            seq_2 = ''
-            len_2 = 0
 
             # initialize alignment data
-            assembly_id = ''
-            genomic_seq_id = ''
+            assembly_id = '-'
             path_num = 0
-            assembly_coverage = 0
+
+            # initialize data of path 1
+            genomic_seq_id_1 = '-'
+            position_1 = ''
+            length_1 = 0
+            coverage_1 = 0
+            percent_identity_1 = 0
+            seq_1 = ''
+            mapped_genes_1 = '-'
+
+            # initialize data of path 2 (these data are necessary when alignment is a chimera)
+            genomic_seq_id_2 = '-'
+            position_2 = ''
+            length_2 = 0
+            coverage_2 = 0
+            percent_identity_2 = 0
+            seq_2 = ''
+            mapped_genes_2 = '-'
+
+            # initialize exon data (these data are necessary when there is one path)
             exon_num = 0
             exon_strand_list =  []
             exon_coordinates_list =  []
             exon_percent_identity_list = []
+            mapped_genes_1 = '-'
 
             # extract the identification
             assembly_id = record[1:].strip('\n')
@@ -260,16 +288,16 @@ def get_exon_data(alignment_file, output_dir):
                     start = record.find(text) + len(text)
                     middle = record.find('(')
                     try:
-                        pos_1 = record[start:middle].strip()
+                        position_1 = record[start:middle].strip()
                     except Exception as e:
-                        raise xlib.ProgramException(e, 'F010', 'position 1', assembly_id)
+                        raise xlib.ProgramException(e, 'F010', 'position_1', assembly_id)
 
                     # get the first sequence length
                     end = record.find(')')
                     try:
-                        len_1 = int(record[middle+1:end-3].strip())
+                        length_1 = int(record[middle+1:end-3].strip())
                     except Exception as e:
-                        raise xlib.ProgramException(e, 'F010', 'sequence length 1', assembly_id)
+                        raise xlib.ProgramException(e, 'F010', 'length_1', assembly_id)
 
                     # get the first genomic sequence identification
                     text = 'genome'
@@ -278,28 +306,53 @@ def get_exon_data(alignment_file, output_dir):
                     try:
                         genomic_seq_id_1 = record[start:start + end].strip()
                     except Exception as e:
-                        raise xlib.ProgramException(e, 'F010', 'genomic sequence identification 1', assembly_id)
+                        raise xlib.ProgramException(e, 'F010', 'genomic_seq_id_1', assembly_id)
+
+                    # read until the coverage
+                    coverage_text = 'Coverage:'
+                    while record != '' and not record.strip().startswith(coverage_text):
+                        record = alignment_file_id.readline()
+
+                    # get the coverage
+                    start = record.find(coverage_text)+len(coverage_text)
+                    end = record[start:].find('(')
+                    try:
+                        coverage_1 = float(record[start:start + end].strip())
+                    except Exception as e:
+                        raise xlib.ProgramException(e, 'F010', 'coverage_1', assembly_id)
+
+                    # read until the percent identity
+                    percent_identity_text = 'Percent identity:'
+                    while record != '' and not record.strip().startswith(percent_identity_text):
+                        record = alignment_file_id.readline()
+
+                    # get the percent identity
+                    start = record.find(percent_identity_text)+len(percent_identity_text)
+                    end = record[start:].find('(')
+                    try:
+                        percent_identity_1 = float(record[start:start + end].strip())
+                    except Exception as e:
+                        raise xlib.ProgramException(e, 'F010', 'percent_identity_1', assembly_id)
 
                     # read until the second path
                     text = 'Path 2: query'
                     while record != '' and record.find(text) == -1:
                         record = alignment_file_id.readline()
 
-
                     # get the second sequence position
                     start = record.find(text) + len(text)
                     middle = record.find('(')
                     try:
-                        pos_2 = record[start:middle].strip()
+                        position_2 = record[start:middle].strip()
                     except Exception as e:
-                        raise xlib.ProgramException(e, 'F010', 'position 2', assembly_id)
+                        raise xlib.ProgramException(e, 'F010', 'position_2', assembly_id)
 
                     # get the second sequence length
                     end = record.find(')')
                     try:
-                        len_2 = int(record[middle+1:end-3].strip())
+                        length_2 = int(record[middle+1:end-3].strip())
                     except Exception as e:
-                        raise xlib.ProgramException(e, 'F010', 'sequence length 1', assembly_id)
+                        raise xlib.ProgramException(e, 'F010', 'length_2', assembly_id)
 
                     # get the second genomic sequence identification
                     text = 'genome'
@@ -308,7 +361,33 @@ def get_exon_data(alignment_file, output_dir):
                     try:
                         genomic_seq_id_2 = record[start:start + end].strip()
                     except Exception as e:
-                        raise xlib.ProgramException(e, 'F010', 'genomic sequence identification 1', assembly_id)
+                        raise xlib.ProgramException(e, 'F010', 'genomic_seq_id_2', assembly_id)
+
+                    # read until the coverage
+                    coverage_text = 'Coverage:'
+                    while record != '' and not record.strip().startswith(coverage_text):
+                        record = alignment_file_id.readline()
+
+                    # get the coverage
+                    start = record.find(coverage_text)+len(coverage_text)
+                    end = record[start:].find('(')
+                    try:
+                        coverage_2 = float(record[start:start + end].strip())
+                    except Exception as e:
+                        raise xlib.ProgramException(e, 'F010', 'coverage_2', assembly_id)
+
+                    # read until the percent identity
+                    percent_identity_text = 'Percent identity:'
+                    while record != '' and not record.strip().startswith(percent_identity_text):
+                        record = alignment_file_id.readline()
+
+                    # get the percent identity
+                    start = record.find(percent_identity_text)+len(percent_identity_text)
+                    end = record[start:].find('(')
+                    try:
+                        percent_identity_2 = float(record[start:start + end].strip())
+                    except Exception as e:
+                        raise xlib.ProgramException(e, 'F010', 'percent_identity_2', assembly_id)
 
                     # get parts of sequence 1
                     is_first_genomic_seq_id_1 = True
@@ -334,7 +413,7 @@ def get_exon_data(alignment_file, output_dir):
                     # get parts of sequence 2
                     is_first_genomic_seq_id_2 = True
                     record = alignment_file_id.readline()
-                    while record != '' and not record.startswith('>'):
+                    while record != '' and not record.startswith('Maps') and not record.startswith('>'):
                         if record.find(genomic_seq_id_2) > -1:
                             if is_first_genomic_seq_id_2:
                                 is_first_genomic_seq_id_2 = False
@@ -352,13 +431,47 @@ def get_exon_data(alignment_file, output_dir):
                                 seq_2 += record[start+1:].replace(' ','')
                         record = alignment_file_id.readline()
 
+                    # read records until the map hits for path 1
+                    while record != '' and record.strip().find('Map hits for path 1') == -1 and not record.startswith('>'):
+                        record = alignment_file_id.readline()
+
+                    if record.strip().find('Map hits for path 1') > -1:
+                        record = alignment_file_id.readline()
+
+                    # read records with mapped genes of path 1
+                    while record != '' and record != '\n' and record.strip().find('Map hits for path 2') == -1 and not record.startswith('>'):
+                        record = record.strip()
+                        last_tab_pos = record.rfind('\t')
+                        if mapped_genes_1 == '-':
+                            mapped_genes_1 = record[last_tab_pos+1:]
+                        else:
+                            mapped_genes_1 = f'{mapped_genes_1}*{record[last_tab_pos+1:]}'
+                        record = alignment_file_id.readline()
+
+                    # read records until the map hits for path 2
+                    while record != '' and record.strip().find('Map hits for path 2') == -1 and not record.startswith('>'):
+                        record = alignment_file_id.readline()
+
+                    if record.strip().find('Map hits for path 2') > -1:
+                        record = alignment_file_id.readline()
+
+                    # read records with maped genes of path 2
+                    while record != '' and record != '\n' and not record.startswith('>'):
+                        record = record.strip()
+                        last_tab_pos = record.rfind('\t')
+                        if mapped_genes_2 == '-':
+                            mapped_genes_2 = record[last_tab_pos+1:]
+                        else:
+                            mapped_genes_2 = f'{mapped_genes_2}*{record[last_tab_pos+1:]}'
+                        record = alignment_file_id.readline()
+
                 # when the align is not a chimera
                 elif not is_chimera:
                     # get the path number
                     try:
                         path_num = int(record[record.find('(') + 1:record.find(')')])
                     except Exception as e:
-                        raise xlib.ProgramException(e, 'F010', 'path number', assembly_id)
+                        raise xlib.ProgramException(e, 'F010', 'path_num', assembly_id)
 
                     # if path number is equal to 0, there are not exon data
                     if path_num == 0:
@@ -371,17 +484,34 @@ def get_exon_data(alignment_file, output_dir):
                     # if path number is greater than to 0, there are exon data
                     elif path_num > 0:
 
-                        # read the next record
-                        record = alignment_file_id.readline()
+                        # read until the first path
+                        text = 'Path 1: query'
+                        while record != '' and record.find(text) == -1:
+                            record = alignment_file_id.readline()
+
+                        # get the first sequence position
+                        start = record.find(text) + len(text)
+                        middle = record.find('(')
+                        try:
+                            position_1 = record[start:middle].strip()
+                        except Exception as e:
+                            raise xlib.ProgramException(e, 'F010', 'position_1', assembly_id)
+
+                        # get the first sequence length
+                        end = record.find(')')
+                        try:
+                            length_1 = int(record[middle+1:end-3].strip())
+                        except Exception as e:
+                            raise xlib.ProgramException(e, 'F010', 'length_1', assembly_id)
 
                         # get the genomic sequence identification
                         text = 'genome'
                         start = record.find(text)+len(text)
                         end = record[start:].find(':')
                         try:
-                            genomic_seq_id = record[start:start + end].strip()
+                            genomic_seq_id_1 = record[start:start + end].strip()
                         except Exception as e:
-                            raise xlib.ProgramException(e, 'F010', 'genomic sequence identification', assembly_id)
+                            raise xlib.ProgramException(e, 'F010', 'genomic_seq_id_1', assembly_id)
 
                         # read until the number of exons
                         exon_num_text = 'Number of exons:'
@@ -393,20 +523,33 @@ def get_exon_data(alignment_file, output_dir):
                         try:
                             exon_num = int(record[start:].strip())
                         except Exception as e:
-                            raise xlib.ProgramException(e, 'F010', 'exon number', assembly_id)
+                            raise xlib.ProgramException(e, 'F010', 'exon_num', assembly_id)
 
                         # read until the coverage
-                        assembly_coverage_text = 'Coverage:'
-                        while record != '' and not record.strip().startswith(assembly_coverage_text):
+                        coverage_text = 'Coverage:'
+                        while record != '' and not record.strip().startswith(coverage_text):
                             record = alignment_file_id.readline()
 
-                        # get the assembly_coverage
-                        start = record.find(assembly_coverage_text)+len(assembly_coverage_text)
+                        # get the coverage
+                        start = record.find(coverage_text)+len(coverage_text)
                         end = record[start:].find('(')
                         try:
-                            assembly_coverage = float(record[start:start + end].strip())
+                            coverage_1 = float(record[start:start + end].strip())
                         except Exception as e:
-                            raise xlib.ProgramException(e, 'F010', 'assembly coverage', assembly_id)
+                            raise xlib.ProgramException(e, 'F010', 'coverage_1', assembly_id)
+
+                        # read until the percent identity
+                        percent_identity_text = 'Percent identity:'
+                        while record != '' and not record.strip().startswith(percent_identity_text):
+                            record = alignment_file_id.readline()
+
+                        # get the percent identity
+                        start = record.find(percent_identity_text)+len(percent_identity_text)
+                        end = record[start:].find('(')
+                        try:
+                            percent_identity_1 = float(record[start:start + end].strip())
+                        except Exception as e:
+                            raise xlib.ProgramException(e, 'F010', 'percent_identity_1', assembly_id)
 
                         # read records until the alignment for path 1
                         while record != '' and not record.strip().startswith('Alignment for path 1:'):
@@ -427,21 +570,42 @@ def get_exon_data(alignment_file, output_dir):
                             except Exception as e:
                                 print(f'i: {i}')
                                 print(f'record: {record.strip()}')
-                                raise xlib.ProgramException(e, 'F010', 'exon strand', assembly_id)
+                                raise xlib.ProgramException(e, 'F010', 'exon_strand', assembly_id)
 
                             # get the coordinates
                             try:
                                 exon_coordinates = record[record.find(':') + 1:record.find('(')].strip()
                                 exon_coordinates_list.append(exon_coordinates)
                             except Exception as e:
-                                raise xlib.ProgramException(e, 'F010', 'exon coordinates', assembly_id)
+                                raise xlib.ProgramException(e, 'F010', 'exon_coordinates', assembly_id)
 
                             # get the percent identity
                             try:
                                 exon_percent_identity = float(record[record.find(')') + 1:record.find('%')].strip())
                                 exon_percent_identity_list.append(exon_percent_identity)
                             except Exception as e:
-                                raise xlib.ProgramException(e, 'F010', 'exon percent identity', assembly_id)
+                                raise xlib.ProgramException(e, 'F010', 'exon_percent_identity', assembly_id)
+
+                            # read next record
+                            record = alignment_file_id.readline()
+
+
+                        # read records until the map hits for path 1
+                        while record != '' and record.strip().find('Map hits for path 1') == -1 and not record.startswith('>'):
+                            record = alignment_file_id.readline()
+
+                        if record.strip().find('Map hits for path 1') > -1:
+                            record = alignment_file_id.readline()
+
+                        # read records with maped genes of path 1
+                        while record != '' and record != '\n' and not record.startswith('>'):
+                            record = record.strip()
+                            last_tab_pos = record.rfind('\t')
+                            if mapped_genes_1 == '-':
+                                mapped_genes_1 = record[last_tab_pos+1:]
+                            else:
+                                mapped_genes_1 = f'{mapped_genes_1}*{record[last_tab_pos+1:]}'
+                            record = alignment_file_id.readline()
 
                         # read records until the next transcript or EOF
                         record = alignment_file_id.readline()
@@ -458,11 +622,11 @@ def get_exon_data(alignment_file, output_dir):
             seq_1 = re.sub('[0123456789]', '', seq_1)
             seq_2 = re.sub('[0123456789]', '', seq_2)
             # check sequence length
-            if len_1 != len(seq_1) or len_2 != len(seq_2):
+            if length_1 != len(seq_1) or length_2 != len(seq_2):
                 print(f'seq_1: {seq_1}')
-                print(f'len_1: {len_1} - len(seq_1): {len(seq_1)}')
+                print(f'length_1: {length_1} - len(seq_1): {len(seq_1)}')
                 print(f'seq_2: {seq_2}')
-                print(f'len_2: {len_2} - len(seq_2): {len(seq_2)}')
+                print(f'length_2: {length_2} - len(seq_2): {len(seq_2)}')
                 raise xlib.ProgramException('', 'F011', assembly_id)
             # write the FASTA sequences
             if assembly_id.startswith('TRINITY'):
@@ -475,25 +639,26 @@ def get_exon_data(alignment_file, output_dir):
                 chimera_fasta_file_id.write(f'>{assembly_id_2}\n')
                 chimera_fasta_file_id.write(f'{seq_2}\n')
             else:
-                chimera_fasta_file_id.write(f'>{assembly_id}-{pos_1}\n')
+                chimera_fasta_file_id.write(f'>{assembly_id}-{position_1}\n')
                 chimera_fasta_file_id.write(f'{seq_1}\n')
-                chimera_fasta_file_id.write(f'>{assembly_id}-{pos_2}\n')
+                chimera_fasta_file_id.write(f'>{assembly_id}-{position_2}\n')
                 chimera_fasta_file_id.write(f'{seq_2}\n')
             # write the assembly identification
-            assembly_ids_chimeras_file_id.write(f'{assembly_id}\n')
+            assembly_ids_chimeras_file_id.write(f'{assembly_id};{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
+            assembly_ids_chimeras_file_id.write(f'{assembly_id};{position_2};{length_2};{genomic_seq_id_2};{coverage_2};{percent_identity_2};{mapped_genes_2}\n')
         else:
             if path_num == 0:
                 # write the assembly identification
-                assembly_ids_0paths_file_id.write(f'{assembly_id}\n')
+                assembly_ids_0paths_file_id.write(f'{assembly_id};{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1}{mapped_genes_1}\n')
             elif path_num == 1:
                 # write the exon data
                 for i in range(exon_num):
-                    exon_data_file_id.write(f'"{assembly_id}";"{genomic_seq_id}";{assembly_coverage};{i +1};"{exon_strand_list[i]}";"{exon_coordinates_list[i]}";{exon_percent_identity_list[i]}\n')
+                    exon_data_file_id.write(f'"{assembly_id}";"{genomic_seq_id_1}";{coverage_1};{i +1};"{exon_strand_list[i]}";"{exon_coordinates_list[i]}";{exon_percent_identity_list[i]}\n')
                     exon_counter += 1
                 # write the assembly identification
-                assembly_ids_1path_file_id.write(f'{assembly_id}\n')
+                assembly_ids_1path_file_id.write(f'{assembly_id};{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
             else:
-                assembly_ids_npaths_file_id.write(f'{assembly_id}\n')
+                assembly_ids_npaths_file_id.write(f'{assembly_id};{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
 
         # print the counters
         xlib.Message.print('verbose', f'\rAlignments ... {alignment_counter:8d} - Exons ... {exon_counter:8d}')

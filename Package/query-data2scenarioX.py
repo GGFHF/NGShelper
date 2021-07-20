@@ -50,7 +50,7 @@ def main(argv):
     conn = xsqlite.connect_database(args.ngshelper_database)
 
     # get the NGShelper database name
-    file_name, file_extension = os.path.splitext(os.path.basename(args.ngshelper_database))
+    file_name, _ = os.path.splitext(os.path.basename(args.ngshelper_database))
 
     # list data of variants and alleles and variant identifications to the scenario X
     query_data(conn, file_name, args.sp1_id, args.sp2_id, args.hybrid_id, args.imputed_md_id, args.max_separation, args.output_dir, args.tsi_list)
@@ -362,7 +362,7 @@ def query_data(conn, file_name, sp1_id, sp2_id, hybrid_id, imputed_md_id, max_se
             # save data
             seq_id = variant_dict[i]['seq_id']
             position = variant_dict[i]['position']
-            start = variant_dict[i]['start']
+            # -- start = variant_dict[i]['start']
             end = variant_dict[i]['end']
             gene = variant_dict[i]['gene']
             description = variant_dict[i]['description']
@@ -446,7 +446,7 @@ def query_data(conn, file_name, sp1_id, sp2_id, hybrid_id, imputed_md_id, max_se
             # save data
             seq_id = variant_dict[i]['seq_id']
             position = variant_dict[i]['position']
-            start = variant_dict[i]['start']
+            # -- start = variant_dict[i]['start']
             end = variant_dict[i]['end']
             gene = variant_dict[i]['gene']
             description = variant_dict[i]['description']

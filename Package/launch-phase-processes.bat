@@ -14,7 +14,7 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script parses a GAMP alignment (-n 0 -m) in order to get data about the coverage, identity and coordinates of exons.
+rem This program launches several PHASE processes with a input file list.
 
 rem ----------------------------------------------------------------------------
 
@@ -34,9 +34,9 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program get-exon-data.py
+rem Execute the program launch-phase-processes.py
 
-python.exe %PYTHON_OPTIONS% get-exon-data.py %* %ARGV%
+python.exe %PYTHON_OPTIONS% launch-phase-processes.py %* %ARGV%
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------

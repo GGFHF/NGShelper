@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 #-------------------------------------------------------------------------------
@@ -15,8 +14,8 @@
 
 #-------------------------------------------------------------------------------
 
-# This script executes a test of the program a vcf2phase.py 
-# in a Linux environment.
+# This script executes a test of the program launch-phase-processes.py in a Linux 
+# environment.
 
 #-------------------------------------------------------------------------------
 
@@ -38,38 +37,16 @@ cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
 
-# Execute the program vcf2phase.py
-
-# -- /usr/bin/time \
-# --     ./vcf2phase.py \
-# --         --vcf=$DATA_DIR/concatenated_imputed_progenies-6000DP-scenario2.vcf \
-# --         --variants=NONE \
-# --         --samples=$DATA_DIR/IDs-total.txt \
-# --         --sp1_id=AL \
-# --         --sp2_id=EN \
-# --         --hyb_id=HY \
-# --         --imd_id=99 \
-# --         --trans=ADD100 \
-# --         --out=$OUTPUT_DIR/vcf2phase_scaffold \
-# --         --verbose=Y \
-# --         --trace=N \
-# --         --tvi=NONE
-# -- if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
+# Execute the program launch-phase-processes.py
 
 /usr/bin/time \
-    ./vcf2phase.py \
-        --vcf=$DATA_DIR/concatenated_imputed_progenies-6000DP-scenario2.vcf \
-        --variants=$OUTPUT_DIR/variants.csv \
-        --samples=$DATA_DIR/IDs-total.txt \
-        --sp1_id=AL \
-        --sp2_id=EN \
-        --hyb_id=HY \
-        --imd_id=99 \
-        --trans=ADD100 \
-        --out=$OUTPUT_DIR/vcf2phase_gene_fragment \
+    ./launch-phase-processes.py \
+        --phasedir=/home/fmm/Apps/PHASE \
+        --processes=4 \
+        --indir=$OUTPUT_DIR/vcf2phase_gene_fragment \
+        --outdir=$OUTPUT_DIR/phase \
         --verbose=Y \
-        --trace=N \
-        --tvi=NONE
+        --trace=N
 if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
 
 #-------------------------------------------------------------------------------

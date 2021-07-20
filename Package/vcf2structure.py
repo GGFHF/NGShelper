@@ -217,7 +217,7 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
     variant_counter = 0
 
     # read the first record of VCF file
-    (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+    (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
     # while there are records in the VCF file
     while record != '':
@@ -232,7 +232,7 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
             xlib.Message.print('verbose', f'\rProcessed VCF records ... {record_counter:8d} - Variants ... {variant_counter:8d}')
 
             # read the next record of the VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
         # process the column description record
         if record.startswith('#CHROM'):
@@ -268,7 +268,7 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
             xlib.Message.print('verbose', f'\rProcessed VCF records ... {record_counter:8d} - Variants ... {variant_counter:8d}')
 
             # read the next record of the VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
         # process variant records
         while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
@@ -331,7 +331,7 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
             xlib.Message.print('verbose', f'\rProcessed VCF records ... {record_counter:8d} - Variants ... {variant_counter:8d}')
 
             # read the next record of the VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
     xlib.Message.print('verbose', '\n')
 
