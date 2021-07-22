@@ -57,7 +57,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.57'
+    return '0.58'
 
 #-------------------------------------------------------------------------------
 
@@ -359,6 +359,34 @@ def get_nucleotide_list_symbol(nucleotide_list):
 
     # return the symbol
     return symbol
+
+#-------------------------------------------------------------------------------
+
+def windows_path_2_wsl_path(path):
+    '''
+    Change a Windows format path to a WSL format path.
+    '''
+
+    # change the format path
+    new_path = path.replace('\\', '/')
+    new_path = f'/mnt/{new_path[0:1].lower()}{new_path[2:]}'
+
+    # return the path
+    return new_path
+
+#-------------------------------------------------------------------------------
+
+def wsl_path_2_windows_path(path):
+    '''
+    Change a WSL format path to a Windows format path.
+    '''
+
+    # change the format path
+    new_path = f'{path[5:6].upper()}:{path[6:]}'
+    new_path = new_path.replace('/', '\\')
+
+    # return the path
+    return new_path
 
 #-------------------------------------------------------------------------------
 
@@ -1526,6 +1554,15 @@ def get_na():
 
 #-------------------------------------------------------------------------------
 
+def get_separator():
+    '''
+    Get the separation line between process steps.
+    '''
+
+    return '**************************************************'
+
+#-------------------------------------------------------------------------------
+
 class DevNull(object):
     '''
     This class is used when it is necessary do not write a output
@@ -1552,9 +1589,11 @@ class Const():
     #---------------
 
     DEFAULT_BLASTX_THREADS_NUMBER = 1
+    DEFAULT_BURN_IN = 100
     DEFAULT_E_VALUE = 1E-6
     DEFAULT_ID_TYPE = 'LITERAL'
     DEFAULT_IMPUTED_MD_ID = '99'
+    DEFAULT_ITERATIONS_NUMBER = 100
     DEFAULT_MACHINE_TYPE = 'local'
     DEFAULT_MAX_HSPS = 999999
     DEFAULT_MAX_TARGET_SEQS = 10
@@ -1568,6 +1607,7 @@ class Const():
     DEFAULT_NUCLEOTIDE_NUMBER = 25
     DEFAULT_QCOV_HSP_PERC = 0.0
     DEFAULT_PROCESSES_NUMBER = 4
+    DEFAULT_THINNING_INTERVAL = 1
     DEFAULT_TRACE = 'N'
     DEFAULT_VARIANT_NUMBER_PER_FILE = 1000
     DEFAULT_VERBOSE = 'N'

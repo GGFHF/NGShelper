@@ -220,7 +220,7 @@ def impute_progenies(input_vcf_file, sample_file, scenario, imputed_md_id, sp1_i
     imputed_variant_counter = 0
 
     # read the first record of input VCF file
-    (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+    (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
     # while there are records in input VCF file
     while record != '':
@@ -238,7 +238,7 @@ def impute_progenies(input_vcf_file, sample_file, scenario, imputed_md_id, sp1_i
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Imputed variants ... {imputed_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
         # process the column description record
         if record.startswith('#CHROM'):
@@ -275,7 +275,7 @@ def impute_progenies(input_vcf_file, sample_file, scenario, imputed_md_id, sp1_i
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Imputed variants ... {imputed_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
         # process variant record
         while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
@@ -376,7 +376,7 @@ def impute_progenies(input_vcf_file, sample_file, scenario, imputed_md_id, sp1_i
                     mother_gt_plus_M_list = mother_gt_list + [xlib.get_md_symbol()]
 
                     # get the list of mother distinct alleles plus imputed and missing data alleles
-                    mother_gt_plus_M_I_list = mother_gt_list + M_I_list
+                    # -- mother_gt_plus_M_I_list = mother_gt_list + M_I_list
 
                     # revision when the scenario is '0' (no imputation) or '2' (maximum possible imputation)
                     if scenario in ['0', '2']:
@@ -925,7 +925,7 @@ def impute_progenies(input_vcf_file, sample_file, scenario, imputed_md_id, sp1_i
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Imputed variants ... {imputed_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
     xlib.Message.print('verbose', '\n')
 

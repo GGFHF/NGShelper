@@ -45,6 +45,10 @@ cd $NGSHELPER_DIR
         --processes=4 \
         --indir=$OUTPUT_DIR/vcf2phase_gene_fragment \
         --outdir=$OUTPUT_DIR/phase \
+        --iterations=100 \
+        --thinning=1 \
+        --burnin=100 \
+        --otherparams=NONE \
         --verbose=Y \
         --trace=N
 if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi

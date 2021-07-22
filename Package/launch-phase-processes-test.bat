@@ -51,6 +51,10 @@ python.exe %PYTHON_OPTIONS% launch-phase-processes.py ^
     --processes=4 ^
     --indir=%OUTPUT_DIR%\vcf2phase_gene_fragment ^
     --outdir=%OUTPUT_DIR%\phase ^
+    --iterations=100 ^
+    --thinning=1 ^
+    --burnin=100 ^
+    --otherparams=NONE ^
     --verbose=Y ^
     --trace=N
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
