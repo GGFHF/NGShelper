@@ -80,7 +80,7 @@ def build_parser():
     parser.add_argument('--iterations', dest='iterations_number', help=f'Number of iterations; default: {xlib.Const.DEFAULT_ITERATIONS_NUMBER}.')
     parser.add_argument('--thinning', dest='thinning_interval', help=f'Thinning interval; default: {xlib.Const.DEFAULT_THINNING_INTERVAL}.')
     parser.add_argument('--burnin', dest='burn_in', help=f'Burn-in; default: {xlib.Const.DEFAULT_BURN_IN}.')
-    parser.add_argument('--otherparams', dest='other_parameters', help='Other parameters to be included in the PHASE run or NONE; default: NONE.')
+    parser.add_argument('--otherparams', dest='other_parameters', help='Other parameters (between quotation marks) to be included in the PHASE run or NONE; default: NONE.')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')
     parser.add_argument('--trace', dest='trace', help=f'Additional info useful to the developer team: {xlib.get_trace_code_list_text()}; default: {xlib.Const.DEFAULT_TRACE}.')
 
@@ -337,6 +337,7 @@ def build_phase_process_script(process_number, phase_dir, input_dir, input_files
             script_file_id.write( '        BASENAME=`basename $IN_FILE`\n')
             script_file_id.write( '        /usr/bin/time \\\n')
             script_file_id.write(f'            PHASE \\\n')
+            script_file_id.write(f'                -d1 \\\n')
             if other_parameters != 'NONE':
                 script_file_id.write(f'                {other_parameters} \\\n')
             script_file_id.write( '                $IN_FILE \\\n')
@@ -459,7 +460,7 @@ def get_log_file(process_number, output_dir):
     '''
 
     # assign the log file path
-    log_file = f'{output_dir}{os.sep}phase-process-{process_number}.log'
+    log_file = f'{output_dir}{os.sep}phase-process-{process_number}-log.txt'
 
     # return the log file path
     return log_file

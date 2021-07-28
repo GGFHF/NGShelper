@@ -158,7 +158,7 @@ def get_exon_data(alignment_file, output_dir):
         raise xlib.ProgramException(e, 'F003', chimera_fasta_file)
 
     # set the head record of files with assembly identification
-    head_record = 'assembly_id;position;length;genomic_seq_id;coverage;percent_identity;mapped_genes'
+    head_record = 'assembly_id;paths_num;path_id;position;length;genomic_seq_id;coverage;percent_identity;mapped_genes'
 
     # set the file of assembly identifications of chimeras
     assembly_ids_chimeras_file = f'{output_dir}{os.sep}assembly-ids-chimeras.csv'
@@ -229,7 +229,7 @@ def get_exon_data(alignment_file, output_dir):
 
             # initialize alignment data
             assembly_id = '-'
-            path_num = 0
+            paths_num = 0
 
             # initialize data of path 1
             genomic_seq_id_1 = '-'
@@ -254,7 +254,6 @@ def get_exon_data(alignment_file, output_dir):
             exon_strand_list =  []
             exon_coordinates_list =  []
             exon_percent_identity_list = []
-            mapped_genes_1 = '-'
 
             # extract the identification
             assembly_id = record[1:].strip('\n')
@@ -469,12 +468,12 @@ def get_exon_data(alignment_file, output_dir):
                 elif not is_chimera:
                     # get the path number
                     try:
-                        path_num = int(record[record.find('(') + 1:record.find(')')])
+                        paths_num = int(record[record.find('(') + 1:record.find(')')])
                     except Exception as e:
                         raise xlib.ProgramException(e, 'F010', 'path_num', assembly_id)
 
                     # if path number is equal to 0, there are not exon data
-                    if path_num == 0:
+                    if paths_num == 0:
 
                         # read records until the next transcript or EOF
                         record = alignment_file_id.readline()
@@ -482,7 +481,7 @@ def get_exon_data(alignment_file, output_dir):
                             record = alignment_file_id.readline()
 
                     # if path number is greater than to 0, there are exon data
-                    elif path_num > 0:
+                    elif paths_num > 0:
 
                         # read until the first path
                         text = 'Path 1: query'
@@ -644,21 +643,21 @@ def get_exon_data(alignment_file, output_dir):
                 chimera_fasta_file_id.write(f'>{assembly_id}-{position_2}\n')
                 chimera_fasta_file_id.write(f'{seq_2}\n')
             # write the assembly identification
-            assembly_ids_chimeras_file_id.write(f'{assembly_id};{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
-            assembly_ids_chimeras_file_id.write(f'{assembly_id};{position_2};{length_2};{genomic_seq_id_2};{coverage_2};{percent_identity_2};{mapped_genes_2}\n')
+            assembly_ids_chimeras_file_id.write(f'{assembly_id};c;1;{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
+            assembly_ids_chimeras_file_id.write(f'{assembly_id};c;2;{position_2};{length_2};{genomic_seq_id_2};{coverage_2};{percent_identity_2};{mapped_genes_2}\n')
         else:
-            if path_num == 0:
+            if paths_num == 0:
                 # write the assembly identification
-                assembly_ids_0paths_file_id.write(f'{assembly_id};{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1}{mapped_genes_1}\n')
-            elif path_num == 1:
+                assembly_ids_0paths_file_id.write(f'{assembly_id};{paths_num};0;{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
+            elif paths_num == 1:
                 # write the exon data
                 for i in range(exon_num):
                     exon_data_file_id.write(f'"{assembly_id}";"{genomic_seq_id_1}";{coverage_1};{i +1};"{exon_strand_list[i]}";"{exon_coordinates_list[i]}";{exon_percent_identity_list[i]}\n')
                     exon_counter += 1
                 # write the assembly identification
-                assembly_ids_1path_file_id.write(f'{assembly_id};{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
+                assembly_ids_1path_file_id.write(f'{assembly_id};{paths_num};1;{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
             else:
-                assembly_ids_npaths_file_id.write(f'{assembly_id};{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
+                assembly_ids_npaths_file_id.write(f'{assembly_id};{paths_num};1;{position_1};{length_1};{genomic_seq_id_1};{coverage_1};{percent_identity_1};{mapped_genes_1}\n')
 
         # print the counters
         xlib.Message.print('verbose', f'\rAlignments ... {alignment_counter:8d} - Exons ... {exon_counter:8d}')
