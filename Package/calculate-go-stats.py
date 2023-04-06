@@ -420,8 +420,9 @@ def calculate_toa_go_stats(annotation_file, go_ontology_dict, output_dir):
         # initialize the old sequence identification
         old_nt_seq_id = data_dict['nt_seq_id']
 
-        # initialize the minimum e-value
+        # initialize the minimum e-value and go identification list of the sequence hit/hsp with less e-value
         min_evalue = 9999
+        min_evalue_go_id_list = []
 
         # while there are records and the same sequence identification
         while record != '' and data_dict['nt_seq_id'] == old_nt_seq_id:
@@ -437,8 +438,9 @@ def calculate_toa_go_stats(annotation_file, go_ontology_dict, output_dir):
                 go_id_list = []
 
             # save the go identification list of the sequence hit/hsp with less e-value
-            if float(data_dict['hsp_evalue']) < min_evalue:
+            if float(data_dict['hsp_evalue']) < min_evalue and go_id_list:
                 min_evalue_go_id_list = go_id_list
+                min_evalue = float(data_dict['hsp_evalue'])
 
             xlib.Message.print('verbose', f'\rAnnotation file: {annotation_counter} processed records')
 
