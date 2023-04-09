@@ -56,7 +56,7 @@ def main(argv):
     elif args.app == 'ENTAP':
         calculate_entap_go_stats(args.annotation_file, go_ontology_dict, args.output_dir)
     elif args.app == 'TOA':
-        calculate_toa_go_stats(args.annotation_file, go_ontology_dict, args.output_dir)
+        calculate_toa_go_stats(args.annotation_file, go_ontology_dict, args.output_dir, args.toa_go_selection)
     elif args.app == 'TRAPID':
         calculate_trapid_go_stats(args.annotation_file, go_ontology_dict, args.output_dir)
     elif args.app == 'TRINOTATE':
@@ -79,6 +79,7 @@ def build_parser():
     parser.add_argument('--annotation', dest='annotation_file', help='Path of annotation file in CSV or TSV format (mandatory).')
     parser.add_argument('--ontology', dest='ontology_file', help='Path of the GO ontology file (mandatory).')
     parser.add_argument('--outdir', dest='output_dir', help='Path of output directoty where GO term statistics saved (mandatory).')
+    parser.add_argument('--toasel', dest='toa_go_selection', help=f'GO terms seleccion (TOA app): {xlib.get_toa_go_seleccion_code_list_text()}; default: {xlib.Const.DEFAULT_TOA_GO_SELECCTION}.')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')
     parser.add_argument('--trace', dest='trace', help=f'Additional info useful to the developer team: {xlib.get_trace_code_list_text()}; default: {xlib.Const.DEFAULT_TRACE}.')
 
@@ -128,6 +129,15 @@ def check_args(args):
     elif not os.path.isdir(args.output_dir):
         xlib.Message.print('error', '*** The output directy does not exist.')
         OK = False
+
+    # check "toa_go_selection"
+    if args.toa_go_selection is None:
+        args.toa_go_selection = xlib.Const.DEFAULT_TOA_GO_SELECCTION
+    elif not xlib.check_code(args.toa_go_selection, xlib.get_toa_go_seleccion_code_list(), case_sensitive=False):
+        xlib.Message.print('error', f'*** The GO terms seleccion (TOA app) has to be {xlib.get_toa_go_seleccion_code_list_text()}.')
+        OK = False
+    else:
+        args.toa_go_selection = args.toa_go_selection.upper()
 
     # check "verbose"
     if args.verbose is None:
@@ -382,7 +392,7 @@ def calculate_entap_go_stats(annotation_file, go_ontology_dict, output_dir):
 
 #-------------------------------------------------------------------------------
 
-def calculate_toa_go_stats(annotation_file, go_ontology_dict, output_dir):
+def calculate_toa_go_stats(annotation_file, go_ontology_dict, output_dir, toa_go_selection):
     '''
     Calculate GO term statistics of a TOA annotation file (only the sequence with less e-Value is considered).
     '''
@@ -438,9 +448,14 @@ def calculate_toa_go_stats(annotation_file, go_ontology_dict, output_dir):
                 go_id_list = []
 
             # save the go identification list of the sequence hit/hsp with less e-value
-            if float(data_dict['hsp_evalue']) < min_evalue and go_id_list:
-                min_evalue_go_id_list = go_id_list
-                min_evalue = float(data_dict['hsp_evalue'])
+            if toa_go_selection == 'LEV': # the lowest e-value (GO data can be empty) is considered
+                if float(data_dict['hsp_evalue']) < min_evalue:
+                    min_evalue_go_id_list = go_id_list
+                    min_evalue = float(data_dict['hsp_evalue'])
+            elif toa_go_selection == 'LEVWD': # the lowest e-value with GO data not empty is considered
+                if float(data_dict['hsp_evalue']) < min_evalue and go_id_list:
+                    min_evalue_go_id_list = go_id_list
+                    min_evalue = float(data_dict['hsp_evalue'])
 
             xlib.Message.print('verbose', f'\rAnnotation file: {annotation_counter} processed records')
 

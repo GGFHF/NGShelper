@@ -1509,6 +1509,24 @@ def get_go_app_code_list_text():
 
 #-------------------------------------------------------------------------------
 
+def get_toa_go_seleccion_code_list():
+    '''
+    Get the code list of selection code for GO term data in TOA results.
+    '''
+
+    return ['LEV', 'LEVWD']
+
+#-------------------------------------------------------------------------------
+
+def get_toa_go_seleccion_code_list_text():
+    '''
+    Get the code list of selection code for GO term data in TOA results as text.
+    '''
+
+    return 'LEV (the lowest e-value -GO data can be empty- is considered) or LEVWD (the lowest e-value with GO data not empty is considered)'
+
+#-------------------------------------------------------------------------------
+
 def get_trace_code_list():
     '''
     Get the code list of "trace".
@@ -1608,6 +1626,7 @@ class Const():
     DEFAULT_QCOV_HSP_PERC = 0.0
     DEFAULT_PROCESSES_NUMBER = 4
     DEFAULT_THINNING_INTERVAL = 1
+    DEFAULT_TOA_GO_SELECCTION = 'LEVWD'
     DEFAULT_TRACE = 'N'
     DEFAULT_VARIANT_NUMBER_PER_FILE = 1000
     DEFAULT_VERBOSE = 'N'
