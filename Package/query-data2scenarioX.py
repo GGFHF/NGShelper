@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program lists data of variants and alleles and variant identifications to the scenario X.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,14 +23,7 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program lists data of variants and alleles and variant identifications to the scenario X.
-'''
-
-#-------------------------------------------------------------------------------
-
 import argparse
-import gzip
 import os
 import sys
 
@@ -33,7 +32,7 @@ import xsqlite
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -405,7 +404,7 @@ def query_data(conn, file_name, sp1_id, sp2_id, hybrid_id, imputed_md_id, max_se
         # write data
         variant_file_id.write(f'"{variant_id}";"{seq_id}";{position};"{genomic_zone}";"{gene_or_fragment}";"{description}";"{chromosome_id}";"{imputations}"\n')
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The file {os.path.basename(variant_file)} containing variant data is created.')
 
     # close the output variant file
@@ -593,7 +592,7 @@ def query_data(conn, file_name, sp1_id, sp2_id, hybrid_id, imputed_md_id, max_se
             # write data variant identification
             allele_file_id.write(f'"{variant_id}";"{seq_id}";{position};"{genomic_zone}";"{gene_or_fragment}";"{description}";"{chromosome_id}";"{imputations}";"{allele_id}";"{bases}";"{sp1_frequency}";"{sp2_frequency}";"{hybrid_frequency}";"{sp1_mothers_frequency}";"{sp2_mothers_frequency}";"{hybrid_mothers_frequency}";"{sp1_progenies_frequency}";"{sp2_progenies_frequency}";"{hybrid_progenies_frequency}"\n')
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The file {os.path.basename(allele_file)} containing allele data is created.')
 
     # close the output allele file
@@ -627,11 +626,11 @@ def query_data(conn, file_name, sp1_id, sp2_id, hybrid_id, imputed_md_id, max_se
                 imputations_with_n = True
 
         # write variant identitications
-        for variant_id in (imputation_dict[gene_or_fragment].keys()):
+        for variant_id in imputation_dict[gene_or_fragment].keys():
             if imputations_with_y == True and imputations_with_n == False or imputation_dict[gene_or_fragment][variant_id]['imputations'] == 'N':
                 selected_id_file_id.write(f'{variant_id}\n')
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The file {os.path.basename(selected_id_file)} containing selected ids is created.')
 
     # close the output allele file
@@ -642,7 +641,7 @@ def query_data(conn, file_name, sp1_id, sp2_id, hybrid_id, imputed_md_id, max_se
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

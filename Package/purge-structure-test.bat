@@ -2,9 +2,11 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script performs a test of the program convert-vcf.py
+rem in a Windows environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -14,25 +16,21 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script executes a test of the program convert-vcf.py
-rem in a Windows environment.
-
-rem ----------------------------------------------------------------------------
-
 rem Control parameters
 
 if not "%*" == "" (set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------
 
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
 set ERROR=0
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
+set PYTHONPATH=.
 
 set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
 set DATA_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\data"
@@ -44,26 +42,26 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program purge-structure.py
+rem Run the program purge-structure.py
 
-python.exe %PYTHON_OPTIONS% purge-structure.py ^
-    --structure=%DATA_DIR%\Scn3-real-prevalencia1.stru ^
-    --type=0 ^
+%PYTHON% %PYTHON_OPTIONS% purge-structure.py ^
+    --structure=%DATA_DIR%\Scn3-real-prevalencia1.tsv ^
+    --format=2 ^
     --operation=CHAVAL ^
     --value=199 ^
     --nvalue=911 ^
-    --out=%OUTPUT_DIR%\Scn3-real-prevalencia1-purged-chaval.stru ^
+    --out=%OUTPUT_DIR%\Scn3-real-prevalencia1-purged-chaval.tsv ^
     --verbose=Y ^
     --trace=N
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 
-python.exe %PYTHON_OPTIONS% purge-structure.py ^
-    --structure=%DATA_DIR%\Scn3-real-prevalencia1.stru ^
-    --type=0 ^
+%PYTHON% %PYTHON_OPTIONS% purge-structure.py ^
+    --structure=%DATA_DIR%\Scn3-real-prevalencia1.tsv ^
+    --format=2 ^
     --operation=DELCOL ^
     --value=199 ^
     --nvalue=NONE ^
-    --out=%OUTPUT_DIR%\Scn3-real-prevalencia1-purged-delcol.stru ^
+    --out=%OUTPUT_DIR%\Scn3-real-prevalencia1-purged-delcol.tsv ^
     --verbose=Y ^
     --trace=N
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)

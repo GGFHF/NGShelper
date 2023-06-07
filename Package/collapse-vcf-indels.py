@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program collapses the variant records corresponding to an indel in a VCF file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program collapses the variant records corresponding to an indel in a VCF file.
 '''
 
 #-------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -294,7 +294,7 @@ def collapse_indels(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
         # process variant record
         while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
 
-            xlib.Message.print('trace', f'Iniciando...')
+            xlib.Message.print('trace', 'Iniciando...')
 
             # set the sequence identification and position control variables
             w_seq_id = data_dict['chrom']
@@ -312,10 +312,10 @@ def collapse_indels(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
             # initialize the collapse control variable
             collapse = True
 
-            # process variant records of same "actual" variant 
+            # process variant records of same "actual" variant
             while record != '' and not record.startswith('##') and not record.startswith('#CHROM') and data_dict['chrom'] == w_seq_id and int(data_dict['pos']) == w_position + actual_variant_record_counter and collapse:
 
-                xlib.Message.print('trace', f'Inside the loop')
+                xlib.Message.print('trace', 'Inside the loop')
                 xlib.Message.print('trace', f'data_dict["chrom"]: {data_dict["chrom"]} - w_seq_id: {w_seq_id} - position: {data_dict["pos"]} - w_position: {w_position} - actual_variant_record_counter: {actual_variant_record_counter}')
 
                 # add set the variant identification
@@ -339,10 +339,11 @@ def collapse_indels(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
                     raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
                 # build the list of sample genotypes of a variant
+                sample_data_list = []
                 sample_gt_list = []
                 for i in range(sample_number):
-                    sample_data_list = data_dict['sample_list'][i].split(':')
-                    sample_gt_list.append(sample_data_list[gt_position])
+                    sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                    sample_gt_list.append(sample_data_list[i][gt_position])
 
                 # build the lists of the left and right side of sample genotypes of a variant
                 sample_gt_left_list = []
@@ -364,7 +365,7 @@ def collapse_indels(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
                 # initialize imputation control variable
                 imputed_adult_count = 0
 
-                # check 
+                # check
                 for i in range(sample_number):
 
                     # only when the sample is adult
@@ -373,7 +374,7 @@ def collapse_indels(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
                         # check if there are imputed data
                         if sample_gt_left_list[i] == imputed_md_id or sample_gt_right_list[i] == imputed_md_id:
                             imputed_adult_count += 1
-                
+
                 xlib.Message.print('trace', f'variant_id: {variant_id} - imputed_adult_count: {imputed_adult_count}')
 
                 # concat the current reference bases to the new reference bases
@@ -415,18 +416,18 @@ def collapse_indels(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
                         found_best_sample_list = True
 
                 # read the next record of the input VCF file
-                xlib.Message.print('trace', f'Reading ...')
+                xlib.Message.print('trace', 'Reading ...')
                 (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
                 if record != '': xlib.Message.print('trace', f'data_dict["chrom"]: {data_dict["chrom"]} - w_seq_id: {w_seq_id} - position: {data_dict["pos"]} - w_position: {w_position} - actual_variant_record_counter: {actual_variant_record_counter}')
 
             # write the variant record
-            xlib.Message.print('trace', f'Writing VCF ...')
+            xlib.Message.print('trace', 'Writing VCF ...')
             xlib.Message.print('trace', f'w_seq_id: {w_seq_id} - w_position: {w_position} - actual_variant_record_counter: {actual_variant_record_counter}')
             sample_list_text = '\t'.join(best_sample_list)
             output_vcf_file_id.write(f'{w_seq_id}\t{w_position}\t{id}\t{reference_bases}\t{alternative_alleles}\t{qual}\t{filter}\t{info}\t{format}\t{sample_list_text}\n')
 
             # write the collapsing statistics  record
-            xlib.Message.print('trace', f'Writing stats...')
+            xlib.Message.print('trace', 'Writing stats...')
             is_imputed = 'IMPUTED' if imputed_adult_count > 0 else '-'
             stats_file_id.write(f'{w_seq_id};{w_position};{actual_variant_record_counter};{len(reference_bases)};{is_imputed}\n')
 
@@ -440,14 +441,14 @@ def collapse_indels(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
     output_vcf_file_id.close()
     stats_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The file {os.path.basename(output_vcf_file)} is created.')
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

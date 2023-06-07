@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program extracts sequences from a FASTA file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,11 +23,6 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program extracts sequences from a FASTA file.
-'''
-
-#-------------------------------------------------------------------------------
 
 import argparse
 import gzip
@@ -33,7 +34,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -138,6 +139,7 @@ def check_args(args):
 
 def extract_sequences(fasta_file, id_file, id_type, extract_file):
     '''
+    x
     '''
 
     # get the identification data
@@ -170,14 +172,14 @@ def extract_sequences(fasta_file, id_file, id_type, extract_file):
     # initialize record counters
     read_seq_counter = 0
     written_seq_counter = 0
- 
+
     # read the first record of FASTA file
     record = fasta_file_id.readline()
 
     # while there are records in FASTA file
     while record != '':
 
-        # process the head record 
+        # process the head record
         if record.startswith('>'):
 
             # extract the identification
@@ -253,13 +255,14 @@ def extract_sequences(fasta_file, id_file, id_type, extract_file):
     fasta_file_id.close()
     extract_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('verbose', f'\nThe file {os.path.basename(extract_file)} containing the extacted sequences is created.')
 
 #-------------------------------------------------------------------------------
 
 def get_id_data(id_file):
     '''
+    x
     '''
 
     # initialize the list and dictonary of identifications
@@ -311,7 +314,7 @@ def get_id_data(id_file):
     return id_list, id_dict
 
 #-------------------------------------------------------------------------------
-    
+
 def get_id_type_code_list():
     '''
     Get the code list of "id_type".
@@ -320,7 +323,7 @@ def get_id_type_code_list():
     return ['LITERAL', 'REGEX']
 
 #-------------------------------------------------------------------------------
-    
+
 def get_id_type_code_list_text():
     '''
     Get the code list of "id_type" as text.
@@ -329,7 +332,7 @@ def get_id_type_code_list_text():
     return str(get_id_type_code_list()).strip('[]').replace('\'','').replace(',', ' or')
 
 #-------------------------------------------------------------------------------
-    
+
 def get_verbose_code_list():
     '''
     Get the code list of "verbose".
@@ -338,7 +341,7 @@ def get_verbose_code_list():
     return ['Y', 'N']
 
 #-------------------------------------------------------------------------------
-    
+
 def get_verbose_code_list_text():
     '''
     Get the code list of "verbose" as text.
@@ -347,7 +350,7 @@ def get_verbose_code_list_text():
     return 'Y (yes) or N (no)'
 
 #-------------------------------------------------------------------------------
-    
+
 def get_trace_code_list():
     '''
     Get the code list of "trace".
@@ -356,7 +359,7 @@ def get_trace_code_list():
     return ['Y', 'N']
 
 #-------------------------------------------------------------------------------
-    
+
 def get_trace_code_list_text():
     '''
     Get the code list of "trace" as text.
@@ -368,7 +371,7 @@ def get_trace_code_list_text():
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

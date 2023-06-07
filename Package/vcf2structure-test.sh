@@ -3,9 +3,11 @@
 
 #-------------------------------------------------------------------------------
 
+# This script performs a test of the program  a vcf2structure.py 
+# in a Linux environment.
+#
 # This software has been developed by:
 #
-#    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -15,18 +17,13 @@
 
 #-------------------------------------------------------------------------------
 
-# This script executes a test of the program  a vcf2structure.py 
-# in a Linux environment.
-
-#-------------------------------------------------------------------------------
-
 # Control parameters
 
 if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 #-------------------------------------------------------------------------------
 
-# Set run environment
+# Set environment
 
 NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
 DATA_DIR=$TRABAJO/ProyectosVScode/NGShelper/data
@@ -38,7 +35,7 @@ cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
 
-# Execute the program vcf2structure.py
+# Run the program vcf2structure.py
 
 /usr/bin/time \
     ./vcf2structure.py \
@@ -50,8 +47,8 @@ cd $NGSHELPER_DIR
         --new_mdi=-109 \
         --imd_id=99 \
         --trans=ADD100 \
-        --type=0 \
-        --out=$OUTPUT_DIR/concatenated_imputed_progenies-6000DP-scenario2-2structure.txt \
+        --out=$OUTPUT_DIR/concatenated_imputed_progenies-6000DP-scenario2-structure.tsv \
+        --format=2 \
         --verbose=Y \
         --trace=N \
         --tvi=NONE

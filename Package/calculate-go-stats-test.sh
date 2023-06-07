@@ -2,9 +2,11 @@
 
 #-------------------------------------------------------------------------------
 
+# This script performs a test of the program  a calculate-go-stats.py 
+# in a Linux environment.
+#
 # This software has been developed by:
 #
-#    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -14,18 +16,13 @@
 
 #-------------------------------------------------------------------------------
 
-# This script executes a test of the program  a calculate-go-stats.py 
-# in a Linux environment.
-
-#-------------------------------------------------------------------------------
-
 # Control parameters
 
 if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 #-------------------------------------------------------------------------------
 
-# Set run environment
+# Set environment
 
 PYTHONPATH=.
 
@@ -39,7 +36,7 @@ cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
 
-# Execute the program calculate-go-stats.py
+# Run the program calculate-go-stats.py
 
 /usr/bin/time \
     ./calculate-go-stats.py \
@@ -67,6 +64,7 @@ if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
         --annotation=$DATA_DIR/plant-annotation.csv \
         --ontology=$DATA_DIR/go.obo \
         --outdir=$OUTPUT_DIR \
+        --toasel=LEVWD \
         --verbose=Y  \
         --trace=N
 if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi

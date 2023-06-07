@@ -2,19 +2,16 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script runs the program filter-ssrs.py in a Windows environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
 rem     https://github.com/ggfhf/
 rem
 rem Licence: GNU General Public Licence Version 3.
-
-rem ----------------------------------------------------------------------------
-
-rem This script filters a SSR file selecting SSRs included in a COS.
 
 rem ----------------------------------------------------------------------------
 
@@ -30,9 +27,10 @@ setlocal EnableDelayedExpansion
 
 set ERROR=0
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
 set ARGV=
+set PYTHONPATH=.
 
 set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
 
@@ -44,7 +42,7 @@ rem Execute the program filter-ssrs.py
 
 :TRANSCRIPT_FILTER
 
-python.exe %PYTHON_OPTIONS% filter-ssrs.py %* %ARGV%
+%PYTHON% %PYTHON_OPTIONS% filter-ssrs.py %* %ARGV%
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------

@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program extracts RNA sequences from a GFF file and its corresponding genome
+FASTA file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program extracts RNA sequences from a GFF file and its corresponding genome 
-FASTA file.
 '''
 
 #-------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -224,7 +224,7 @@ def extract_gff_rnas(gff_file, gff_format, genome_file, rna_file, tvi_list):
 
     xlib.Message.print('verbose', '\n')
 
-    for x in tvi_list: 
+    for x in tvi_list:
         xlib.Message.print('trace', f'RNA seq in {x}: {rna_seq_id_dict.get(x, {})}')
 
     # close the input GFF file
@@ -257,14 +257,14 @@ def extract_gff_rnas(gff_file, gff_format, genome_file, rna_file, tvi_list):
     # initialize record counters
     genomic_seq_counter = 0
     rna_seq_counter = 0
- 
+
     # read the first record of genome file
     record = genome_file_id.readline()
 
     # while there are records in genome file
     while record != '':
 
-        # process the head record 
+        # process the head record
         if record.startswith('>'):
 
             # add 1 to the read sequence counter
@@ -327,14 +327,14 @@ def extract_gff_rnas(gff_file, gff_format, genome_file, rna_file, tvi_list):
     genome_file_id.close()
     rna_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('verbose', f'\nThe file {os.path.basename(rna_file)} containing FASTA RNA sequences in cDNA format cDNA is created.')
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

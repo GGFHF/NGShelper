@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program extracts sequences from a VCF file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program extracts sequences from a VCF file.
 '''
 
 #-------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -243,14 +243,14 @@ def extract_sequences(vcf_file, id_file, extract_file):
     vcf_file_id.close()
     extract_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The file {os.path.basename(extract_file)} containing the extracted sequences is created.')
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

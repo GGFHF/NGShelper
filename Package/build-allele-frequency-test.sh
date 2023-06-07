@@ -1,11 +1,12 @@
-
 #!/bin/bash
 
 #-------------------------------------------------------------------------------
 
+# This script performs a test of the program  a build-allele-frequency.py 
+# in a Linux environment.
+#
 # This software has been developed by:
 #
-#    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -15,18 +16,13 @@
 
 #-------------------------------------------------------------------------------
 
-# This script executes a test of the program  a build-allele-frequency.py 
-# in a Linux environment.
-
-#-------------------------------------------------------------------------------
-
 # Control parameters
 
 if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 #-------------------------------------------------------------------------------
 
-# Set run environment
+# Set environment
 
 NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
 DATA_DIR=$TRABAJO/ProyectosVScode/NGShelper/data
@@ -38,7 +34,7 @@ cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
 
-# Execute the program build-allele-frequency.py
+# Run the program build-allele-frequency.py
 
 # -- /usr/bin/time \
 # --     ./build-allele-frequency.py \

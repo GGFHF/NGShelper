@@ -2,9 +2,10 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script runs the program get-flanking-regions.py in a Windows environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -14,20 +15,16 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script builds a FASTA file with the flanking genomic region of variants
-rem contained in a VCF file.
-
-rem ----------------------------------------------------------------------------
-
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
 set ERROR=0
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
 set ARGV=
+set PYTHONPATH=.
 
 set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
 
@@ -35,9 +32,9 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program get-flanking-regions.py
+rem Run the program get-flanking-regions.py
 
-python.exe %PYTHON_OPTIONS% get-flanking-regions.py %* %ARGV%
+%PYTHON% %PYTHON_OPTIONS% get-flanking-regions.py %* %ARGV%
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------

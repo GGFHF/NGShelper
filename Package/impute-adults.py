@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-#-------------------------------------------------------------------------------
-
-'''
-This software has been developed by:
-
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
-    Dpto. Sistemas y Recursos Naturales
-    ETSI Montes, Forestal y del Medio Natural
-    Universidad Politecnica de Madrid
-    https://github.com/ggfhf/
-
-Licence: GNU General Public Licence Version 3.
-'''
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -21,6 +12,15 @@ Licence: GNU General Public Licence Version 3.
 This program imputes genotypes with missing data of adult individuals in a VCF file generated in a
 hybridization studies of two parental species, hybrids and their half-sib progenies, based on the
 relative frequencies of missing data in the adults of both parental species.
+
+This software has been developed by:
+
+    Dpto. Sistemas y Recursos Naturales
+    ETSI Montes, Forestal y del Medio Natural
+    Universidad Politecnica de Madrid
+    https://github.com/ggfhf/
+
+Licence: GNU General Public Licence Version 3.
 '''
 
 #-------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -139,7 +139,7 @@ def check_args(args):
     elif not xlib.check_float(args.min_aa_percentage, minimum=0.0, maximum=100.0):
         xlib.Message.print('error', 'The minimum percent of alternative alleles per species has to be a float number between 0.0 and 100.0.')
         OK = False
-    else: 
+    else:
         args.min_aa_percentage = float(args.min_aa_percentage)
 
     # check "min_md_imputation_percentage"
@@ -149,7 +149,7 @@ def check_args(args):
     elif not xlib.check_float(args.min_md_imputation_percentage, minimum=0.0, maximum=100.0):
         xlib.Message.print('error', 'The minimum percentage of missing data imputation to a new alternative allele per species has to be a float number between 0.0 and 100.0.')
         OK = False
-    else: 
+    else:
         args.min_md_imputation_percentage = float(args.min_md_imputation_percentage)
 
     # check "imputed_md_id"
@@ -197,7 +197,7 @@ def check_args(args):
     elif not xlib.check_float(args.min_afr_percentage, minimum=0.0, maximum=100.0):
         xlib.Message.print('error', 'The minimum percentage of allele frequency per species has to be a float number between 0.0 and 100.0.')
         OK = False
-    else: 
+    else:
         args.min_afr_percentage = float(args.min_afr_percentage)
 
     # check "min_depth"
@@ -266,7 +266,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
     adult_num_1 = 0
     adult_num_2 = 0
     adult_num_h = 0
-    for key, value in sample_dict.items():
+    for _, value in sample_dict.items():
         if value['mother_id'] == 'NONE':
             if value['species_id'] == sp1_id:
                 adult_num_1 += 1
@@ -316,7 +316,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
     filtered_variant_counter = 0
 
     # read the first record of input VCF file
-    (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+    (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
     # while there are records in input VCF file
     while record != '':
@@ -334,7 +334,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Filtered variants ... {filtered_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
         # process the column description record
         if record.startswith('#CHROM'):
@@ -369,7 +369,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Filtered variants ... {filtered_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
         # process variant record
         while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
@@ -424,10 +424,11 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
                 raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
             # build the list of sample genotypes of a variant
+            sample_data_list = []
             sample_gt_list = []
             for i in range(sample_number):
-                sample_data_list = data_dict['sample_list'][i].split(':')
-                sample_gt_list.append(sample_data_list[gt_position])
+                sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                sample_gt_list.append(sample_data_list[i][gt_position])
 
             # build the lists of the left and right side of sample genotypes of a variant
             sample_gt_left_list = []
@@ -539,7 +540,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
                     alternative_allele_list
             if variant_id in tvi_list: xlib.Message.print('trace', f'(9) alternative_allele_counter_list: {alternative_allele_counter_list}')
 
-            # calculate the missing data counter per species and their percentages 
+            # calculate the missing data counter per species and their percentages
             md_counter_1 = 0
             md_counter_2 = 0
             md_counter_h = 0
@@ -602,7 +603,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
             if variant_id in tvi_list: xlib.Message.print('trace', f'(12) monomorphic: {monomorphic}')
 
             if variant_id in tvi_list:
-                literal = ' '
+                literal = ''
                 for i in range(sample_number):
                     literal += f'{str(sample_gt_left_list[i])}{sample_sep_list[i]}{str(sample_gt_right_list[i])} '
                 xlib.Message.print('trace', f'(13) genotype list before imputation revision: {literal}')
@@ -668,8 +669,8 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
             # rebuild the sample genotype data list and their corresponding record data
             sample_list = []
             for i in range(sample_number):
-                sample_data_list[gt_position] = sample_gt_list[i]
-                sample_list.append(':'.join(sample_data_list))
+                sample_data_list[i][gt_position] = sample_gt_list[i]
+                sample_list.append(':'.join(sample_data_list[i]))
 
             if variant_id in tvi_list: xlib.Message.print('trace', f'(15) reference_bases: {reference_bases}')
             if variant_id in tvi_list: xlib.Message.print('trace', f'(16) alternative_allele_list: {alternative_allele_list}')
@@ -732,10 +733,10 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
                         scenario0_are_there_imputations = True
                         break
 
-            # if DP is less than the minimum combined depth or all samples are monomorphic or the missing data percentage is greater than or equal to the missing data percentage threshold in both species or allele frequency is not OK 
+            # if DP is less than the minimum combined depth or all samples are monomorphic or the missing data percentage is greater than or equal to the missing data percentage threshold in both species or allele frequency is not OK
             if variant_id in tvi_list: xlib.Message.print('trace', f'(22) dp: {dp} - md_percentage_1: {md_percentage_1:5.2f}% - md_percentage_2: {md_percentage_2:5.2f}% - allele_frequency_OK: {allele_frequency_OK}')
             if dp < min_depth or monomorphic or (md_percentage_1 > sp1_max_md_percentage and md_percentage_2 > sp2_max_md_percentage) or not allele_frequency_OK or scenario0_are_there_imputations:
- 
+
                 # add 1 to the filtered variant counter
                 filtered_variant_counter += 1
                 if variant_id in tvi_list: xlib.Message.print('trace', '(23) This variant is deleted!!!')
@@ -755,7 +756,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Filtered variants ... {filtered_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
     xlib.Message.print('verbose', '\n')
 
@@ -763,7 +764,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
     input_vcf_file_id.close()
     temporal_vcf_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The temporal file {os.path.basename(temporal_vcf_file)} containing the filtered variants is created.')
     xlib.Message.print('info', 'Removing metadata of filtered variants ...')
 
@@ -806,7 +807,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
             i2 = record.find(',', i1)
             if i2 > -1:
                 seq_id = record[i1:i2]
-            
+
             # write the record when the sequence identification was not filtered
             if seq_id in non_filtered_seq_id_list:
                 output_vcf_file_id.write(record)
@@ -824,7 +825,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
     temporal_vcf_file_id.close()
     output_vcf_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The file {os.path.basename(output_vcf_file)} containing the filtered variants is created.')
 
     # delete temporal VCF file
@@ -835,7 +836,7 @@ def impute_adults(input_vcf_file, sample_file, fix, scenario, min_aa_percentage,
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

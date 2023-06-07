@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program prints data of a selected variant list.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program prints data of a selected variant list.
 '''
 
 #-------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -173,7 +173,7 @@ def print_variants(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, output_dir,
     # get the sample data
     sample_dict = xlib.get_sample_data(sample_file, sp1_id, sp2_id, hybrid_id)
 
-    # initialize the sample, species and mother identification lists per variant and their maximum identification length 
+    # initialize the sample, species and mother identification lists per variant and their maximum identification length
     sample_id_list = []
     sample_id_max_len = 0
     species_id_list = []
@@ -198,7 +198,7 @@ def print_variants(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, output_dir,
     total_variant_counter = 0
 
     # read the first record of input VCF file
-    (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+    (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
     # while there are records in input VCF file
     try:
@@ -214,7 +214,7 @@ def print_variants(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, output_dir,
                 xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Found variants ... {len(found_variant_list):8d}')
 
                 # read the next record of the input VCF file
-                (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+                (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
             # process the column description record
             if record.startswith('#CHROM'):
@@ -251,7 +251,7 @@ def print_variants(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, output_dir,
                 xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Found variants ... {len(found_variant_list):8d}')
 
                 # read the next record of the input VCF file
-                (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+                (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
             # process variant record
             while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
@@ -273,10 +273,11 @@ def print_variants(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, output_dir,
                     raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
                 # build the list of sample genotypes of a variant
+                sample_data_list = []
                 sample_gt_list = []
                 for i in range(sample_number):
-                    sample_data_list = data_dict['sample_list'][i].split(':')
-                    sample_gt_list.append(sample_data_list[gt_position])
+                    sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                    sample_gt_list.append(sample_data_list[i][gt_position])
 
                 # build the lists of the left and right side of sample genotypes of a variant
                 sample_gt_left_list = []
@@ -349,7 +350,7 @@ def print_variants(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, output_dir,
                     raise xlib.BreakAllLoops
 
                 # read the next record of the input VCF file
-                (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+                (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
     except xlib.BreakAllLoops:
         pass
@@ -374,7 +375,7 @@ def print_variants(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, output_dir,
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

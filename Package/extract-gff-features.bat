@@ -2,9 +2,10 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script runs the program extract-gff-features.py in a Windows environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -14,20 +15,16 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script This program extracts genomic features from a GFF file corresponding
-rem to the variant of a VCF file.
-
-rem ----------------------------------------------------------------------------
-
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
 set ERROR=0
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
 set ARGV=
+set PYTHONPATH=.
 
 set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
 
@@ -35,9 +32,9 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program extract-gff-features.py
+rem Run the program extract-gff-features.py
 
-python.exe %PYTHON_OPTIONS% extract-gff-features.py %* %ARGV%
+%PYTHON% %PYTHON_OPTIONS% extract-gff-features.py %* %ARGV%
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------

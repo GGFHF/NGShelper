@@ -2,9 +2,11 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script performs a test of the program vcf2structure.py
+rem in a Windows environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -14,25 +16,21 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script executes a test of the program vcf2structure.py
-rem in a Windows environment.
-
-rem ----------------------------------------------------------------------------
-
 rem Control parameters
 
 if not "%*" == "" (set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------
 
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
 set ERROR=0
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
+set PYTHONPATH=.
 
 set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
 set DATA_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\data"
@@ -44,9 +42,9 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program vcf2structure.py
+rem Run the program vcf2structure.py
 
-python.exe %PYTHON_OPTIONS% vcf2structure.py ^
+%PYTHON% %PYTHON_OPTIONS% vcf2structure.py ^
     --vcf=%DATA_DIR%\concatenated_imputed_progenies-6000DP-scenario2.vcf ^
     --samples=%DATA_DIR%\IDs-total.txt ^
     --sp1_id=AL ^
@@ -55,8 +53,8 @@ python.exe %PYTHON_OPTIONS% vcf2structure.py ^
     --new_mdi=-109 ^
     --imd_id=99 ^
     --trans=ADD100 ^
-    --type=0 ^
-    --out=%OUTPUT_DIR%\concatenated_imputed_progenies-6000DP-scenario2-2structure.txt ^
+    --out=%OUTPUT_DIR%\concatenated_imputed_progenies-6000DP-scenario2-structure.tsv ^
+    --format=2 ^
     --verbose=Y ^
     --trace=N ^
     --tvi=NONE

@@ -2,9 +2,10 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script runs the program simhyb2structure.py in a Windows environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -14,19 +15,16 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script converts a output SimHyb file to the input Structure format in two lines.
-
-rem ----------------------------------------------------------------------------
-
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
 set ERROR=0
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
 set ARGV=
+set PYTHONPATH=.
 
 set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
 
@@ -34,9 +32,9 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program simhyb2structure.py
+rem Run the program simhyb2structure.py
 
-python.exe %PYTHON_OPTIONS% simhyb2structure.py %* %ARGV%
+%PYTHON% %PYTHON_OPTIONS% simhyb2structure.py %* %ARGV%
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------

@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-#-------------------------------------------------------------------------------
-
-'''
-This software has been developed by:
-
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
-    Dpto. Sistemas y Recursos Naturales
-    ETSI Montes, Forestal y del Medio Natural
-    Universidad Politecnica de Madrid
-    https://github.com/ggfhf/
-
-Licence: GNU General Public Licence Version 3.
-'''
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
 This program builds the allele frequency from a VCF file in the format required
 by SimHyb application.
+
+This software has been developed by:
+
+    Dpto. Sistemas y Recursos Naturales
+    ETSI Montes, Forestal y del Medio Natural
+    Universidad Politecnica de Madrid
+    https://github.com/ggfhf/
+
+Licence: GNU General Public Licence Version 3.
 '''
 
 #-------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -300,13 +300,13 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
             atcg_conversion_list = []
             index = atcg.find(reference_bases.upper())
             if index == -1:
-                raise xlib.ProgramException('', 'L016')
+                raise xlib.ProgramException('', 'L016', variant_id)
             else:
                 atcg_conversion_list.append(index + 1)
             for i in range(len(alternative_allele_list)):
                 index = atcg.find(alternative_allele_list[i].upper())
                 if index == -1:
-                    raise xlib.ProgramException('', 'L016')
+                    raise xlib.ProgramException('', 'L016', variant_id)
                 else:
                     atcg_conversion_list.append(index + 1)
             atcg_conversion_dict[total_variant_counter] = atcg_conversion_list
@@ -319,10 +319,11 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
                 raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
             # build the list of sample genotypes of a variant
+            sample_data_list = []
             sample_gt_list = []
             for i in range(sample_number):
-                sample_data_list = data_dict['sample_list'][i].split(':')
-                sample_gt_list.append(sample_data_list[gt_position])
+                sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                sample_gt_list.append(sample_data_list[i][gt_position])
 
             # build the lists of the left and right side of sample genotypes of a variant
             sample_gt_left_list = []
@@ -507,7 +508,7 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
         # close SymHyb file
         current_simhyb_file_id.close()
 
-        # print OK message 
+        # print OK message
         xlib.Message.print('info', f'The SimHyb file {os.path.basename(current_simhyb_file)} is created.')
 
         # set the new begin and end variant
@@ -518,7 +519,7 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

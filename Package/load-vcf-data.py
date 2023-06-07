@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program loads data of a VCF file into NGShelper database.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,15 +23,8 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program loads data of a VCF file into NGShelper database.
-'''
-
-#-------------------------------------------------------------------------------
-
 import argparse
 import gzip
-import math
 import os
 import sys
 
@@ -34,7 +33,7 @@ import xsqlite
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -170,8 +169,10 @@ def check_args(args):
 
     # check the identification set
     if OK:
-        if args.sp1_id == args.sp2_id or \
-           args.hybrid_id is not None and (args.sp1_id == args.hybrid_id or args.sp2_id == args.hybrid_id):
+        if args.sp1_id.upper() == 'NONE' and args.hybrid_id.upper() == 'NONE':
+            pass
+        elif args.sp1_id == args.sp2_id or \
+           args.hybrid_id.upper() != 'NONE' and (args.sp1_id == args.hybrid_id or args.sp2_id == args.hybrid_id):
             xlib.Message.print('error', 'The identifications must be different.')
             OK = False
 
@@ -205,7 +206,7 @@ def load_vcf_data(conn, vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, impute
         value['type'] = 'N/A'
         xsqlite.insert_vcf_samples_row(conn, value)
     xlib.Message.print('verbose', 'Data are inserted.\n')
-     
+
     # create index "vcf_samples_index" with columns "dataset_id" and "gene_id"  (if not exists)
     xlib.Message.print('verbose', 'Creating the index on the table "vcf_samples" (if it does not exist) ...\n')
     xsqlite.create_vcf_samples_index(conn)
@@ -248,10 +249,21 @@ def load_vcf_data(conn, vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, impute
     xsqlite.create_vcf_samples_alleles(conn)
     xlib.Message.print('verbose', 'The table is created.\n')
 
-    # initialize the row data dictionary corresponding to the tables "vcf_variants" and "vcf_samples_alleles"
+    # drop table "vcf_samples_genotypes" (if it exists)
+    xlib.Message.print('verbose', 'Droping the table "vcf_samples_genotypes" ...\n')
+    xsqlite.drop_vcf_samples_genotypes(conn)
+    xlib.Message.print('verbose', 'The table is droped.\n')
+
+    # create table "vcf_samples_genotypes"
+    xlib.Message.print('verbose', 'Creating the table "vcf_samples_genotypes" ...\n')
+    xsqlite.create_vcf_samples_genotypes(conn)
+    xlib.Message.print('verbose', 'The table is created.\n')
+
+    # initialize the row data dictionary corresponding to the tables "vcf_variants", "vcf_alleles", "vcf_samples_alleles" and "vcf_samples_genotypes"
     vcf_variants_row_dict = {}
     vcf_alleles_row_dict = {}
     vcf_samples_alleles_row_dict = {}
+    vcf_samples_genotypes_row_dict = {}
 
     # build the list of imputed and missing data alleles
     M_I_list = [imputed_md_id, xlib.get_md_symbol()]
@@ -265,6 +277,7 @@ def load_vcf_data(conn, vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, impute
     vcf_variants_inserted_row_counter = 0
     vcf_alleles_inserted_row_counter = 0
     vcf_samples_alleles_inserted_row_counter = 0
+    vcf_samples_genotypes_inserted_row_counter = 0
 
     # initialize the sample species and mother identification lists per variant
     sample_id_list = []
@@ -296,7 +309,7 @@ def load_vcf_data(conn, vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, impute
             input_record_counter += 1
 
             # print the counters
-            xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... { total_variant_counter:8d}')
+            xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - vcf_variants ... {vcf_variants_inserted_row_counter:8d} - vcf_alleles ... {vcf_alleles_inserted_row_counter:8d} - vcf_samples_alleles ... {vcf_samples_alleles_inserted_row_counter:8d} - vcf_samples_genotypes ... {vcf_samples_genotypes_inserted_row_counter:8d}')
 
             # read the next record of the input VCF file
             (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
@@ -330,7 +343,7 @@ def load_vcf_data(conn, vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, impute
             sample_number = len(species_id_list)
 
             # print the counters
-            xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d}')
+            xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - vcf_variants ... {vcf_variants_inserted_row_counter:8d} - vcf_alleles ... {vcf_alleles_inserted_row_counter:8d} - vcf_samples_alleles ... {vcf_samples_alleles_inserted_row_counter:8d} - vcf_samples_genotypes ... {vcf_samples_genotypes_inserted_row_counter:8d}')
 
             # read the next record of the input VCF file
             (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
@@ -391,10 +404,11 @@ def load_vcf_data(conn, vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, impute
                 raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
             # build the list of sample genotypes of a variant
+            sample_data_list = []
             sample_gt_list = []
             for i in range(sample_number):
-                sample_data_list = data_dict['sample_list'][i].split(':')
-                sample_gt_list.append(sample_data_list[gt_position])
+                sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                sample_gt_list.append(sample_data_list[i][gt_position])
 
             # build the lists of the left and right side of sample genotypes of a variant
             sample_gt_left_list = []
@@ -503,27 +517,41 @@ def load_vcf_data(conn, vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, impute
                     xsqlite.insert_vcf_samples_alleles_row(conn, vcf_samples_alleles_row_dict)
                     vcf_samples_alleles_inserted_row_counter += 1
 
+            # set data and insert rows into the table "vcf_samples_genotypes"
+            vcf_samples_genotypes_row_dict['variant_id'] = variant_id
+            for i in range(sample_number):
+                vcf_samples_genotypes_row_dict['sample_id'] = sample_id_list[i]
+                vcf_samples_genotypes_row_dict['gt_left'] = sample_gt_left_list[i]
+                vcf_samples_genotypes_row_dict['gt_right'] = sample_gt_right_list[i]
+                xsqlite.insert_vcf_samples_genotypes_row(conn, vcf_samples_genotypes_row_dict)
+                vcf_samples_genotypes_inserted_row_counter += 1
+
             # print the counters
-            xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - vcf_variants ... {vcf_variants_inserted_row_counter:8d} - vcf_alleles ... {vcf_alleles_inserted_row_counter:8d} - vcf_samples_alleles ... {vcf_samples_alleles_inserted_row_counter:8d}')
+            xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - vcf_variants ... {vcf_variants_inserted_row_counter:8d} - vcf_alleles ... {vcf_alleles_inserted_row_counter:8d} - vcf_samples_alleles ... {vcf_samples_alleles_inserted_row_counter:8d} - vcf_samples_genotypes ... {vcf_samples_genotypes_inserted_row_counter:8d}')
 
             # read the next record of the input VCF file
             (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
     xlib.Message.print('verbose', '\n')
-     
+
     # create the index "vcf_variants_index" on the table "vcf_variants"
     xlib.Message.print('verbose', 'Creating the index on the table "vcf_variants" ...\n')
     xsqlite.create_vcf_variants_index(conn)
     xlib.Message.print('verbose', 'The index is created.\n')
-     
+
     # create the index "vcf_alleles_index" on the table "vcf_alleles"
     xlib.Message.print('verbose', 'Creating the index on the table "vcf_alleles" ...\n')
     xsqlite.create_vcf_alleles_index(conn)
     xlib.Message.print('verbose', 'The index is created.\n')
-     
+
     # create the index "vcf_samples_alleles_index" on the table "vcf_samples_alleles"
     xlib.Message.print('verbose', 'Creating the index on the table "vcf_samples_alleles" ...\n')
     xsqlite.create_vcf_samples_alleles_index(conn)
+    xlib.Message.print('verbose', 'The index is created.\n')
+
+    # create the index "vcf_samples_genotypes_index" on the table "vcf_samples_genotypes"
+    xlib.Message.print('verbose', 'Creating the index on the table "vcf_samples_genotypes" ...\n')
+    xsqlite.create_vcf_samples_genotypes_index(conn)
     xlib.Message.print('verbose', 'The index is created.\n')
 
     # save changes into NGShelper database
@@ -538,7 +566,7 @@ def load_vcf_data(conn, vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, impute
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

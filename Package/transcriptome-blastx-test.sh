@@ -2,9 +2,11 @@
 
 #-------------------------------------------------------------------------------
 
+# This script performs a test of the program transcriptome-blastx.py
+# in a Linux environment.
+#
 # This software has been developed by:
 #
-#    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -14,18 +16,13 @@
 
 #-------------------------------------------------------------------------------
 
-# This script executes a test of the program transcriptome-blastx.py in a Linux
-# environment.
-
-#-------------------------------------------------------------------------------
-
 # Control parameters
 
 if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 #-------------------------------------------------------------------------------
 
-# Set run environment
+# Set environment
 
 BLASTPLUS_DIR=$APPS/Miniconda3/envs/blast/bin
 NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
@@ -50,7 +47,7 @@ cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
 
-# Execute the program transcriptome-blastx.py
+# Run the program transcriptome-blastx.py
 
 /usr/bin/time \
     ./transcriptome-blastx.py \

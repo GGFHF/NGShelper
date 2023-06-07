@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program annotates transcripts.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -15,11 +21,6 @@ This software has been developed by:
 Licence: GNU General Public Licence Version 3.
 '''
 
-#-------------------------------------------------------------------------------
-
-'''
-This program annotates transcripts.
-'''
 #-------------------------------------------------------------------------------
 
 import gzip
@@ -34,7 +35,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -49,7 +50,7 @@ def main(argv):
     parser = build_parser()
     (options, args) = parser.parse_args()
     check_options(options)
- 
+
     # set environment
     os.environ['BLASTDB'] = options.blast_db
 
@@ -119,10 +120,10 @@ def main(argv):
             # while there are records
             while record != '':
 
-                # process the head record 
+                # process the head record
                 if record.startswith('>'):
 
-                    # extract the data 
+                    # extract the data
                     mo = re.search(pattern, record)
                     transcript_info = mo.group(1)
 
@@ -273,7 +274,7 @@ def main(argv):
                 break
 
             # wait a delay time
-            time.sleep(xlib.Const.DELAY_TIME) 
+            time.sleep(xlib.Const.DELAY_TIME)
 
         # check all blastx processes are ended OK
         if ok_count < options.node_number:
@@ -298,7 +299,7 @@ def main(argv):
 
                 # open the concatenation file
                 concatenation_file_id = open(concatenation_file, mode='w', encoding='utf8', newline='\n')
-                
+
                 # process every annotation file
                 for i in range(options.node_number):
 
@@ -737,7 +738,7 @@ def build_watcher_script(watcher_script, watcher_log, blastx_process_script, con
 def check_infrastructure_software():
     '''
     Check if the infrastructure software is setup.
-    '''    
+    '''
 
     # initialize the control variable
     OK = True
@@ -760,7 +761,7 @@ def check_infrastructure_software():
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program filters a FASTA file according to the sequence length.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,15 +23,9 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program filters a FASTA file according to the sequence length.
-'''
-#-------------------------------------------------------------------------------
-
 import argparse
 import gzip
 import os
-import subprocess
 import sys
 
 import xlib
@@ -45,8 +45,8 @@ def main():
     args = parser.parse_args()
     check_args(args)
 
-    # filter transcripts
-    filter_transcripts_bylen(args.fasta_file, args.output_file, args.minlen, args.maxlen)
+    # filter sequences
+    filter_sequences_bylen(args.fasta_file, args.output_file, args.minlen, args.maxlen)
 
 #-------------------------------------------------------------------------------
 
@@ -62,9 +62,9 @@ def build_parser():
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'
     parser.add_argument('--fasta', dest='fasta_file', help='Path of FASTA file (mandatory)')
-    parser.add_argument('--output', dest='output_file', help='Path of a output file where filtered transcripts will be saved.')
-    parser.add_argument('--minlen', dest='minlen', help=f'Transcript with length values less than this value will be filtered (default: {xlib.Const.DEFAULT_MINLEN}).')
-    parser.add_argument('--maxlen', dest='maxlen', help=f'Transcript with length values greater than this value will be filtered (default: {xlib.Const.DEFAULT_MAXLEN}).')
+    parser.add_argument('--output', dest='output_file', help='Path of a output file where sequences filtered will be saved.')
+    parser.add_argument('--minlen', dest='minlen', help=f'Sequences with length values less than this value will be filtered (default: {xlib.Const.DEFAULT_MINLEN}).')
+    parser.add_argument('--maxlen', dest='maxlen', help=f'Sequences with length values greater than this value will be filtered (default: {xlib.Const.DEFAULT_MAXLEN}).')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')
     parser.add_argument('--trace', dest='trace', help=f'Additional info useful to the developer team: {xlib.get_trace_code_list_text()}; default: {xlib.Const.DEFAULT_TRACE}.')
 
@@ -91,7 +91,7 @@ def check_args(args):
 
     # check the output_file value
     if args.output_file is None:
-        xlib.Message.print('error', '*** A output file where filtered transcripts will be saved is not indicated in the input arguments.')
+        xlib.Message.print('error', '*** A output file where sequences filtered will be saved is not indicated in the input arguments.')
         OK = False
     else:
         try:
@@ -150,9 +150,9 @@ def check_args(args):
 
 #-------------------------------------------------------------------------------
 
-def filter_transcripts_bylen(fasta_file, output_file, minlen, maxlen):
+def filter_sequences_bylen(fasta_file, output_file, minlen, maxlen):
     '''
-    Filter transcripts according to their length.
+    Filter sequences according to their length.
     '''
 
     # open the FASTA file
@@ -182,14 +182,14 @@ def filter_transcripts_bylen(fasta_file, output_file, minlen, maxlen):
     # initialize record counters
     read_seq_counter = 0
     written_seq_counter = 0
- 
+
     # read the first record of FASTA file
     record = fasta_file_id.readline()
 
     # while there are records in FASTA file
     while record != '':
 
-        # process the head record 
+        # process the head record
         if record.startswith('>'):
 
             # extract the identification
@@ -237,7 +237,7 @@ def filter_transcripts_bylen(fasta_file, output_file, minlen, maxlen):
     fasta_file_id.close()
     output_file_id.close()
 
-    # print OK message 
+    # print OK message
     print(f'\nThe file {os.path.basename(output_file)} containing the selected sequences is created.')
 
 #-------------------------------------------------------------------------------

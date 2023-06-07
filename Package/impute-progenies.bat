@@ -2,9 +2,10 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script runs the program impute-progenies.py in a Windows environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -14,21 +15,16 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This program treats the VCF output file of impute-adults.py, checks the genotype compatibility
-rem between each mother and its progeny, and reimputes missing data of progeny genotypes according
-rem to the selected imputation scenario.
-
-rem ----------------------------------------------------------------------------
-
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
 set ERROR=0
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
 set ARGV=
+set PYTHONPATH=.
 
 set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
 
@@ -36,9 +32,9 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program impute-progenies.py
+rem Run the program impute-progenies.py
 
-python.exe %PYTHON_OPTIONS% impute-progenies.py %* %ARGV%
+%PYTHON% %PYTHON_OPTIONS% impute-progenies.py %* %ARGV%
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------

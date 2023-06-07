@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program builds a FASTA file with the flanking genomic region of variants contained in a VCF file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program builds a FASTA file with the flanking genomic region of variants contained in a VCF file.
 '''
 
 #-------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -258,14 +258,14 @@ def get_flanking_regions(vcf_file, genome_file, flanking_region_file, nucleotide
     # initialize record counters
     genomic_seq_counter = 0
     flanking_region_seq_counter = 0
- 
+
     # read the first record of genome file
     record = genome_file_id.readline()
 
     # while there are records in genome file
     while record != '':
 
-        # process the head record 
+        # process the head record
         if record.startswith('>'):
 
             # add 1 to the read sequence counter
@@ -327,14 +327,14 @@ def get_flanking_regions(vcf_file, genome_file, flanking_region_file, nucleotide
     genome_file_id.close()
     flanking_region_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('verbose', f'\nThe file {os.path.basename(flanking_region_file)} containing the variant flanking regions is created.')
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

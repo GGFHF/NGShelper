@@ -2,9 +2,11 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script performs a test of the program phase2structure.py
+rem in a Windows environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -14,25 +16,21 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script executes a test of the program phase2structure.py
-rem in a Windows environment.
-
-rem ----------------------------------------------------------------------------
-
 rem Control parameters
 
 if not "%*" == "" (set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------
 
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
 set ERROR=0
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
+set PYTHONPATH=.
 
 set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
 set DATA_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\data"
@@ -44,16 +42,19 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program phase2structure.py
+rem Run the program phase2structure.py
 
-python.exe %PYTHON_OPTIONS% phase2structure.py ^
-    --phasedir=%DATA_DIR% ^
-    --phaseext=.out ^
+%PYTHON% %PYTHON_OPTIONS% phase2structure.py ^
+    --phase-indir=%DATA_DIR%\ULH-phase-input ^
+    --phase-outdir=%DATA_DIR%\ULH-phase-output ^
     --samples=%DATA_DIR%\IDs-total.txt ^
     --sp1_id=AL ^
     --sp2_id=EN ^
     --hyb_id=HY ^
+    --max_md=50 ^
     --structure=%OUTPUT_DIR%\phase-converted.tsv ^
+    --format=2 ^
+    --errors=%OUTPUT_DIR%\wrong-phase-filex.txt ^
     --verbose=Y ^
     --trace=N
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)

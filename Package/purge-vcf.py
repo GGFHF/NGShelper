@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program purges a VCF file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program purges a VCF file.
 '''
 
 #-------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -186,7 +186,7 @@ def change_value(input_vcf_file, value, new_value, output_purged_file):
     changed_data = 0
 
     # read the first record of input VCF file
-    (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+    (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
     # while there are records in input VCF file
     while record != '':
@@ -204,7 +204,7 @@ def change_value(input_vcf_file, value, new_value, output_purged_file):
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Changed data ... {changed_data:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
         # process the column description record
         if record.startswith('#CHROM'):
@@ -225,7 +225,7 @@ def change_value(input_vcf_file, value, new_value, output_purged_file):
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Changed data ... {changed_data:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
         # process variant record
         while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
@@ -251,10 +251,11 @@ def change_value(input_vcf_file, value, new_value, output_purged_file):
                 raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
             # build the list of sample genotypes of a variant
+            sample_data_list = []
             sample_gt_list = []
             for i in range(sample_number):
-                sample_data_list = data_dict['sample_list'][i].split(':')
-                sample_gt_list.append(sample_data_list[gt_position])
+                sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                sample_gt_list.append(sample_data_list[i][gt_position])
 
             # build the lists of the left and right side of sample genotypes of a variant
             sample_gt_left_list = []
@@ -291,8 +292,8 @@ def change_value(input_vcf_file, value, new_value, output_purged_file):
             # rebuild the sample genotype data list and their corresponding record data
             sample_list = []
             for i in range(sample_number):
-                sample_data_list[gt_position] = sample_gt_list[i]
-                sample_list.append(':'.join(sample_data_list))
+                sample_data_list[i][gt_position] = sample_gt_list[i]
+                sample_list.append(':'.join(sample_data_list[i]))
 
             # write the variant record
             sample_list_text = '\t'.join(sample_list)
@@ -302,7 +303,7 @@ def change_value(input_vcf_file, value, new_value, output_purged_file):
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Changed data ... {changed_data:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
     xlib.Message.print('verbose', '\n')
 
@@ -310,7 +311,7 @@ def change_value(input_vcf_file, value, new_value, output_purged_file):
     input_vcf_file_id.close()
     output_purged_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The purged file {os.path.basename(output_purged_file)} is created.')
 
 #-------------------------------------------------------------------------------
@@ -359,7 +360,7 @@ def filter_variant(input_vcf_file, value, output_purged_file):
     filtered_variant_counter = 0
 
     # read the first record of input VCF file
-    (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+    (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
     # while there are records in input VCF file
     while record != '':
@@ -377,7 +378,7 @@ def filter_variant(input_vcf_file, value, output_purged_file):
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Filtered variants ... {filtered_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
         # process the column description record
         if record.startswith('#CHROM'):
@@ -398,7 +399,7 @@ def filter_variant(input_vcf_file, value, output_purged_file):
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Filtered variants ... {filtered_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
         # process variant record
         while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
@@ -424,10 +425,11 @@ def filter_variant(input_vcf_file, value, output_purged_file):
                 raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
             # build the list of sample genotypes of a variant
+            sample_data_list = []
             sample_gt_list = []
             for i in range(sample_number):
-                sample_data_list = data_dict['sample_list'][i].split(':')
-                sample_gt_list.append(sample_data_list[gt_position])
+                sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                sample_gt_list.append(sample_data_list[i][gt_position])
 
             # build the lists of the left and right side of sample genotypes of a variant
             sample_gt_left_list = []
@@ -467,9 +469,9 @@ def filter_variant(input_vcf_file, value, output_purged_file):
                 # rebuild the sample genotype data list and their corresponding record data
                 sample_list = []
                 for i in range(sample_number):
-                    sample_data_list[gt_position] = sample_gt_list[i]
-                    sample_list.append(':'.join(sample_data_list))
- 
+                    sample_data_list[i][gt_position] = sample_gt_list[i]
+                    sample_list.append(':'.join(sample_data_list[i]))
+
                 # add the sequence identification to the non filtered sequence identification list
                 if data_dict['chrom'] not in non_filtered_seq_id_list:
                     non_filtered_seq_id_list.append(data_dict['chrom'])
@@ -480,7 +482,7 @@ def filter_variant(input_vcf_file, value, output_purged_file):
 
             # if the process does not have to write the variant
             else:
- 
+
                 # add 1 to the filtered variant counter
                 filtered_variant_counter += 1
 
@@ -488,7 +490,7 @@ def filter_variant(input_vcf_file, value, output_purged_file):
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d} - Filtered variants ... {filtered_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(input_vcf_file_id, sample_number)
 
     xlib.Message.print('verbose', '\n')
 
@@ -496,7 +498,7 @@ def filter_variant(input_vcf_file, value, output_purged_file):
     input_vcf_file_id.close()
     temporal_vcf_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The temporal file {os.path.basename(temporal_vcf_file)} containing the filtered variants is created.')
     xlib.Message.print('info', 'Removing metadata of filtered variants ...')
 
@@ -539,7 +541,7 @@ def filter_variant(input_vcf_file, value, output_purged_file):
             i2 = record.find(',', i1)
             if i2 > -1:
                 seq_id = record[i1:i2]
-            
+
             # write the record when the sequence identification was not filtered
             if seq_id in non_filtered_seq_id_list:
                 output_purged_file_id.write(record)
@@ -557,7 +559,7 @@ def filter_variant(input_vcf_file, value, output_purged_file):
     temporal_vcf_file_id.close()
     output_purged_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The purged file {os.path.basename(output_purged_file)} is created.')
 
     # delete temporal VCF file
@@ -568,7 +570,7 @@ def filter_variant(input_vcf_file, value, output_purged_file):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

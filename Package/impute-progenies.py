@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-#-------------------------------------------------------------------------------
-
-'''
-This software has been developed by:
-
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
-    Dpto. Sistemas y Recursos Naturales
-    ETSI Montes, Forestal y del Medio Natural
-    Universidad Politecnica de Madrid
-    https://github.com/ggfhf/
-
-Licence: GNU General Public Licence Version 3.
-'''
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -21,6 +12,15 @@ Licence: GNU General Public Licence Version 3.
 This program treats the VCF output file of impute-adults.py, checks the genotype compatibility
 between each mother and its progeny, and imputes missing data of progeny genotypes according
 to the selected imputation scenario.
+
+This software has been developed by:
+
+    Dpto. Sistemas y Recursos Naturales
+    ETSI Montes, Forestal y del Medio Natural
+    Universidad Politecnica de Madrid
+    https://github.com/ggfhf/
+
+Licence: GNU General Public Licence Version 3.
 '''
 
 #-------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -312,10 +312,11 @@ def impute_progenies(input_vcf_file, sample_file, scenario, imputed_md_id, sp1_i
                 raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
             # build the list of sample genotypes of a variant
+            sample_data_list = []
             sample_gt_list = []
             for i in range(sample_number):
-                sample_data_list = data_dict['sample_list'][i].split(':')
-                sample_gt_list.append(sample_data_list[gt_position])
+                sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                sample_gt_list.append(sample_data_list[i][gt_position])
 
             # build the lists of the left and right side of sample genotypes of a variant
             sample_gt_left_list = []
@@ -913,8 +914,8 @@ def impute_progenies(input_vcf_file, sample_file, scenario, imputed_md_id, sp1_i
             # rebuild the sample genotype data list and their corresponding record data
             sample_list = []
             for i in range(sample_number):
-                sample_data_list[gt_position] = sample_gt_list[i]
-                sample_list.append(':'.join(sample_data_list))
+                sample_data_list[i][gt_position] = sample_gt_list[i]
+                sample_list.append(':'.join(sample_data_list[i]))
             if variant_id in tvi_list: xlib.Message.print('trace', f'(17) sample_gt_list: {sample_gt_list}')
 
             # write the variant record
@@ -933,14 +934,14 @@ def impute_progenies(input_vcf_file, sample_file, scenario, imputed_md_id, sp1_i
     input_vcf_file_id.close()
     output_vcf_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The file {os.path.basename(output_vcf_file)} is created.')
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

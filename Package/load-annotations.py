@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program loads annotation data from a TOA annotation file into NGShelper database.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program loads annotation data from a TOA annotation file into NGShelper database.
 '''
 
 #-------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ import xsqlite
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -138,7 +138,7 @@ def load_annotations(conn, annotation_file, toa_file_type):
     '''
     Load annotation data from a TOA annotation file into NGShelper database.
     '''
-    
+
     # drop the table "annotations" (if it exists)
     xlib.Message.print('verbose', 'Droping the table "annotations" ...\n')
     xsqlite.drop_annotations(conn)
@@ -168,13 +168,13 @@ def load_annotations(conn, annotation_file, toa_file_type):
             raise xlib.ProgramException(e, 'F001', annotation_file)
 
     # read head record of the annotation file
-    (record, key, data_dict) = xlib.read_toa_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
+    (record, _, data_dict) = xlib.read_toa_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
 
     # add 1 to record counter
     record_counter += 1
 
     # read the first data record of the annotation file
-    (record, key, data_dict) = xlib.read_toa_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
+    (record, _, data_dict) = xlib.read_toa_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
 
     # while there are records
     while record != '':
@@ -202,7 +202,7 @@ def load_annotations(conn, annotation_file, toa_file_type):
                 description = data_dict['desc'].replace("'", '´').replace(';', ',')
 
             # read the next record
-            (record, key, data_dict) = xlib.read_toa_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
+            (record, _, data_dict) = xlib.read_toa_annotation_record(annotation_file, annotation_file_id, toa_file_type, record_counter)
 
         # insert data into the table "annotations"
         row_dict = {'seq_id': seq_id, 'description': description}
@@ -234,7 +234,7 @@ def load_annotations(conn, annotation_file, toa_file_type):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

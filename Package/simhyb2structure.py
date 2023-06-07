@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program converts a output SimHyb file to the input Structure format in two lines.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,23 +23,16 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program converts a output SimHyb file to the input Structure format in two lines.
-'''
-
-#-------------------------------------------------------------------------------
-
 import argparse
 import gzip
 import os
-import re
 import sys
 
 import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -163,7 +162,7 @@ def convert_simhyb_to_structure(simhyb_file, header_row_number, structure_file):
     # initialize record counters
     input_record_counter = 0
     written_record_counter = 0
- 
+
     # read the first record of the SimHyb file
     record = simhyb_file_id.readline()
 
@@ -225,14 +224,14 @@ def convert_simhyb_to_structure(simhyb_file, header_row_number, structure_file):
     simhyb_file_id.close()
     structure_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The converted file {os.path.basename(structure_file)} is created.')
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

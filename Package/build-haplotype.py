@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program builds the haplotype of a sample set from a VCF file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program builds the haplotype of a sample set from a VCF file.
 '''
 
 #-------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -267,7 +267,7 @@ def build_haplotype(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
 
                 # add 1 to the read sequence counter
                 input_record_counter += 1
-                             
+
                 # add 1 to the total variant counter
                 total_variant_counter += 1
 
@@ -301,10 +301,11 @@ def build_haplotype(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
                     raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
                 # build the list of sample genotypes of a variant
+                sample_data_list = []
                 sample_gt_list = []
                 for i in range(sample_number):
-                    sample_data_list = data_dict['sample_list'][i].split(':')
-                    sample_gt_list.append(sample_data_list[gt_position])
+                    sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                    sample_gt_list.append(sample_data_list[i][gt_position])
 
                 # build the sample nucleotide list of a variant
                 sample_nuclotide_list = []
@@ -416,14 +417,14 @@ def build_haplotype(input_vcf_file, sample_file, imputed_md_id, sp1_id, sp2_id, 
     # close file
     haplotype_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The converted file {os.path.basename(haplotype_file)} is created.')
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

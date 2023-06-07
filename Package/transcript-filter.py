@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program filters transcripts according to their length, FPKM and TPM calculated by DETONATE.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,16 +23,10 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program filters transcripts according to their length, FPKM and TPM calculated by DETONATE.
-'''
-#-------------------------------------------------------------------------------
-
 import argparse
 import gzip
 import os
 import re
-import subprocess
 import sys
 
 import xlib
@@ -286,17 +286,17 @@ def filter_transcripts(assembly_software_code, transcriptome_file, score_file, o
 
     # set the pattern of the head records (>transcriptome_info)
     pattern = r'^>(.*)$'
- 
+
     # read the first record of transcriptome file
     tanscriptome_record = tanscriptome_file_id.readline()
 
     # while there are records in transcriptome file
     while tanscriptome_record != '':
 
-        # process the head record 
+        # process the head record
         if tanscriptome_record.startswith('>'):
 
-            # extract the data 
+            # extract the data
             mo = re.search(pattern, tanscriptome_record)
             transcript_info = mo.group(1)
 
@@ -352,7 +352,7 @@ def filter_transcripts(assembly_software_code, transcriptome_file, score_file, o
     tanscriptome_file_id.close()
     output_file_id.close()
 
-    # print OK message 
+    # print OK message
     print(f'\nThe file {os.path.basename(output_file)} containing the transcripts selected is created.')
 
 #-------------------------------------------------------------------------------

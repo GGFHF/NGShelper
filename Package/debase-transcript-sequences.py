@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program debases sequences from a transcript FASTA file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program debases sequences from a transcript FASTA file.
 '''
 
 #-------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -108,7 +108,7 @@ def check_args(args):
     elif not xlib.check_float(args.fragmentation_probability, minimum=xlib.Const.FRAGPROB_LOWEST, maximum=xlib.Const.FRAGPROB_UPPEST):
         xlib.Message.print('error', f'The fragmentation probability has to be a float number between {xlib.Const.FRAGPROB_LOWEST} and {xlib.Const.FRAGPROB_UPPEST}.')
         OK = False
-    else: 
+    else:
         args.fragmentation_probability = float(args.fragmentation_probability)
 
     # check "max_fragment_number"
@@ -118,7 +118,7 @@ def check_args(args):
     elif not xlib.check_int(args.max_fragment_number, minimum=xlib.Const.MAXFRAGNUM_LOWEST, maximum=xlib.Const.MAXFRAGNUM_UPPEST):
         xlib.Message.print('error', f'The maximum fragment number has to be a integer number between {xlib.Const.MAXFRAGNUM_LOWEST} and {xlib.Const.MAXFRAGNUM_UPPEST}.')
         OK = False
-    else: 
+    else:
         args.max_fragment_number = int(args.max_fragment_number)
 
     # check "max_end_shortening"
@@ -128,7 +128,7 @@ def check_args(args):
     elif not xlib.check_int(args.max_end_shortening, minimum=xlib.Const.MAXSHORTENING_LOWEST, maximum=xlib.Const.MAXSHORTENING_UPPEST):
         xlib.Message.print('error', f'The maximum shortening of a fragment end has to be a integer number between {xlib.Const.MAXSHORTENING_LOWEST} and {xlib.Const.MAXSHORTENING_UPPEST}.')
         OK = False
-    else: 
+    else:
         args.max_end_shortening = int(args.max_end_shortening)
 
     # check "min_fragment_length"
@@ -138,7 +138,7 @@ def check_args(args):
     elif not xlib.check_int(args.min_fragment_length, minimum=1):
         xlib.Message.print('error', 'The minimum fragment length has to be a integer number greater than 0.')
         OK = False
-    else: 
+    else:
         args.min_fragment_length = int(args.min_fragment_length)
 
     # check "mutation_probability"
@@ -148,7 +148,7 @@ def check_args(args):
     elif not xlib.check_float(args.mutation_probability, minimum=xlib.Const.MUTPROB_LOWEST, maximum=xlib.Const.MUTPROB_UPPEST):
         xlib.Message.print('error', f'The mutation probability has to be a float number between {xlib.Const.MUTPROB_LOWEST} and {xlib.Const.MUTPROB_UPPEST}')
         OK = False
-    else: 
+    else:
         args.mutation_probability = float(args.mutation_probability)
 
     # check "max_mutation_number"
@@ -158,7 +158,7 @@ def check_args(args):
     elif not xlib.check_int(args.max_mutation_number, minimum=xlib.Const.MAXMUTNUM_LOWEST, maximum=xlib.Const.MAXMUTNUM_UPPEST):
         xlib.Message.print('error', f'The maximum mutation number has to be a integer number between {xlib.Const.MAXMUTNUM_LOWEST} and {xlib.Const.MAXMUTNUM_UPPEST}.')
         OK = False
-    else: 
+    else:
         args.max_mutation_number = int(args.max_mutation_number)
 
     # check "indel_probability"
@@ -168,7 +168,7 @@ def check_args(args):
     elif not xlib.check_float(args.indel_probability, minimum=xlib.Const.INDELPROB_LOWEST, maximum=xlib.Const.INDELPROB_UPPEST):
         xlib.Message.print('error', f'The insertion/deletion probability has to be a float number between {xlib.Const.INDELPROB_LOWEST} and {xlib.Const.INDELPROB_UPPEST}.')
         OK = False
-    else: 
+    else:
         args.indel_probability = float(args.indel_probability)
 
     # check "max_mutation_size"
@@ -178,7 +178,7 @@ def check_args(args):
     elif not xlib.check_int(args.max_mutation_size, minimum=xlib.Const.MAXMUTSIZE_LOWEST, maximum=xlib.Const.MAXMUTSIZE_UPPEST):
         xlib.Message.print('error', f'The maximum mutation size size has to be a integer number between {xlib.Const.MAXMUTSIZE_LOWEST} and {xlib.Const.MAXMUTSIZE_UPPEST}.')
         OK = False
-    else: 
+    else:
         args.max_mutation_size = int(args.max_mutation_size)
 
     # check "verbose"
@@ -237,14 +237,14 @@ def debase_sequences(fasta_file, output_file, fragmentation_probability, max_fra
     # initialize record counters
     read_seq_counter = 0
     written_seq_counter = 0
- 
+
     # read the first record of FASTA file
     record = fasta_file_id.readline()
 
     # while there are records in FASTA file
     while record != '':
 
-        # process the head record 
+        # process the head record
         if record.startswith('>'):
 
             # extract the identification
@@ -340,7 +340,7 @@ def debase_sequences(fasta_file, output_file, fragmentation_probability, max_fra
 
         # write sequences whose lenght is greater than or equeal to the minimum fragment length
         for i in range(len(seq_list)):
-            if len(seq_list[i]) >= min_fragment_length: 
+            if len(seq_list[i]) >= min_fragment_length:
 
                 # write the header record
                 if len(seq_list) == 1:
@@ -365,14 +365,14 @@ def debase_sequences(fasta_file, output_file, fragmentation_probability, max_fra
     fasta_file_id.close()
     output_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('verbose', f'\nThe file {os.path.basename(output_file)} containing debased sequences is created.')
 
 #-------------------------------------------------------------------------------
 
 def mutate_sequence(seq, indel_probability, max_mutation_size):
     '''
-    Mutate the sequence varying several nucleotides or doing a indel. 
+    Mutate the sequence varying several nucleotides or doing a indel.
     '''
 
     # initialize the new sequence
@@ -407,7 +407,7 @@ def mutate_sequence(seq, indel_probability, max_mutation_size):
 
     # there is a mutation of several nucleotides
     else:
-        
+
         # get mutation position
         j = random.randrange(0, max(len(seq) - mutation_size, 1))
 
@@ -436,7 +436,7 @@ def generate_random_sequence(length):
 
     # initialize the sequence
     seq = ''
-   
+
     # get randomly a new nucleotide and add it to the sequence
     for _ in range(length):
         radnum = random.randrange(0, 4)
@@ -446,7 +446,7 @@ def generate_random_sequence(length):
     return seq
 
 #-------------------------------------------------------------------------------
-    
+
 def get_verbose_code_list():
     '''
     Get the code list of "verbose".
@@ -455,7 +455,7 @@ def get_verbose_code_list():
     return ['Y', 'N']
 
 #-------------------------------------------------------------------------------
-    
+
 def get_verbose_code_list_text():
     '''
     Get the code list of "verbose" as text.
@@ -464,7 +464,7 @@ def get_verbose_code_list_text():
     return 'Y (yes) or N (no)'
 
 #-------------------------------------------------------------------------------
-    
+
 def get_trace_code_list():
     '''
     Get the code list of "trace".
@@ -473,7 +473,7 @@ def get_trace_code_list():
     return ['Y', 'N']
 
 #-------------------------------------------------------------------------------
-    
+
 def get_trace_code_list_text():
     '''
     Get the code list of "trace" as text.
@@ -485,7 +485,7 @@ def get_trace_code_list_text():
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

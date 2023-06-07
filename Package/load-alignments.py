@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program loads alignment data into NGShelper database.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program loads alignment data into NGShelper database.
 '''
 
 #-------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ import xsqlite
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -171,14 +171,14 @@ def load_alignments(conn, alignment_file):
         # initialize the row data dictionary
         row_dict = {}
 
-        # process the header record 
+        # process the header record
         if header_record:
             header_record = False
 
         # process data records
         else:
 
-            # extract data 
+            # extract data
             # record format: variant_id;chromosome_id;identity;coord1;coord2;e-value
             data_list = []
             begin = 0
@@ -221,7 +221,7 @@ def load_alignments(conn, alignment_file):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

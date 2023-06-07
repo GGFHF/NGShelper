@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program converts a VCF file to the Structure input formats.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,23 +23,16 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program converts a VCF file to the Structure input formats.
-'''
-
-#-------------------------------------------------------------------------------
-
 import argparse
 import gzip
 import os
-import re
 import sys
 
 import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -47,7 +46,7 @@ def main(argv):
     check_args(args)
 
     # convert the VCF file
-    convert_vcf_to_structure(args.vcf_file, args.sample_file, args.sp1_id, args.sp2_id, args.hybrid_id, args.imputed_md_id, args.new_md_id, args.allele_transformation, args.structure_file_type, args.output_converted_file, args.tvi_list)
+    convert_vcf_to_structure(args.vcf_file, args.sample_file, args.sp1_id, args.sp2_id, args.hybrid_id, args.imputed_md_id, args.new_md_id, args.allele_transformation, args.structure_input_format, args.output_converted_file, args.tvi_list)
 
 #-------------------------------------------------------------------------------
 
@@ -70,8 +69,8 @@ def build_parser():
     parser.add_argument('--imd_id', dest='imputed_md_id', help=f'Identification of the alternative allele for imputed missing data; default {xlib.Const.DEFAULT_IMPUTED_MD_ID}')
     parser.add_argument('--new_mdi', dest='new_md_id', help=f'New identification of missing data which will replace "."); default: {xlib.Const.DEFAULT_NEW_MD_ID}.')
     parser.add_argument('--trans', dest='allele_transformation', help=f'Transformation of the allele symbol: {xlib.get_allele_transformation_code_list_text()}; default: NONE.')
-    parser.add_argument('--type', dest='structure_file_type', help=f'Type of the Structure file (mandatory): {xlib.get_structure_file_type_code_list_text()}.')
     parser.add_argument('--out', dest='output_converted_file', help='Path of the converted file (mandatory).')
+    parser.add_argument('--format', dest='structure_input_format', help=f'Structure file format (mandatory): {xlib.get_structure_input_format_code_list_text()}.')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')
     parser.add_argument('--trace', dest='trace', help=f'Additional info useful to the developer team: {xlib.get_trace_code_list_text()}; default: {xlib.Const.DEFAULT_TRACE}.')
     parser.add_argument('--tvi', dest='tvi_list', help='Variant identification list to trace with format seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n or NONE; default: NONE.')
@@ -136,17 +135,17 @@ def check_args(args):
     else:
         args.allele_transformation = args.allele_transformation.upper()
 
-    # check "structure_file_type"
-    if args.structure_file_type is None:
-        xlib.Message.print('error', '*** The type of the structure file is not indicated in the input arguments.')
-        OK = False
-    elif not xlib.check_code(args.structure_file_type, xlib.get_structure_file_type_code_list(), case_sensitive=False):
-        xlib.Message.print('error', f'*** The type of the converted file has to be {xlib.get_structure_file_type_code_list_text()}.')
-        OK = False
-
     # check "output_converted_file"
     if args.output_converted_file is None:
         xlib.Message.print('error', '*** The converted file is not indicated in the input arguments.')
+        OK = False
+
+    # check "structure_input_format"
+    if args.structure_input_format is None:
+        xlib.Message.print('error', '*** The Structure input format is not indicated in the input arguments.')
+        OK = False
+    elif not xlib.check_code(args.structure_input_format, xlib.get_structure_input_format_code_list(), case_sensitive=False):
+        xlib.Message.print('error', f'*** The Structure input format has to be {xlib.get_structure_input_format_code_list_text()}.')
         OK = False
 
     # check "verbose"
@@ -179,7 +178,7 @@ def check_args(args):
 
 #-------------------------------------------------------------------------------
 
-def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, imputed_md_id, new_md_id, allele_transformation, structure_file_type, output_converted_file, tvi_list):
+def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, imputed_md_id, new_md_id, allele_transformation, structure_input_format, output_converted_file, tvi_list):
     '''
     Convert a VCF file to the Structure input formats.
     '''
@@ -278,7 +277,7 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
 
             # add 1 to the VCF record counter
             record_counter += 1
- 
+
             # add 1 to the variant counter
             variant_counter += 1
 
@@ -294,10 +293,11 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
                 raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
             # build the list of sample genotypes of a variant
+            sample_data_list = []
             sample_gt_list = []
             for i in range(sample_number):
-                sample_data_list = data_dict['sample_list'][i].split(':')
-                sample_gt_list.append(sample_data_list[gt_position])
+                sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                sample_gt_list.append(sample_data_list[i][gt_position])
             if variant_id in tvi_list: xlib.Message.print('trace', f'(4) sample_gt_list: {sample_gt_list}')
 
             # build the lists of the left and right side of sample genotypes of a variant
@@ -338,8 +338,8 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
     # close the VCF file
     vcf_file_id.close()
 
-    # review the imputed missing data when the type of the converted file is 1
-    if structure_file_type == '1':
+    # review the imputed missing data when the type of the converted file is 2
+    if structure_input_format == '2':
 
         # detect variants with any imputed missing data
         excluded_variant_index_list = []
@@ -406,14 +406,14 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
     # close file
     output_converted_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The converted file {os.path.basename(output_converted_file)} is created.')
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

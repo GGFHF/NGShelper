@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program calculates statistics of a transcriptome.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,15 +23,8 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program calculates statistics of a transcriptome.
-'''
-#-------------------------------------------------------------------------------
-
 import argparse
-import contextlib
 import gzip
-import itertools
 import os
 import re
 import sys
@@ -34,7 +33,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -129,7 +128,7 @@ def calculate_statistics(transcriptome_file, output_directory):
     '''
     Calculate statistics of a transcriptome.
     '''
- 
+
     # initialize the transcript length dictionary
     transcript_len_dict = {}
 
@@ -157,10 +156,10 @@ def calculate_statistics(transcriptome_file, output_directory):
     # while there are records
     while record != '':
 
-        # process the head record 
+        # process the head record
         if record.startswith('>'):
 
-            # extract the data 
+            # extract the data
             mo = re.search(pattern, record)
             transcript_info = mo.group(1)
 
@@ -263,7 +262,7 @@ def calculate_statistics(transcriptome_file, output_directory):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

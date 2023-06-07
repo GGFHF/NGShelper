@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program builds functional annotation data corresponding to a TRAPID run.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,23 +23,16 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program builds functional annotation data corresponding to a TRAPID run.
-'''
-
-#-------------------------------------------------------------------------------
-
 import argparse
 import gzip
 import os
 import sys
 
 import xlib
-import xsqlite
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -183,6 +182,7 @@ def build_trapid_annotation(transcripts_with_go_file, transcripts_with_gf_file, 
 
 def get_go_annotations(transcripts_with_go_file, annotation_dict):
     '''
+    x
     '''
 
     # initialize the record counter
@@ -212,7 +212,7 @@ def get_go_annotations(transcripts_with_go_file, annotation_dict):
         # process data records
         if not record.startswith('#'):
 
-            # extract data 
+            # extract data
             # record format: counter	transcript_id	go	evidence_code	is_hidden	description
             data_list = []
             begin = 0
@@ -258,6 +258,7 @@ def get_go_annotations(transcripts_with_go_file, annotation_dict):
 
 def get_gf_annotations(transcripts_with_gf_file, annotation_dict):
     '''
+    x
     '''
 
     # initialize the record counter
@@ -287,7 +288,7 @@ def get_gf_annotations(transcripts_with_gf_file, annotation_dict):
         # process data records
         if not record.startswith('#'):
 
-            # extract data 
+            # extract data
             # record format: counter	transcript_id	gf_id
             data_list = []
             begin = 0
@@ -329,6 +330,7 @@ def get_gf_annotations(transcripts_with_gf_file, annotation_dict):
 
 def get_ko_annotations(transcripts_with_ko_file, annotation_dict):
     '''
+    x
     '''
 
     # initialize the record counter
@@ -358,7 +360,7 @@ def get_ko_annotations(transcripts_with_ko_file, annotation_dict):
         # process data records
         if not record.startswith('#'):
 
-            # extract data 
+            # extract data
             # record format: counter	transcript_id	ko	description
             data_list = []
             begin = 0
@@ -404,7 +406,7 @@ def get_ko_annotations(transcripts_with_ko_file, annotation_dict):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

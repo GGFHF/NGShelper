@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+#pylint: disable=too-many-lines
+#pylint: disable=line-too-long
+#pylint: disable=invalid-name
+#pylint: disable=multiple-statements
+#pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This source contains general functions and classes used in NGShelper
+software package used in both console mode and gui mode.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,20 +24,13 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This source contains general functions and classes used in NGShelper
-software package used in both console mode and gui mode.
-'''
-
-#-------------------------------------------------------------------------------
-
 import collections
 import gzip
 import os
 import re
-import requests
 import subprocess
 import sys
+import requests
 
 #-------------------------------------------------------------------------------
 
@@ -57,14 +57,14 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.59'
+    return '0.76'
 
 #-------------------------------------------------------------------------------
 
 def check_os():
     '''
     Check the operating system.
-    '''    
+    '''
 
     # if the operating system is unsupported, exit with exception
     if not sys.platform.startswith('linux') and not sys.platform.startswith('darwin') and not sys.platform.startswith('win32') and not sys.platform.startswith('cygwin'):
@@ -79,9 +79,9 @@ def check_startswith(literal, text_list, case_sensitive=False):
 
     # initialize the control variable
     OK = False
-  
+
     # initialize the working list
-    list = []
+    w_list = []
 
     # if the codification is not case sensitive, convert the code and code list to uppercase
     if not case_sensitive:
@@ -90,14 +90,14 @@ def check_startswith(literal, text_list, case_sensitive=False):
         except:
             pass
         try:
-            list = [x.upper() for x in text_list]
+            w_list = [x.upper() for x in text_list]
         except:
             pass
     else:
-        list = text_list
+        w_list = text_list
 
     # check if the literal starts with a text in the list
-    for text in list:
+    for text in w_list:
         if literal.startswith(text):
             OK = True
             break
@@ -111,9 +111,9 @@ def check_code(literal, code_list, case_sensitive=False):
     '''
     Check if a literal is in a code list.
     '''
-    
+
     # initialize the working list
-    list = []
+    w_list = []
 
     # if the codification is not case sensitive, convert the code and code list to uppercase
     if not case_sensitive:
@@ -122,14 +122,14 @@ def check_code(literal, code_list, case_sensitive=False):
         except:
             pass
         try:
-            list = [x.upper() for x in code_list]
+            w_list = [x.upper() for x in code_list]
         except:
             pass
     else:
-        list = code_list
+        w_list = code_list
 
     # check if the code is in the code list
-    OK = literal in list
+    OK = literal in w_list
 
     # return control variable
     return OK
@@ -143,7 +143,7 @@ def check_int(literal, minimum=(-sys.maxsize - 1), maximum=sys.maxsize):
 
     # initialize the control variable
     OK = True
-  
+
     # check the number
     try:
         int(literal)
@@ -167,7 +167,7 @@ def check_float(literal, minimum=float(-sys.maxsize - 1), maximum=float(sys.maxs
 
     # initialize the control variable
     OK = True
-  
+
     # check the number
     try:
         float(literal)
@@ -190,11 +190,11 @@ def split_literal_to_integer_list(literal):
     '''
     Split a string literal in a integer value list which are separated by comma.
     '''
-  
+
     # initialize the string values list and the interger values list
     strings_list = []
     integers_list = []
-    
+
     # split the string literal in a string values list
     strings_list = split_literal_to_string_list(literal)
 
@@ -219,7 +219,7 @@ def split_literal_to_float_list(literal):
     # initialize the string values list and the float values list
     strings_list = []
     float_list = []
-    
+
     # split the string literal in a string values list
     strings_list = split_literal_to_string_list(literal)
 
@@ -330,7 +330,7 @@ def get_nucleotide_dict():
         'N':{'code': 'N', 'nuclotide_list':['A','C','G','T'], 'complementary_code':'N', 'complementary_nuclotide_list':['A','C','G','T']},
         'n':{'code': 'n', 'nuclotide_list':['a','c','g','t'], 'complementary_code':'n', 'complementary_nuclotide_list':['a','c','g','t']}
         }
-    
+
     # return the nucleotide dictionary
     return nucleotide_dict
 
@@ -459,7 +459,7 @@ def read_vcf_file(vcf_file_id, sample_number, check_sample_number=True):
 
     # if there is a metadata records
     if record != '' and record.startswith('##'):
-       
+
         pass
 
     # if there is a column description record
@@ -476,7 +476,7 @@ def read_vcf_file(vcf_file_id, sample_number, check_sample_number=True):
         # get the record data dictionary
         data_dict = {'record_data_list': record_data_list}
 
-    # if there is a variant record 
+    # if there is a variant record
     if record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
 
         # split the record data
@@ -504,16 +504,16 @@ def read_vcf_file(vcf_file_id, sample_number, check_sample_number=True):
         info = record_data_list[7]
         format = record_data_list[8]
         sample_list = []
-        for i in range(sample_number):
+        for i in range(len(record_data_list) - 9):
             sample_list.append(record_data_list[i + 9])
 
         # set the key
-        key = f'{chrom}'
+        key = f'{chrom}-{int(pos):09d}'
 
         # get the record data dictionary
         data_dict = {'chrom': chrom, 'pos': pos, 'id': id, 'ref': ref, 'alt': alt, 'qual': qual, 'filter': filter, 'info': info, 'format': format, 'sample_list': sample_list}
 
-    # if there is not any record 
+    # if there is not any record
     else:
 
         # set the key
@@ -570,7 +570,7 @@ def get_sample_data(sample_file, sp1_id, sp2_id, hybrid_id):
             # add 1 to the sample counter
             sample_counter += 1
 
-            # extract the data 
+            # extract the data
             try:
                 mo = record_pattern.match(record)
                 sample_id = mo.group(1).strip()
@@ -601,15 +601,17 @@ def get_sample_data(sample_file, sp1_id, sp2_id, hybrid_id):
     sample_file_id.close()
 
     # check the species identification
-    if sp1_id not in species_id_list or \
+    if sp2_id.upper() == 'NONE' and hybrid_id.upper() == 'NONE':
+        pass
+    elif sp1_id not in species_id_list or \
        sp2_id not in species_id_list or \
-       hybrid_id == 'NONE' and len(species_id_list) != 2 or \
-       hybrid_id != 'NONE' and (hybrid_id not in species_id_list or len(species_id_list) != 3):
+       hybrid_id.upper() == 'NONE' and len(species_id_list) != 2 or \
+       hybrid_id.upper() != 'NONE' and (hybrid_id not in species_id_list or len(species_id_list) != 3):
         raise ProgramException('','L001')
 
     # check the mother identification exists when it is not equal to NONE
     for _, value in sample_dict.items():
-        if value['mother_id'] != 'NONE':
+        if value['mother_id'].upper() != 'NONE':
             if sample_dict.get(value['mother_id'], {}) == {}:
                 raise ProgramException('', 'L002', value['mother_id'])
 
@@ -672,7 +674,7 @@ def get_id_data(id_file):
     return id_list, id_dict
 
 #-------------------------------------------------------------------------------
-    
+
 def get_toa_file_type_code_list():
     '''
     Get the code list of "toa_file_type".
@@ -681,7 +683,7 @@ def get_toa_file_type_code_list():
     return ['PLAZA', 'REFSEQ', 'NT', 'NR', 'MERGER']
 
 #-------------------------------------------------------------------------------
-    
+
 def get_toa_file_type_code_list_text():
     '''
     Get the code list of "toa_file_type" as text.
@@ -749,7 +751,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
     # read next record
     record = file_id.readline()
 
-    # if there is record 
+    # if there is record
     if record != '':
 
         # remove EOL
@@ -758,7 +760,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
         # if type is PLAZA
         if type.upper() == 'PLAZA':
 
-            # extract data 
+            # extract data
             # PLAZA record format: "seq_id";"nt_seq_id";"aa_seq_id";"hit_num";"hsp_num";"iteration_iter_num";"hit_accession";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases";"go_id";"go_desc";"interpro_id";"interpro_desc";"mapman_id";"mapman_desc";"ec_id";"kegg_id";"metacyc_id"
             data_list = []
             start = 0
@@ -808,7 +810,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
         # if type is REFSEQ
         elif type.upper() == 'REFSEQ':
 
-            # extract data 
+            # extract data
             # REFSEQ record format: "seq_id";"nt_seq_id";"aa_seq_id";"hit_num";"hsp_num";"iteration_iter_num";"hit_id";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases";"gene_id";"status";"rna_nucleotide_accession";"protein_accession";"genomic_nucleotide_accession";"gene_symbol";"go_id";"evidence";"go_term";"category";"interpro_id";"interpro_desc";"ec_id";"kegg_id";"metacyc_id"
             data_list = []
             start = 0
@@ -864,7 +866,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
         # if type is NT o NR
         if type.upper() in ['NT', 'NR']:
 
-            # extract data 
+            # extract data
             # PLAZA record format: "seq_id";"nt_seq_id";"aa_seq_id";"hit_num";"hsp_num";"iteration_iter_num";"hit_id";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases"
             data_list = []
             start = 0
@@ -906,7 +908,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
         # MERGER record format: "seq_id";"nt_seq_id";"aa_seq_id";"hit_num";"hsp_num";"hit_id";"hsp_evalue";"hsp_identity";"hsp_positive";"hsp_gaps";"hsp_align_len";"hsp_qseq";"species";"family";"phylum";"kingdom";"superkingdom";"desc";"databases";"go_id";"go_desc";"interpro_id";"interpro_desc";"mapman_id";"mapman_desc";"refseq_gene_id";"refseq_desc";"refseq_status";"refseq_protein_accession";"refseq_genomic_nucleotide_accession";"refseq_gene_symbol"
         elif type.upper() == 'MERGER':
 
-            # extract data 
+            # extract data
             data_list = []
             start = 0
             for end in [i for i, chr in enumerate(record) if chr == ';']:
@@ -954,11 +956,11 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
 
             # set the key
             key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
-    
+
             # get the record data dictionary
             data_dict = {'seq_id': seq_id, 'nt_seq_id': nt_seq_id, 'aa_seq_id': aa_seq_id, 'hit_num': hit_num, 'hsp_num': hsp_num, 'hit_id': hit_id, 'hsp_evalue': hsp_evalue,  'hsp_identity': hsp_identity, 'hsp_positive': hsp_positive, 'hsp_gaps': hsp_gaps, 'hsp_align_len': hsp_align_len, 'hsp_qseq': hsp_qseq, 'species': species, 'family': family, 'phylum': phylum, 'kingdom': kingdom, 'superkingdom': superkingdom, 'desc': desc, 'databases': databases, 'go_id': go_id, 'go_desc': go_desc, 'interpro_id': interpro_id, 'interpro_desc': interpro_desc, 'mapman_id': mapman_id, 'mapman_desc': mapman_desc, 'ec_id': ec_id, 'kegg_id': kegg_id, 'metacyc_id': metacyc_id, 'refseq_gene_id': refseq_gene_id, 'refseq_desc': refseq_desc, 'refseq_status': refseq_status, 'refseq_rna_nucleotide_accession': refseq_rna_nucleotide_accession, 'refseq_protein_accession': refseq_protein_accession, 'refseq_genomic_nucleotide_accession': refseq_genomic_nucleotide_accession, 'refseq_gene_symbol': refseq_gene_symbol}
 
-    # if there is not record 
+    # if there is not record
     else:
 
         # set the key
@@ -982,13 +984,13 @@ def read_blast2go_annotation_record(file_name, file_id, record_counter):
     # read next record
     record = file_id.readline()
 
-    # if there is record 
+    # if there is record
     if record != '':
 
         # remove EOL
         record = record.strip('\n')
 
-        # extract data 
+        # extract data
         # Blast2GO record format: unknown	Tags	SeqName	Description	Length	#Hits	e-Value	sim mean	#GO	GO IDs	GO Names	Enzyme Codes	Enzyme Names	InterPro IDs	InterPro GO IDs	InterPro GO Names
         data_list = []
         start = 0
@@ -1019,7 +1021,7 @@ def read_blast2go_annotation_record(file_name, file_id, record_counter):
         # get the record data dictionary
         data_dict = {'tags': tags, 'seq_name': seq_name, 'description': description, 'length': length, 'hit_counter': hit_counter, 'e_value': e_value, 'sim_mean': sim_mean, 'go_counter': go_counter, 'go_ids': go_ids, 'go_names': go_names, 'enzyme_codes': enzyme_codes, 'enzyme_names': enzyme_names, 'interpro_ids': interpro_ids, 'interpro_go_ids': interpro_go_ids, 'interpro_go_names': interpro_go_names}
 
-    # if there is not record 
+    # if there is not record
     else:
 
         # set the key
@@ -1043,14 +1045,14 @@ def read_entap_annotation_record(file_name, file_id, record_counter):
     # read next record
     record = file_id.readline()
 
-    # if there is record 
+    # if there is record
     if record != '':
 
         # remove EOL
         record = record.strip('\n')
 
-        # extract data 
-        # EnTAP record format: Query Sequence	Subject Sequence	Percent Identical	Alignment Length	Mismatches	Gap Openings	Query Start	Query End	Subject Start	Subject End	E Value	Coverage	Description	Species	Taxonomic Lineage	Origin Database	Contaminant	Informative	Seed Ortholog	Seed E-Value	Seed Score	Predicted Gene	Tax Scope	Tax Scope Max	Member OGs	KEGG Terms	GO Biological	GO Cellular	GO Molecular	
+        # extract data
+        # EnTAP record format: Query Sequence	Subject Sequence	Percent Identical	Alignment Length	Mismatches	Gap Openings	Query Start	Query End	Subject Start	Subject End	E Value	Coverage	Description	Species	Taxonomic Lineage	Origin Database	Contaminant	Informative	Seed Ortholog	Seed E-Value	Seed Score	Predicted Gene	Tax Scope	Tax Scope Max	Member OGs	KEGG Terms	GO Biological	GO Cellular	GO Molecular
         data_list = []
         start = 0
         for end in [i for i, chr in enumerate(record) if chr == '\t']:
@@ -1093,7 +1095,7 @@ def read_entap_annotation_record(file_name, file_id, record_counter):
         # get the record data dictionary
         data_dict = {'query_sequence': query_sequence, 'subject_sequence': subject_sequence, 'percent_identical': percent_identical, 'alignment_length': alignment_length, 'mismatches': mismatches, 'gap_openings': gap_openings, 'query_start': query_start, 'query_end': query_end, 'subject_start': subject_start, 'subject_end': subject_end, 'e_value': e_value, 'coverage': coverage, 'description': description, 'species': species, 'taxonomic_lineage': taxonomic_lineage, 'origin_databasem': origin_database, 'contaminant': contaminant, 'informative': informative, 'seed_ortholog': seed_ortholog, 'seed_e_value': seed_e_value, 'seed_score': seed_score, 'predicted_gene': predicted_gene, 'tax_scope': tax_scope, 'tax_scope_max': tax_scope_max, 'member_ogs': member_ogs, 'kegg_terms': kegg_terms, 'go_biological': go_biological, 'go_cellular': go_cellular, 'go_molecular': go_molecular}
 
-    # if there is not record 
+    # if there is not record
     else:
 
         # set the key
@@ -1117,13 +1119,13 @@ def read_trapid_annotation_record(file_name, file_id, record_counter):
     # read next record
     record = file_id.readline()
 
-    # if there is record 
+    # if there is record
     if record != '':
 
         # remove EOL
         record = record.strip('\n')
 
-        # extract data 
+        # extract data
         # TRAPID record format: counter	transcript_id	go	evidence_code	is_hidden	description
         data_list = []
         start = 0
@@ -1144,7 +1146,7 @@ def read_trapid_annotation_record(file_name, file_id, record_counter):
         # get the record data dictionary
         data_dict = {'counter': counter, 'transcript_id': transcript_id, 'go': go, 'evidence_code': evidence_code, 'is_hidden': is_hidden, 'description': description}
 
-    # if there is not record 
+    # if there is not record
     else:
 
         # set the key
@@ -1168,13 +1170,13 @@ def read_trinotate_annotation_record(file_name, file_id, record_counter):
     # read next record
     record = file_id.readline()
 
-    # if there is record 
+    # if there is record
     if record != '':
 
         # remove EOL
         record = record.strip('\n')
 
-        # extract data 
+        # extract data
         # Trinotate record format: True	Tags	SeqName	Description	Length	#Hits	e-Value	sim mean	#GO	GO IDs	GO Names	Enzyme Codes	Enzyme Names	InterPro IDs	InterPro GO IDs	InterPro GO Names
         data_list = []
         start = 0
@@ -1206,7 +1208,7 @@ def read_trinotate_annotation_record(file_name, file_id, record_counter):
         # get the record data dictionary
         data_dict = {'gene_id': gene_id, 'transcript_id': transcript_id, 'sprot_top_blastx_hit': sprot_top_blastx_hit, 'rnammer': rnammer, 'prot_id': prot_id, 'prot_coords': prot_coords, 'sprot_top_blastp_hit': sprot_top_blastp_hit, 'pfam': pfam, 'signalp': signalp, 'tmhmmx': tmhmmx, 'eggnog': eggnog, 'kegg': kegg, 'gene_ontology_blastx': gene_ontology_blastx, 'gene_ontology_blastp': gene_ontology_blastp, 'gene_ontology_pfam': gene_ontology_pfam, 'transcript': transcript, 'peptide': peptide}
 
-    # if there is not record 
+    # if there is not record
     else:
 
         # set the key
@@ -1338,42 +1340,6 @@ def build_go_ontology_dict(ontology_file):
 
 #-------------------------------------------------------------------------------
 
-def get_converted_file_type_code_list():
-    '''
-    Get the code list of "converted_file_type".
-    '''
-
-    return ['0', '1', '2']
-
-#-------------------------------------------------------------------------------
-
-def get_converted_file_type_code_list_text():
-    '''
-    Get the code list of "converted_file_type" as text.
-    '''
-
-    return '0 (Structure input format in two lines, all variants) or 1 (Structure input format in two lines, only variants without any imputed missing data) or 2 (PHASE input format)'
-
-#-------------------------------------------------------------------------------
-
-def get_structure_file_type_code_list():
-    '''
-    Get the code list of "structure_file_type".
-    '''
-
-    return ['0']
-
-#-------------------------------------------------------------------------------
-
-def get_structure_file_type_code_list_text():
-    '''
-    Get the code list of "structure_file_type" as text.
-    '''
-
-    return '0 (Structure format in two lines)'
-
-#-------------------------------------------------------------------------------
-
 def get_fix_code_list():
     '''
     Get the code list of "fix".
@@ -1455,42 +1421,24 @@ def get_allele_transformation_code_list_text():
 
 #-------------------------------------------------------------------------------
 
-def get_vcf_purge_code_list():
+def get_converted_file_type_code_list():
     '''
-    Get the code list of "vcf_purge_variant".
+    Get the code list of "converted_file_type".
     '''
 
-    return ['CHAVAL', 'FILVAR']
+    return ['0', '1', '2']
 
 #-------------------------------------------------------------------------------
 
-def get_vcf_purge_code_list_text():
+def get_converted_file_type_code_list_text():
     '''
-    Get the code list of "vcf_purge_variant" as text.
+    Get the code list of "converted_file_type" as text.
     '''
 
-    return 'CHAVAL (change a value by a new value) or FILVAR (filter variants containing a determined value)'
+    return '0 (Structure input format in two lines, all variants) or 1 (Structure input format in two lines, only variants without any imputed missing data) or 2 (PHASE input format)'
 
 #-------------------------------------------------------------------------------
 
-def get_strcuture_purge_code_list():
-    '''
-    Get the code list of "structure_purge_code".
-    '''
-
-    return ['CHAVAL', 'DELCOL']
-
-#-------------------------------------------------------------------------------
-
-def get_structure_purge_code_list_text():
-    '''
-    Get the code list of "structure_purge_code" as text.
-    '''
-
-    return 'CHAVAL (change a value by a new value) or DELCOL (delete columns containing a determined value)'
-
-#-------------------------------------------------------------------------------
-    
 def get_go_app_code_list():
     '''
     Get the code list of applications with GO terms statistics.
@@ -1499,7 +1447,7 @@ def get_go_app_code_list():
     return ['Blast2GO', 'EnTAP', 'TOA', 'TRAPID', 'Trinotate']
 
 #-------------------------------------------------------------------------------
-    
+
 def get_go_app_code_list_text():
     '''
     Get the code list of applications with GO terms statistics as text.
@@ -1524,6 +1472,172 @@ def get_toa_go_seleccion_code_list_text():
     '''
 
     return 'LEV (the lowest e-value -GO data can be empty- is considered) or LEVWD (the lowest e-value with GO data not empty is considered)'
+
+#-------------------------------------------------------------------------------
+
+def get_structure_input_format_code_list():
+    '''
+    Get the code list of "structure_input_format".
+    '''
+
+    # -- return ['1', '2']
+    return ['2']
+
+#-------------------------------------------------------------------------------
+
+def get_structure_input_format_code_list_text():
+    '''
+    Get the code list of "structure_input_format" as text.
+    '''
+
+    # -- return '1 (one line: one allele in different columns) or 2 (two lines:  one allele in different rows)'
+    return '2 (two lines:  one allele in different rows)'
+
+#-------------------------------------------------------------------------------
+
+def get_structure_swap_type_code_list():
+    '''
+    Get the code list of "structure_input_format".
+    '''
+
+    # -- return ['1TO2', '2TO1']
+    return ['2TO1']
+
+#-------------------------------------------------------------------------------
+
+def get_structure_swap_type_code_list_text():
+    '''
+    Get the code list of "structure_swap_type" as text.
+    '''
+
+    # -- return '1TO2 (one line to two lines) or 2TO1 (two lines to one line)'
+    return '2TO1 (two lines to one line)'
+
+#-------------------------------------------------------------------------------
+
+def get_strcuture_purge_code_list():
+    '''
+    Get the code list of "structure_purge_code".
+    '''
+
+    return ['CHAVAL', 'DELCOL']
+
+#-------------------------------------------------------------------------------
+
+def get_structure_purge_code_list_text():
+    '''
+    Get the code list of "structure_purge_code" as text.
+    '''
+
+    return 'CHAVAL (change a value by a new value) or DELCOL (delete columns containing a determined value)'
+
+#-------------------------------------------------------------------------------
+
+def get_vcf_purge_code_list():
+    '''
+    Get the code list of "vcf_purge_variant".
+    '''
+
+    return ['CHAVAL', 'FILVAR']
+
+#-------------------------------------------------------------------------------
+
+def get_vcf_purge_code_list_text():
+    '''
+    Get the code list of "vcf_purge_variant" as text.
+    '''
+
+    return 'CHAVAL (change a value by a new value) or FILVAR (filter variants containing a determined value)'
+
+#-------------------------------------------------------------------------------
+
+def get_vcf_reduction_code_list():
+    '''
+    Get the code list of "vcf_reduction_variant".
+    '''
+
+    return ['RANDOM']
+
+#-------------------------------------------------------------------------------
+
+def get_vcf_reduction_code_list_text():
+    '''
+    Get the code list of "vcf_reduction_variant" as text.
+    '''
+
+    return 'RANDOM (Reduce randomly variants)'
+
+#-------------------------------------------------------------------------------
+
+def get_simulation_method_code_list():
+    '''
+    Get the code list of "simulation_method".
+    '''
+
+    return ['RANDOM']
+
+#-------------------------------------------------------------------------------
+
+def get_simulation_method_code_list_text():
+    '''
+    Get the code list of "simulation_method" as text.
+    '''
+
+    return 'RANDOM'
+
+#-------------------------------------------------------------------------------
+
+def get_r_estimator_code_list():
+    '''
+    Get the code list of "r_estimator".
+    '''
+
+    return ['ru', 'rw']
+
+#-------------------------------------------------------------------------------
+
+def get_r_estimator_code_list_text():
+    '''
+    Get the code list of "r_estimator" as text.
+    '''
+
+    return 'ru (the unweighted average estimator) or rw (the weighted estimator)'
+
+#-------------------------------------------------------------------------------
+
+def get_genotype_imputation_method_code_list():
+    '''
+    Get the code list of "genotype_imputation_method".
+    '''
+
+    return ['MF', 'CK']
+
+#-------------------------------------------------------------------------------
+
+def get_genotype_imputation_method_code_list_text():
+    '''
+    Get the code list of "genotype_ imputation_method" as text.
+    '''
+
+    return 'MF (the most frequent genotype) or CK (the genotype of the closest kinship individual)'
+
+#-------------------------------------------------------------------------------
+
+def get_vcf_filtering_action_code_list():
+    '''
+    Get the code list of "genotype_imputation_method".
+    '''
+
+    return ['MM']
+
+#-------------------------------------------------------------------------------
+
+def get_vcf_filtering_action_code_list_text():
+    '''
+    Get the code list of "genotype_ imputation_method" as text.
+    '''
+
+    return 'MM (variants with all monomorphic individuals)'
 
 #-------------------------------------------------------------------------------
 
@@ -1609,11 +1723,13 @@ class Const():
     DEFAULT_BLASTX_THREADS_NUMBER = 1
     DEFAULT_BURN_IN = 100
     DEFAULT_E_VALUE = 1E-6
+    DEFAULT_GENOTYPE_IMPUTATION_METHOD = 'MF'
     DEFAULT_ID_TYPE = 'LITERAL'
     DEFAULT_IMPUTED_MD_ID = '99'
     DEFAULT_ITERATIONS_NUMBER = 100
     DEFAULT_MACHINE_TYPE = 'local'
     DEFAULT_MAX_HSPS = 999999
+    DEFAULT_MAXPERC_IND_WMD = 10
     DEFAULT_MAX_TARGET_SEQS = 10
     DEFAULT_MAXLEN = 10000
     DEFAULT_MIN_DEPTH = 1
@@ -1627,8 +1743,11 @@ class Const():
     DEFAULT_PROCESSES_NUMBER = 4
     DEFAULT_THINNING_INTERVAL = 1
     DEFAULT_TOA_GO_SELECCTION = 'LEVWD'
+    DEFAULT_R_ESTIMATOR = 'ru'
+    DEFAULT_STRUCTURE_INFO_COL_NUMBER = 2
     DEFAULT_TRACE = 'N'
     DEFAULT_VARIANT_NUMBER_PER_FILE = 1000
+    DEFAULT_VCF_FILTERING_ACTION = 'MM'
     DEFAULT_VERBOSE = 'N'
 
     #---------------
@@ -1715,7 +1834,7 @@ class ProgramException(Exception):
    #---------------
 
     def __init__(self, e, code_exception, param1='', param2='', param3='', param4='', param5='', param6=''):
-        '''Initialize the object to manage a passed exception.''' 
+        '''Initialize the object to manage a passed exception.'''
 
         # print the message of the exception
         if e != '':
@@ -1792,7 +1911,19 @@ class ProgramException(Exception):
         elif code_exception == 'L015':
             Message.print('error', f'*** ERROR {code_exception}: Transcript id or lenght or FPKM data have not been found out in score file.')
         elif code_exception == 'L016':
-            Message.print('error', f'*** ERROR {code_exception}: An allele is not A, T, C or G.')
+            Message.print('error', f'*** ERROR {code_exception}: An allele is not A, T, C or G in variant {param1}.')
+        elif code_exception == 'L017':
+            Message.print('error', f'*** ERROR {code_exception}: The number of samples in the two VCF files are different ({param1}: {param2} - {param3}: {param4}).')
+        elif code_exception == 'L018':
+            Message.print('error', f'*** ERROR {code_exception}: The sample identifications lists has to be equal in the VCF files {param1} and {param2}.')
+        elif code_exception == 'L019':
+            Message.print('error', f'*** ERROR {code_exception}: The variant {param1} has different reference allele in the VCF files {param2} and {param3}.')
+        elif code_exception == 'L020':
+            Message.print('error', f'*** ERROR {code_exception}: The variant {param1} has different alternative alleles in the VCF files {param2} and {param3}.')
+        elif code_exception == 'L021':
+            Message.print('error', f'\n*** ERROR {code_exception}: The variant {param1} has more than one alternative allele.')
+        elif code_exception == 'L022':
+            Message.print('error', f'\n*** ERROR {code_exception}: The genotype number does not correspond to variant number in the sample {param1}.')
         elif code_exception == 'P001':
             Message.print('error', f'*** ERROR {code_exception}: The program has parameters with invalid values.')
         elif code_exception == 'P002':

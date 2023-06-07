@@ -2,20 +2,17 @@
 
 #-------------------------------------------------------------------------------
 
+# This script executes a test of the program load-alignments.py
+# in a Linux environment.
+#
 # This software has been developed by:
 #
-#    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
 #    https://github.com/ggfhf/
 #
 # Licence: GNU General Public Licence Version 3.
-
-#-------------------------------------------------------------------------------
-
-# This script executes a test of the program load-alignments.py in a Linux
-# environment.
 
 #-------------------------------------------------------------------------------
 

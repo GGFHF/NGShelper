@@ -2,9 +2,11 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script performs a test of the program  a calculate-go-stats.py 
+rem in a Linux environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -14,23 +16,19 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script executes a test of the program calculate-go-stats.py
-rem in a Windows environment.
-
-rem ----------------------------------------------------------------------------
-
 rem Control parameters
 
 if not "%*" == "" (set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------
 
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
+set PYTHONPATH=.
 
 set NGSHELPER_DIR=%NGSHELPER%
 set DATA_DIR=%NGSHELPER_DIR%\data
@@ -44,9 +42,9 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program calculate-go-stats.py
+rem Run the program calculate-go-stats.py
 
-python.exe %PYTHON_OPTIONS% calculate-go-stats.py ^
+%PYTHON% %PYTHON_OPTIONS% calculate-go-stats.py ^
     --app=Blast2GO ^
     --annotation=%DATA_DIR%\PCAN_omicsbox_table.txt ^
     --ontology=%DATA_DIR%\go.obo ^
@@ -55,7 +53,7 @@ python.exe %PYTHON_OPTIONS% calculate-go-stats.py ^
     --trace=N
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 
-python.exe %PYTHON_OPTIONS% calculate-go-stats.py ^
+%PYTHON% %PYTHON_OPTIONS% calculate-go-stats.py ^
     --app=EnTAP ^
     --annotation=%DATA_DIR%\final_annotations_no_contam_lvl0.tsv ^
     --ontology=%DATA_DIR%\go.obo ^
@@ -64,16 +62,17 @@ python.exe %PYTHON_OPTIONS% calculate-go-stats.py ^
     --trace=N
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 
-python.exe %PYTHON_OPTIONS% calculate-go-stats.py ^
+%PYTHON% %PYTHON_OPTIONS% calculate-go-stats.py ^
     --app=TOA ^
     --annotation=%DATA_DIR%\plant-annotation.csv ^
     --ontology=%DATA_DIR%\go.obo ^
     --outdir=%OUTPUT_DIR% ^
+    --toasel=LEVWD ^
     --verbose=Y ^
     --trace=N
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 
-python.exe %PYTHON_OPTIONS% calculate-go-stats.py ^
+%PYTHON% %PYTHON_OPTIONS% calculate-go-stats.py ^
     --app=TRAPID ^
     --annotation=%DATA_DIR%\transcripts_go_exp1524.txt ^
     --ontology=%DATA_DIR%\go.obo ^
@@ -82,7 +81,7 @@ python.exe %PYTHON_OPTIONS% calculate-go-stats.py ^
     --trace=N
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 
-python.exe %PYTHON_OPTIONS% calculate-go-stats.py ^
+%PYTHON% %PYTHON_OPTIONS% calculate-go-stats.py ^
     --app=Trinotate ^
     --annotation=%DATA_DIR%\trinotate_annotation_report.xls ^
     --ontology=%DATA_DIR%\go.obo ^

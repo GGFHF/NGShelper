@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program filters a SSR file selecting SSRs included in a COS.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,15 +23,9 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program filters a SSR file selecting SSRs included in a COS.
-'''
-#-------------------------------------------------------------------------------
-
 import argparse
 import gzip
 import os
-import subprocess
 import sys
 
 import xlib
@@ -156,7 +156,7 @@ def filter_ssrs(cos_file, ssr_file, output_file):
     # initialize counters
     cos_record_counter = 0
     cos_seq_counter = 0
- 
+
     # read the first record of COS file
     record = cos_file_id.readline()
     cos_record_counter += 1
@@ -164,7 +164,7 @@ def filter_ssrs(cos_file, ssr_file, output_file):
     # while there are records in COS file
     while record != '':
 
-        # process the head record 
+        # process the head record
         if record.startswith('>'):
 
             # add 1 to the COS sequences counter
@@ -263,7 +263,7 @@ def filter_ssrs(cos_file, ssr_file, output_file):
 
         # when record is not the head
         else:
- 
+
             # extract SSR data
             ssr_data = record[1:].strip('\n')
             ssr_data_list = []
@@ -278,7 +278,7 @@ def filter_ssrs(cos_file, ssr_file, output_file):
                 ssr_end = int(ssr_data_list[3])
             except Exception as e:
                 raise xlib.ProgramException(e, 'F006', os.path.basename(cos_file), cos_record_counter)
- 
+
             # get COS data of the contig
             cos_data_dict = contig_dict.get(contig_name, {})
 
@@ -304,7 +304,7 @@ def filter_ssrs(cos_file, ssr_file, output_file):
     ssr_file_id.close()
     output_file_id.close()
 
-    # print OK message 
+    # print OK message
     print(f'\nThe file {os.path.basename(output_file)} containing the selected SSRs is created.')
 
 #-------------------------------------------------------------------------------

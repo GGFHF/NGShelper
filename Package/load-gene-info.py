@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-#-------------------------------------------------------------------------------
-
-'''
-This software has been developed by:
-
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
-    Dpto. Sistemas y Recursos Naturales
-    ETSI Montes, Forestal y del Medio Natural
-    Universidad Politecnica de Madrid
-    https://github.com/ggfhf/
-
-Licence: GNU General Public Licence Version 3.
-'''
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
 This program loads gene infomation included in a file of ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/GENE_INFO/
 into NGShelper database.
+
+This software has been developed by:
+
+    Dpto. Sistemas y Recursos Naturales
+    ETSI Montes, Forestal y del Medio Natural
+    Universidad Politecnica de Madrid
+    https://github.com/ggfhf/
+
+Licence: GNU General Public Licence Version 3.
 '''
 
 #-------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ import xsqlite
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -127,6 +127,7 @@ def check_args(args):
 
 def load_gene_info(conn, gene_info_file):
     '''
+    x
     '''
 
     # drop the table "gene_info" (if it exists)
@@ -172,14 +173,14 @@ def load_gene_info(conn, gene_info_file):
         # initialize the row data dictionary
         row_dict = {}
 
-        # process the header record 
+        # process the header record
         if header_record:
             header_record = False
 
         # process data records
         else:
 
-            # extract data 
+            # extract data
             # record format: tax_id	GeneID	Symbol	LocusTag	Synonyms	dbXrefs	chromosome	map_location	description	type_of_gene	Symbol_from_nomenclature_authority	Full_name_from_nomenclature_authority	Nomenclature_status	Other_designations	Modification_date	Feature_type
             data_list = []
             begin = 0
@@ -247,7 +248,7 @@ def load_gene_info(conn, gene_info_file):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

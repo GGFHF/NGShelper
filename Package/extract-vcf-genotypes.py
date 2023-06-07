@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program extracts extracts genotype data of every variant from a VCF file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program extracts extracts genotype data of every variant from a VCF file.
 '''
 
 #-------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -251,10 +251,11 @@ def extract_vcf_genotypes(input_vcf_file, imputed_md_id, output_genotype_file, t
                 raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
 
             # build the list of sample genotypes of a variant
+            sample_data_list = []
             sample_gt_list = []
             for i in range(sample_number):
-                sample_data_list = data_dict['sample_list'][i].split(':')
-                sample_gt_list.append(sample_data_list[gt_position])
+                sample_data_list.append(data_dict['sample_list'][i].split(':'))
+                sample_gt_list.append(sample_data_list[i][gt_position])
 
             # build the lists of the left and right side of sample genotypes of a variant
             sample_gt_left_list = []
@@ -330,7 +331,7 @@ def extract_vcf_genotypes(input_vcf_file, imputed_md_id, output_genotype_file, t
     input_vcf_file_id.close()
     tmp_genotype_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The file {os.path.basename(tmp_genotype_file)} is created.')
 
     # open the temporal genotype data file
@@ -450,13 +451,14 @@ def extract_vcf_genotypes(input_vcf_file, imputed_md_id, output_genotype_file, t
     tmp_genotype_file_id.close()
     output_genotype_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The file {os.path.basename(output_genotype_file)} is created.')
 
 #-------------------------------------------------------------------------------
 
 def read_temporal_genotype_data_file_record(file_name, file_id, record_counter):
     '''
+    x
     '''
 
     # initialize the data dictionary
@@ -468,13 +470,13 @@ def read_temporal_genotype_data_file_record(file_name, file_id, record_counter):
     # read next record
     record = file_id.readline()
 
-    # if there is record 
+    # if there is record
     if record != '':
 
         # remove EOL
         record = record.strip('\n')
 
-        # extract data 
+        # extract data
         # format: seq_id;position;ref;alt;genotype;counter
         data_list = []
         start = 0
@@ -495,7 +497,7 @@ def read_temporal_genotype_data_file_record(file_name, file_id, record_counter):
         # get the record data dictionary
         data_dict = {'seq_id': seq_id, 'position': position, 'ref': ref, 'alt': alt, 'genotype': genotype, 'counter': counter}
 
-    # if there is not record 
+    # if there is not record
     else:
 
         # set the key
@@ -508,7 +510,7 @@ def read_temporal_genotype_data_file_record(file_name, file_id, record_counter):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

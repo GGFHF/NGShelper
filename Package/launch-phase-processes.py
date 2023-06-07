@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program launches several PHASE processes with a input file list.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,24 +23,16 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-Description: This program launches several PHASE processes with a input file list.
-'''
-
-#-------------------------------------------------------------------------------
-
 import argparse
-import gzip
 import pathlib
 import os
-from re import X
 import sys
 
 import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -111,7 +109,7 @@ def check_args(args):
     elif not xlib.check_int(args.processes_number, minimum=1):
         xlib.Message.print('error', 'The processes number has to be a integer number greater than or equal to 1.')
         OK = False
-    else: 
+    else:
         args.processes_number = int(args.processes_number)
 
     # check "input_dir"
@@ -136,7 +134,7 @@ def check_args(args):
     elif not xlib.check_int(args.iterations_number, minimum=1):
         xlib.Message.print('error', 'The processes number has to be a integer number greater than or equal to 1.')
         OK = False
-    else: 
+    else:
         args.iterations_number = int(args.iterations_number)
 
     # check "thinning_interval"
@@ -145,7 +143,7 @@ def check_args(args):
     elif not xlib.check_int(args.thinning_interval, minimum=1):
         xlib.Message.print('error', 'The processes number has to be a integer number greater than or equal to 1.')
         OK = False
-    else: 
+    else:
         args.thinning_interval = int(args.thinning_interval)
 
     # check "burn_in"
@@ -154,7 +152,7 @@ def check_args(args):
     elif not xlib.check_int(args.burn_in, minimum=1):
         xlib.Message.print('error', 'The processes number has to be a integer number greater than or equal to 1.')
         OK = False
-    else: 
+    else:
         args.burn_in = int(args.burn_in)
 
     # check "other_parameters"
@@ -187,6 +185,7 @@ def check_args(args):
 
 def launch_phase_processes(phase_dir, processes_number, input_dir, output_dir, iterations_number,thinning_interval, burn_in, other_parameters):
     '''
+    x
     '''
 
     # initialize the counter of rename files
@@ -220,8 +219,10 @@ def launch_phase_processes(phase_dir, processes_number, input_dir, output_dir, i
 
     # build the path file with input files of each process
     input_files_list_file_list = []
+    witherror_file_list = []
     for process_number in range(processes_number):
         input_files_list_file_list.append(f'{output_dir}{os.sep}phase-process-{process_number}-file-list.txt')
+        witherror_file_list.append(f'{output_dir}{os.sep}phase-process-{process_number}-unprocessed-files.txt')
 
     # write input files corrrespondig to each process
     start = 0
@@ -234,13 +235,13 @@ def launch_phase_processes(phase_dir, processes_number, input_dir, output_dir, i
         for i in range(start, end):
             input_files_list_file_id.write(f'{input_file_list[i]}\n')
         input_files_list_file_id.close()
-        start = end 
+        start = end
 
     # create scripts of PHASE processes
     xlib.Message.print('info', f'{xlib.get_separator()}\n')
     for process_number in range(processes_number):
         xlib.Message.print('info', f'Creating the process script {get_phase_process_script(process_number, output_dir)} ...\n')
-        build_phase_process_script(process_number, phase_dir, input_dir, input_files_list_file_list[process_number], output_dir, iterations_number, thinning_interval, burn_in, other_parameters)
+        build_phase_process_script(process_number, phase_dir, input_dir, input_files_list_file_list[process_number], witherror_file_list[process_number], output_dir, iterations_number, thinning_interval, burn_in, other_parameters)
         xlib.Message.print('info', 'The script is created.\n')
 
     # set run permision to the scripts of PHASE processes
@@ -294,7 +295,7 @@ def launch_phase_processes(phase_dir, processes_number, input_dir, output_dir, i
 
 #-------------------------------------------------------------------------------
 
-def build_phase_process_script(process_number, phase_dir, input_dir, input_files_list_file, output_dir, iterations_number, thinning_interval, burn_in, other_parameters):
+def build_phase_process_script(process_number, phase_dir, input_dir, input_files_list_file, witherror_file_list, output_dir, iterations_number, thinning_interval, burn_in, other_parameters):
     '''
     Build the PHASE process script corresponding to the process number
     '''
@@ -329,6 +330,8 @@ def build_phase_process_script(process_number, phase_dir, input_dir, input_files
             script_file_id.write( 'function run_phase_process\n')
             script_file_id.write( '{\n')
             script_file_id.write(f'    cd {output_dir}\n')
+            script_file_id.write(f'    rm -f {witherror_file_list}\n')
+            script_file_id.write(f'    touch {witherror_file_list}\n')
             script_file_id.write( '    while read FILE_NAME; do\n')
             script_file_id.write( '        echo "$SEP"\n')
             script_file_id.write(f'        IN_FILE={input_dir}/$FILE_NAME\n')
@@ -346,8 +349,7 @@ def build_phase_process_script(process_number, phase_dir, input_dir, input_files
             script_file_id.write(f'                {thinning_interval} \\\n')
             script_file_id.write(f'                {burn_in}\n')
             script_file_id.write( '            RC=$?\n')
-            script_file_id.write( '            # -- if [ $RC -ne 0 ]; then manage_error PHASE $RC; fi\n')
-            script_file_id.write( '        echo "The file is processed."\n')
+            script_file_id.write(f'            if [ $RC -ne 0 ]; then echo "$IN_FILE" >> {witherror_file_list}; else echo "The file is processed."; fi\n')
             script_file_id.write(f'    done < {input_files_list_file}\n')
             script_file_id.write( '}\n')
             script_file_id.write( '#-------------------------------------------------------------------------------\n')
@@ -469,7 +471,7 @@ def get_log_file(process_number, output_dir):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

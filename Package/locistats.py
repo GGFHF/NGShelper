@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program calculates haplotype statistics per locus from a ipyrad loci file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program calculates haplotype statistics per locus from a ipyrad loci file.
 '''
 
 #-------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -150,17 +150,17 @@ def calculate_haplotype_statistics(loci_file_path, stats_file_path):
 
     # initialize the dictionary of haplotype sequences in the locus
     haplotype_seqs_in_locus_dict = {}
- 
+
     # read the first record of complete loci file
     record = loci_file_id.readline()
 
     # while there are records
     while record != '':
 
-        # process the locus id record 
+        # process the locus id record
         if record.startswith('//'):
 
-            # extract the locus id 
+            # extract the locus id
             mo = re.search(pattern1, record)
             variant_seq = mo.group(1)
             locus_id = mo.group(2)
@@ -196,7 +196,7 @@ def calculate_haplotype_statistics(loci_file_path, stats_file_path):
             # add the record to the list of locus information records
             locus_line_list.append(record)
 
-        # read the next record of complete loci file      
+        # read the next record of complete loci file
         record = loci_file_id.readline()
 
     # close file
@@ -218,7 +218,7 @@ def calculate_haplotype_statistics(loci_file_path, stats_file_path):
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

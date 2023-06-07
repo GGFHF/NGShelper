@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program purges a Structure file.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -17,23 +23,16 @@ Licence: GNU General Public Licence Version 3.
 
 #-------------------------------------------------------------------------------
 
-'''
-This program purges a Structure file.
-'''
-
-#-------------------------------------------------------------------------------
-
 import argparse
 import gzip
 import os
-import re
 import sys
 
 import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -47,8 +46,8 @@ def main(argv):
     check_args(args)
 
     # purge the Structure file
-    if args.structure_file_type == '0' and args.purge_operation in ['DELCOL', 'CHAVAL']:
-        purge_structure_file_type_0(args.input_structure_file, args.purge_operation, args.value, args.new_value, args.output_purged_file)
+    if args.structure_input_format == '2' and args.purge_operation in ['DELCOL', 'CHAVAL']:
+        purge_structure_input_format_2(args.input_structure_file, args.purge_operation, args.value, args.new_value, args.output_purged_file)
 
 #-------------------------------------------------------------------------------
 
@@ -58,13 +57,13 @@ def build_parser():
     '''
 
     # create the parser and add arguments
-    description = 'Description: This program purges a Structure file.'
+    description = 'Description: This program purges a Structure input file.'
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'
-    parser.add_argument('--structure', dest='input_structure_file', help='Path of the Structure file (mandatory).')
-    parser.add_argument('--type', dest='structure_file_type', help=f'Type of the Structure file (mandatory): {xlib.get_structure_file_type_code_list_text()}.')
+    parser.add_argument('--structure', dest='input_structure_file', help='Path of the Structure input file (mandatory).')
+    parser.add_argument('--format', dest='structure_input_format', help=f'Structure input format (mandatory): {xlib.get_structure_input_format_code_list_text()}.')
     parser.add_argument('--operation', dest='purge_operation', help=f'Purge operation (mandatory): {xlib.get_structure_purge_code_list_text()}.')
     parser.add_argument('--value', dest='value', help='value to operate (mandatory)')
     parser.add_argument('--nvalue', dest='new_value', help='new value that replaces value when operation in CHAVAL (mandatory); else NONE (default)')
@@ -87,18 +86,18 @@ def check_args(args):
 
     # check "input_structure_file"
     if args.input_structure_file is None:
-        xlib.Message.print('error', '*** The Structure file is not indicated in the input arguments.')
+        xlib.Message.print('error', '*** The Structure input file is not indicated in the input arguments.')
         OK = False
     elif not os.path.isfile(args.input_structure_file):
         xlib.Message.print('error', f'*** The file {args.input_structure_file} does not exist.')
         OK = False
 
-    # check "structure_file_type"
-    if args.structure_file_type is None:
-        xlib.Message.print('error', '*** The type of the converted file is not indicated in the input arguments.')
+    # check "structure_input_format"
+    if args.structure_input_format is None:
+        xlib.Message.print('error', '*** The Structure input format is not indicated in the input arguments.')
         OK = False
-    elif not xlib.check_code(args.structure_file_type, xlib.get_structure_file_type_code_list(), case_sensitive=False):
-        xlib.Message.print('error', f'*** The type of the converted file has to be {xlib.get_structure_file_type_code_list_text()}.')
+    elif not xlib.check_code(args.structure_input_format, xlib.get_structure_input_format_code_list(), case_sensitive=False):
+        xlib.Message.print('error', f'*** The Structure input format has to be {xlib.get_structure_input_format_code_list_text()}.')
         OK = False
 
     # check "purge_operation"
@@ -154,9 +153,9 @@ def check_args(args):
 
 #-------------------------------------------------------------------------------
 
-def purge_structure_file_type_0(input_structure_file, purge_operation, value, new_value, output_purged_file):
+def purge_structure_input_format_2(input_structure_file, purge_operation, value, new_value, output_purged_file):
     '''
-    Purge a Structure file with format in two lines.
+    Purge a Structure file with format in two lines: one allele in different rows.
     '''
 
     # initialize the data matrix (rows: samples (first row is the header); columns: variants)
@@ -191,8 +190,7 @@ def purge_structure_file_type_0(input_structure_file, purge_operation, value, ne
         # split the record data
         record_data_list = []
         start = 0
-        separator = ' ' if input_record_counter == 1 else '\t'
-        for end in [i for i, chr in enumerate(record) if chr == separator]:
+        for end in [i for i, chr in enumerate(record) if chr == '\t']:
             record_data_list.append(record[start:end].strip())
             start = end + 1
         record_data_list.append(record[start:].strip('\n').strip())
@@ -200,7 +198,9 @@ def purge_structure_file_type_0(input_structure_file, purge_operation, value, ne
         # set and verify the column number
         if col_number == 0:
             col_number = len(record_data_list)
+            print(f'col_number: {col_number}')
         elif col_number != len(record_data_list):
+            print(f'record_data_list: {len(record_data_list)}')
             raise xlib.ProgramException('', 'L014')
 
         # append record data to data matrix
@@ -285,14 +285,14 @@ def purge_structure_file_type_0(input_structure_file, purge_operation, value, ne
     # close file
     output_purged_file_id.close()
 
-    # print OK message 
+    # print OK message
     xlib.Message.print('info', f'The purged file {os.path.basename(output_purged_file)} is created.')
 
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

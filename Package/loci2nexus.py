@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-#-------------------------------------------------------------------------------
-
-'''
-This software has been developed by:
-
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
-    Dpto. Sistemas y Recursos Naturales
-    ETSI Montes, Forestal y del Medio Natural
-    Universidad Politecnica de Madrid
-    https://github.com/ggfhf/
-
-Licence: GNU General Public Licence Version 3.
-'''
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
 This program builds a Nexus file from a ypirad loci file for a determinated
 loci set to be used by BEAST software.
+
+This software has been developed by:
+
+    Dpto. Sistemas y Recursos Naturales
+    ETSI Montes, Forestal y del Medio Natural
+    Universidad Politecnica de Madrid
+    https://github.com/ggfhf/
+
+Licence: GNU General Public Licence Version 3.
 '''
 
 #-------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -152,7 +152,7 @@ def build_nexus_file(selection_loci_id_file_path, complete_loci_file_path, selec
 
     # initialize the selected loci id list
     selected_loci_id_list = []
-    
+
     # load the selected loci ids and set the selected loci id list
     try:
         with open(selection_loci_id_file_path) as selected_loci_ids_file_id:
@@ -191,17 +191,17 @@ def build_nexus_file(selection_loci_id_file_path, complete_loci_file_path, selec
 
     # initialize the base count
     base_count = 0
- 
+
     # read the first record of complete loci file
     record = complete_loci_file_id.readline()
 
     # while there are records
     while record != '':
 
-        # process the locus id record 
+        # process the locus id record
         if record.startswith('//'):
 
-            # extract the locus id 
+            # extract the locus id
             mo = re.search(pattern1, record)
             locus_id = mo.group(2)
 
@@ -242,7 +242,7 @@ def build_nexus_file(selection_loci_id_file_path, complete_loci_file_path, selec
             # add the record to the list of locus information records
             locus_line_list.append(record)
 
-        # read the next record of complete loci file      
+        # read the next record of complete loci file
         record = complete_loci_file_id.readline()
 
     # sort the taxon id list
@@ -281,7 +281,7 @@ def build_nexus_file(selection_loci_id_file_path, complete_loci_file_path, selec
     # while there are records
     while record != '':
 
-        # process the locus id record 
+        # process the locus id record
         if record.startswith('//'):
 
             # get the sequence length of a taxon
@@ -311,7 +311,7 @@ def build_nexus_file(selection_loci_id_file_path, complete_loci_file_path, selec
             sequence = mo.group(2).strip()
 
             # add the record to the dictionary of locus information records
-            locus_line_dict[taxon_id] = sequence 
+            locus_line_dict[taxon_id] = sequence
 
         # read the next record of selected loci file
         record = selected_loci_file_id.readline()
@@ -334,7 +334,7 @@ def build_nexus_file(selection_loci_id_file_path, complete_loci_file_path, selec
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

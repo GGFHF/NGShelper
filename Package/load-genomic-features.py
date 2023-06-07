@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
+This program loads genomic features from a GFF file into NGShelper database.
+
 This software has been developed by:
 
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
     https://github.com/ggfhf/
 
 Licence: GNU General Public Licence Version 3.
-'''
-
-#-------------------------------------------------------------------------------
-
-'''
-This program loads genomic features from a GFF file into NGShelper database.
 '''
 
 #-------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ import xsqlite
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -135,9 +135,10 @@ def check_args(args):
 
 def load_genomic_features(conn, gff_file, gff_format):
     '''
+    x
     '''
-    
-    # drop the table "gene_info" (if it exists)
+
+    # drop the table "genomic_features" (if it exists)
     xlib.Message.print('verbose', 'Droping the table "genomic_features" ...\n')
     xsqlite.drop_genomic_features(conn)
     xlib.Message.print('verbose', 'The table is droped.\n')
@@ -181,7 +182,7 @@ def load_genomic_features(conn, gff_file, gff_format):
             record_counter += 1
 
             if record.startswith('#'):
-                if first_header_record == True and gff_format == 'GFF3':
+                if first_header_record and gff_format == 'GFF3':
                     if not record.startswith('##gff-version 3'):
                         raise xlib.ProgramException('', 'F005', os.path.basename(gff_file), 'GFF3')
                 first_header_record = False
@@ -304,7 +305,7 @@ def load_genomic_features(conn, gff_file, gff_format):
                         raise xlib.ProgramException(e, 'F009', os.path.basename(gff_file), record_counter)
 
     xlib.Message.print('verbose', '\n')
-     
+
     # create the index "genomic_features_index" on the table "genomic_features"
     xlib.Message.print('verbose', 'Creating the index on the table "genomic_features" ...\n')
     xsqlite.create_genomic_features_index(conn)
@@ -322,7 +323,7 @@ def load_genomic_features(conn, gff_file, gff_format):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

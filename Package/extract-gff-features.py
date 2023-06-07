@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-#-------------------------------------------------------------------------------
-
-'''
-This software has been developed by:
-
-    GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
-    Dpto. Sistemas y Recursos Naturales
-    ETSI Montes, Forestal y del Medio Natural
-    Universidad Politecnica de Madrid
-    https://github.com/ggfhf/
-
-Licence: GNU General Public Licence Version 3.
-'''
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
+# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
 '''
 This program extracts genomic features from a GFF file corresponding to the variant
 of a VCF file.
+
+This software has been developed by:
+
+    Dpto. Sistemas y Recursos Naturales
+    ETSI Montes, Forestal y del Medio Natural
+    Universidad Politecnica de Madrid
+    https://github.com/ggfhf/
+
+Licence: GNU General Public Licence Version 3.
 '''
 
 #-------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ import xlib
 
 #-------------------------------------------------------------------------------
 
-def main(argv):
+def main():
     '''
     Main line of the program.
     '''
@@ -195,7 +195,7 @@ def extract_ff_features(input_gff_file, gff_format, vcf_file, output_gff_file):
 
             # add 1 to the VCF record counter
             record_counter += 1
- 
+
             # add 1 to the variant counter
             variant_counter += 1
 
@@ -286,7 +286,7 @@ def extract_ff_features(input_gff_file, gff_format, vcf_file, output_gff_file):
                     found_position_list.append(str(position))
 
             # if the feature has variants, write in the output file
-            if are_there_variants == True:
+            if are_there_variants:
                 fragment_id = f'{seq_id[:seq_id.find(".")]}_{"-".join(found_position_list)}'
                 output_record = f'{record.strip()}\t{",".join(found_position_list)}\t{fragment_id}\n'
                 output_gff_file_id.write(output_record)
@@ -308,7 +308,7 @@ def extract_ff_features(input_gff_file, gff_format, vcf_file, output_gff_file):
 
 if __name__ == '__main__':
 
-    main(sys.argv[1:])
+    main()
     sys.exit(0)
 
 #-------------------------------------------------------------------------------
