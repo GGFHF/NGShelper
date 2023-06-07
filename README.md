@@ -8,7 +8,6 @@ Python programs.
 
 This software has been developed by:
 
-    GI Genética, Fisiología e Historia Forestal
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politécnica de Madrid
