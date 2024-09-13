@@ -7,6 +7,7 @@ rem in a Windows environment.
 rem
 rem This software has been developed by:
 rem
+rem     GI en especies leñosas (WooSp)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -32,12 +33,13 @@ set PYTHON=python.exe
 set PYTHON_OPTIONS=
 set PYTHONPATH=.
 
-set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
-set DATA_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\data"
-set OUTPUT_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\output"
+set NGSHELPER_DIR=%NGSHELPER%
+set DATA_DIR=%NGSHELPER%\data
+set OUTPUT_DIR=%NGSHELPER%\output
 
 if not exist %OUTPUT_DIR% (mkdir %OUTPUT_DIR%)
 
+set INITIAL_DIR=%cd%
 cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
@@ -47,8 +49,9 @@ rem Run the program impute-md-som.py
 %PYTHON% %PYTHON_OPTIONS% impute-md-som.py ^
     --threads=1 ^
     --db=%DATA_DIR%\ddRADseqTools2.db ^
-    --vcf=%DATA_DIR%\variants-nonko.vcf ^
-    --out=%OUTPUT_DIR%\variants-nonko-imputed.vcf ^
+    --input_vcf=%DATA_DIR%\variants-nonko.vcf ^
+    --output_vcf=%OUTPUT_DIR%\variants-nonko-imputed.vcf ^
+    --impdata=$OUTPUT_DIR/imputation_data.csv ^
     --xdim=3 ^
     --ydim=3 ^
     --sigma=0.5 ^
@@ -66,6 +69,8 @@ if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 rem ----------------------------------------------------------------------------
 
 :END
+
+cd %INITIAL_DIR%
 
 if %ERROR% equ 0 (
     rem -- exit 0

@@ -1,10 +1,10 @@
 **********************************************************************
 
-NGShelper v0.76 - build-allele-frequency.py
+NGShelper v0.81 - build-allele-frequency.py
 
 Description: This program builds the allele frequency from a VCF file in the format required by SimHyb application.
 
-build-allele-frequency.py arguments
+Usage: build-allele-frequency.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -35,11 +35,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - build-haplotype.py
+NGShelper v0.81 - build-haplotype.py
 
 Description: This program builds the haplotype of a sample set from a VCF file.
 
-build-haplotype.py arguments
+Usage: build-haplotype.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -64,11 +64,33 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - build-trapid-annotation.py
+NGShelper v0.81 - build-interproscan-annotations-stats.py
+
+Description: This program builds statistics of an InterProScan analysis used by/nthe MMSEQ2-benchmarking software.
+
+Usage: build-interproscan-annotations-stats.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --analysis ANALYSIS_FILE
+                        Path of the InterProScan analysis file (mandatory).
+  --annotations ANNOTATIONS_FILE
+                        Path of output CSV file with annotations per sequence
+                        (mandatory).
+  --stats STATS_FILE    Path of output CSV file with statistics or NONE;
+                        default: NONE.
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - build-trapid-annotation.py
 
 Description: This program builds functional annotation data corresponding to a TRAPID run.
 
-build-trapid-annotation.py arguments
+Usage: build-trapid-annotation.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -87,19 +109,70 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - calculate-genotype-data.py
+NGShelper v0.81 - calculate-alignment-identity.py
 
-Description: This program calculates genotype data: sample genotypes of SNPs, linkage desequilibrium
+Description: This program calculates the global identity percentage of set of files with alignment of sequences in FASTA format.
+
+Usage: calculate-alignment-identity.py arguments
+
+Arguments:
+  -h, --help         show this help message and exit
+  --indir INPUT_DIR  Path of the directory where cluster files with alignment
+                     of sequences are located(mandatory).
+  --pattern PATTERN  Pattern for selecting cluster files with alignment of
+                     sequences (mandatory).
+  --out OUTPUT_FILE  Path of file where the global identity percentage is
+                     saved (mandatory).
+  --verbose VERBOSE  Additional job status info during the run: Y (yes) or N
+                     (no); default: N.
+  --trace TRACE      Additional info useful to the developer team: Y (yes) or
+                     N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - calculate-enrichment-analysis.py
+
+Description: This program calculates the enrichment analysis of GO terms in
+a (gymntoTOA, TOA, EnTAP or TRAPID) annotation file and the gymnoTOA database.
+
+Usage: calculate-enrichment-analysis.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --app APP             Application (mandatory): EnTAP-runN or EnTAP-runP or
+                        gymnoTOA or TOA or TRAPID.
+  --annotations ANNOTATION_FILE
+                        Path of annotation file in CSV format (mandatory).
+  --species SPECIES_NAME
+                        The species name or "all_species" (mandatory).
+  --method FDR_METHOD   Method used in FDR calcutation: bh (Benjamini-
+                        Hochberg) or by (Benjamini-Yekutieli); default: by.
+  --msqannot MIN_SEQNUM_ANNOTATIONS
+                        Minimum sequence number in annotation; default: 5.
+  --msqspec MIN_SEQNUM_SPECIES
+                        Minimum sequence number in species; default: 10.
+  --goea GOEA_FILE      Path of the GO term enrichment analysis file
+                        (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - calculate-genotype-data.py
+
+Description: This program calculates genotype data: sample genotypes of SNPs, linkage disequilibrium
 between each pair of SNPs and sample kinship.
 
-calculate-genotype-data.py arguments
+Usage: calculate-genotype-data.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
   --threads THREADS_NUM
                         Number of threads (mandatory).
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --vcf VCF_FILE        Path of the input VCF file (mandatory).
   --verbose VERBOSE     Additional job status info during the run: Y (yes) or
                         N (no); default: N.
@@ -111,11 +184,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - calculate-go-stats.py
+NGShelper v0.81 - calculate-go-stats.py
 
 Description: This program calculates GO term statistics generated by annotation applications.
 
-calculate-go-stats.py arguments
+Usage: calculate-go-stats.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -140,19 +213,35 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - characterize-population.py
+NGShelper v0.81 - calculate-gymnotoadb-stats.py
+
+Description: This program calculates statistics of the gymnoTOA SQLite database.
+
+Usage: calculate-gymnotoadb-stats.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the gymnoTOA SQLite database (mandatory).
+  --stats STATS_FILE    Path of statistics file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - characterize-population.py
 
 Description: This program characterizes a population from a VCF file with a single population using
-linkage desequilibrium and kinship data).
+linkage disequilibrium and kinship data).
 
-characterize-population.py arguments
+Usage: characterize-population.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
   --threads THREADS_NUM
                         Number of threads (mandatory).
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --vcf VCF_FILE        Path of the input VCF file (mandatory).
   --verbose VERBOSE     Additional job status info during the run: Y (yes) or
                         N (no); default: N.
@@ -164,16 +253,15 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - check-imputations.py
+NGShelper v0.81 - check-imputations.py
 
 Description: This program checks the missing data imputations in a VCF whose missing data were simulated.
 
-check-imputations.py arguments
+Usage: check-imputations.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --chvcffile CH_VCF_FILE
                         Path of the VCF file with imputations to be checked
                         (mandatory).
@@ -200,11 +288,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - collapse-vcf-indels.py
+NGShelper v0.81 - collapse-vcf-indels.py
 
 Description: This program collapses the variant records corresponding to an indel in a VCF file.
 
-collapse-vcf-indels.py arguments
+Usage: collapse-vcf-indels.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -231,11 +319,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - correct-imputation-info.py
+NGShelper v0.81 - correct-imputation-info.py
 
 Description: This program corrects columns of info data in a summay file yielded by a SOM imputation process.
 
-correct-imputation-info.py arguments
+Usage: correct-imputation-info.py arguments
 
 Arguments:
   -h, --help         show this help message and exit
@@ -248,11 +336,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - debase-transcript-sequences.py
+NGShelper v0.81 - debase-transcript-sequences.py
 
 Description: This program debases sequences from a transcript FASTA file.
 
-debase-transcript-sequences.py arguments
+Usage: debase-transcript-sequences.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -289,11 +377,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - extract-fasta-seqs.py
+NGShelper v0.81 - extract-fasta-seqs.py
 
 Description: This program extracts sequences from a FASTA file.
 
-extract-fasta-seqs.py arguments
+Usage: extract-fasta-seqs.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -311,11 +399,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - extract-gff-features.py
+NGShelper v0.81 - extract-gff-features.py
 
 Description: This program extracts genomic features from a GFF file corresponding to the variant of a VCF file.
 
-extract-gff-features.py arguments
+Usage: extract-gff-features.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -333,11 +421,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - extract-gff-rnas.py
+NGShelper v0.81 - extract-gff-rnas.py
 
 Description: This program extracts RNA sequences from a GFF file and its corresponding genome FASTA file.
 
-extract-gff-rnas.py arguments
+Usage: extract-gff-rnas.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -357,13 +445,13 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - extract-vcf-genotypes.py
+NGShelper v0.81 - extract-vcf-genotypes.py
 
 Description: This program extracts genotype data of every variant from a VCF file.
 compatibility between each mother and its progeny, and imputes missing data of progeny genotypes
 according to the selected imputation scenario.
 
-extract-vcf-genotypes.py arguments
+Usage: extract-vcf-genotypes.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -383,11 +471,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - extract-vcf-seqs.py
+NGShelper v0.81 - extract-vcf-seqs.py
 
 Description: This program extracts sequences from a VCF file.
 
-extract-vcf-seqs.py arguments
+Usage: extract-vcf-seqs.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -403,11 +491,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - filter-fasta.py
+NGShelper v0.81 - filter-fasta.py
 
 Description: This program filters a FASTA file according to the sequence length.
 
-filter-fasta.py arguments
+Usage: filter-fasta.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -425,11 +513,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - filter-ssrs.py
+NGShelper v0.81 - filter-ssrs.py
 
 Description: This program filters a SSR file selecting SSRs included in a COS.
 
-filter-ssrs.py arguments
+Usage: filter-ssrs.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -444,11 +532,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - filter-vcf.py
+NGShelper v0.81 - filter-vcf.py
 
 Description: This program filters variants of a VCF file based on genotypes.
 
-filter-vcf.py arguments
+Usage: filter-vcf.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -471,11 +559,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - generate-id-files.py
+NGShelper v0.81 - generate-id-files.py
 
 Description: This program generates template files with random sample identifiers for use with VCF files.
 
-generate-id-files.py arguments
+Usage: generate-id-files.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -511,11 +599,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - get-exon-data-nochim.py
+NGShelper v0.81 - get-exon-data-nochim.py
 
 Description: This program parses a GMAP alignment without considenring chimeras in order to get data about the coverage, identity and coordinates of exons.
 
-get-exon-data-nochim.py arguments
+Usage: get-exon-data-nochim.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -530,11 +618,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - get-exon-data-wchim.py
+NGShelper v0.81 - get-exon-data-wchim.py
 
 Description: This program parses a GMAP alignment considering chimeras (GMAP options -n 0 -m) in order to get data about the coverage, identity and coordinates of exons.
 
-get-exon-data-wchim.py arguments
+Usage: get-exon-data-wchim.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -549,11 +637,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - get-flanking-regions.py
+NGShelper v0.81 - get-flanking-regions.py
 
 Description: This program builds a FASTA file with the flanking genomic region of variants contained in a VCF file.
 
-get-flanking-regions.py arguments
+Usage: get-flanking-regions.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -572,14 +660,14 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - impute-adults.py
+NGShelper v0.81 - impute-adults.py
 
 Description: This program imputes genotypes with missing data of adult individuals in a VCF
 file generated in a hybridization studies of two parental species, hybrids and their half-sib
 progenies, based on the relative frequencies of missing data in the adults of both parental
 species.
 
-impute-adults.py arguments
+Usage: impute-adults.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -626,11 +714,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - impute-md-naive.py
+NGShelper v0.81 - impute-md-naive.py
 
 Description: This program imputes genotypes with missing data in a VCF file using a naive process.
 
-impute-md-naive.py arguments
+Usage: impute-md-naive.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -650,11 +738,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - impute-md-random.py
+NGShelper v0.81 - impute-md-random.py
 
 Description: This program imputes genotypes with missing data in a VCF file using a random process.
 
-impute-md-random.py arguments
+Usage: impute-md-random.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -674,18 +762,17 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - impute-md-som.py
+NGShelper v0.81 - impute-md-som.py
 
 Description: This program imputes genotypes with missing data in a VCF file using Self-Organizing Maps.
 
-impute-md-som.py arguments
+Usage: impute-md-som.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
   --threads THREADS_NUM
                         Number of threads (mandatory).
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --vcf INPUT_VCF_FILE  Path of the input VCF file (mandatory).
   --out OUTPUT_VCF_FILE
                         Path of the output VCF file with missing data imputed
@@ -717,13 +804,13 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - impute-progenies.py
+NGShelper v0.81 - impute-progenies.py
 
 Description: This program treats the VCF output file of impute-adults.py, checks the genotype
 compatibility between each mother and its progeny, and imputes missing data of progeny genotypes
 according to the selected imputation scenario.
 
-impute-progenies.py arguments
+Usage: impute-progenies.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -752,11 +839,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - launch-phase-processes.py
+NGShelper v0.81 - launch-phase-processes.py
 
 Description: This program launches several PHASE processes with a input file list.
 
-launch-phase-processes.py arguments
+Usage: launch-phase-processes.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -783,16 +870,15 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - load-alignments.py
+NGShelper v0.81 - load-alignments.py
 
-Description: This program loads alignment data into NGShelper database.
+Description: This program loads alignment data into SQLite database.
 
-load-alignments.py arguments
+Usage: load-alignments.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --alignment ALIGNMENT_FILE
                         Path of alignmanet file in CSV format (mandatory).
   --verbose VERBOSE     Additional job status info during the run: Y (yes) or
@@ -802,16 +888,15 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - load-annotations.py
+NGShelper v0.81 - load-annotations.py
 
-Description: This program loads annotation data from a TOA annotation file into NGShelper database.
+Description: This program loads annotation data from a TOA annotation file into SQLite database.
 
-load-annotations.py arguments
+Usage: load-annotations.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --annotation ANNOTATION_FILE
                         Path of the TOA annotation file in CSV format
                         (mandatory).
@@ -824,17 +909,77 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - load-gene-info.py
+NGShelper v0.81 - load-emapper-annotations.py
 
-Description: This program loads gene infomation included in a file of ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/GENE_INFO/
-into NGShelper database.
+Description: This program loads eggNOG-mapper annotations into a SQLite database.
 
-load-gene-info.py arguments
+Usage: load-emapper-annotations.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --annotations ANNOTATION_FILE
+                        Path of the eggNOG-mapper annotation file (mandatory).
+  --taxnames TAXNAME_FILE
+                        Path of the NCBI taxonomy name file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-gene2accession.py
+
+Description: This program loads the accessions that are related to a GeneID
+into a SQLite database.
+
+Usage: load-gene2accession.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --relfile RELATIONSHIP_FILE
+                        Path of the relationship file (mandatory).
+  --topnode TOP_NODE_TAXID
+                        Taxid of the top node whose species are considered
+                        (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-gene2go.py
+
+Description: This program loads the GO terms that have been associated with genes
+into a SQLite database.
+
+Usage: load-gene2go.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --relfile RELATIONSHIP_FILE
+                        Path of the relationship file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-gene-info.py
+
+Description: This program loads gene infomation included in a file of ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/GENE_INFO/
+into a SQLite database.
+
+Usage: load-gene-info.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --gene GENE_INFO_FILE
                         Path of the gene info file (mandatory).
   --verbose VERBOSE     Additional job status info during the run: Y (yes) or
@@ -844,16 +989,52 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - load-genomic-features.py
+NGShelper v0.81 - load-gene-ontology.py
 
-Description: This program loads genomic features from a GFF file into NGShelper database.
+Description: This program loads Gene Ontology data into a SQLite database.
 
-load-genomic-features.py arguments
+Usage: load-gene-ontology.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --ontology ONTOLOGY_FILE
+                        Path of the ontology file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-gene-orthologs.py
+
+Description: This program loads relationships of orthologous genes
+into a SQLite database.
+
+Usage: load-gene-orthologs.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --relfile RELATIONSHIP_FILE
+                        Path of the relationship file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-genomic-features.py
+
+Description: This program loads genomic features from a GFF file into SQLite database.
+
+Usage: load-genomic-features.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --gff GFF_FILE        Path of the GFF file (mandatory).
   --format GFF_FORMAT   The format of the GFF file: GFF3; default: GFF3.
   --verbose VERBOSE     Additional job status info during the run: Y (yes) or
@@ -863,16 +1044,116 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - load-vcf-data.py
+NGShelper v0.81 - load-interproscan-annotations.py
 
-Description: This program loads data of a VCF file into NGShelper database.
+Description: This program loads InterProScan annotations into a SQLite database.
 
-load-vcf-data.py arguments
+Usage: load-interproscan-annotations.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --annotations ANNOTATION_FILE
+                        Path of the InterProScan annotation file (mandatory).
+  --stats STATS_FILE    Path of output CSV file with statistics or NONE;
+                        default: NONE.
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-mmseqs2-relationships.py
+
+Description: This program loads loads the MMSeq2s cluster sequence relationships into a SQLite database.
+
+Usage: load-mmseqs2-relationships.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --relationships RELATIONSHIP_FILE
+                        Path of the relationship file between sequence
+                        identifications and cluster identifications
+                        (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-protaccession2taxid.py
+
+Description: This program loads taxid mapping for protein sequences corresponding to a set of species taxids
+into a SQLite database.
+
+Usage: load-protaccession2taxid.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --relfile RELATIONSHIP_FILE
+                        Path of the relationship file (mandatory).
+  --topnode TOP_NODE_TAXID
+                        Taxid of the top node whose species are considered
+                        (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-tair10-orthologs.py
+
+Description: This program loads the TAIR 10 orthologs of a cluster set into a SQLite database.
+
+Usage: load-tair10-orthologs.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --alignments ALIGNMENT_FILE
+                        Path of the alignment file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-taxonomy-data.py
+
+Description: This program loads taxanomy infomation downloaded from https://ftp.ncbi.nih.gov/pub/taxonomy/
+into a SQLite database.
+
+Usage: load-taxonomy-data.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --nodes TAXONOMY_NODE_FILE
+                        Path of the taxonomy nodes file (mandatory).
+  --names SPECIES_NAME_FILE
+                        Path of the species name file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - load-vcf-data.py
+
+Description: This program loads data of a VCF file into SQLite database.
+
+Usage: load-vcf-data.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --vcf VCF_FILE        Path of input VCF file (mandatory).
   --samples SAMPLE_FILE
                         Path of the sample file in the following record
@@ -899,12 +1180,12 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - loci2nexus.py
+NGShelper v0.81 - loci2nexus.py
 
 Description: This program builds a Nexus file from a ypirad loci file
 for a determinated loci set to be used by BEAST software.
 
-loci2nexus.py arguments
+Usage: loci2nexus.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -923,11 +1204,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - locistats.py
+NGShelper v0.81 - locistats.py
 
 Description: This program calculates haplotype statistics per locus from a ipyrad loci file.
 
-locistats.py arguments
+Usage: locistats.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -942,11 +1223,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - phase2structure.py
+NGShelper v0.81 - phase2structure.py
 
 Description: This program converts a output PHASE files to the input Structure format in two lines.
 
-phase2structure.py arguments
+Usage: phase2structure.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -976,11 +1257,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - print-vcf-variants.py
+NGShelper v0.81 - print-vcf-variants.py
 
 Description: This program prints data of a selected variant list.
 
-print-vcf-variants.py arguments
+Usage: print-vcf-variants.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -1003,11 +1284,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - purge-structure.py
+NGShelper v0.81 - purge-structure.py
 
 Description: This program purges a Structure input file.
 
-purge-structure.py arguments
+Usage: purge-structure.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -1032,11 +1313,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - purge-vcf.py
+NGShelper v0.81 - purge-vcf.py
 
 Description: This program purges a VCF file.
 
-purge-vcf.py arguments
+Usage: purge-vcf.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -1057,16 +1338,15 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - query-data2scenarioX.py
+NGShelper v0.81 - query-data2scenarioX.py
 
 Description: This program lists data of variants and alleles and variant identifications to the scenario X.
 
-query-data2scenarioX.py arguments
+Usage: query-data2scenarioX.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --sp1_id SP1_ID       Identification of the first species (mandatory)
   --sp2_id SP2_ID       Identification of the second species (mandatory).
   --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
@@ -1087,41 +1367,43 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - query-data2scenarioX.py
+NGShelper v0.81 - rebuild-database.py
 
-Description: This program lists data of variants and alleles and variant identifications to the scenario X.
+Description: This program rebuilds a SQLite database.
 
-query-data2scenarioX.py arguments
+Usage: rebuild-database.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
-  --db NGSHELPER_DATABASE
-                        Path of the NGShelper database (mandatory).
-  --sp1_id SP1_ID       Identification of the first species (mandatory)
-  --sp2_id SP2_ID       Identification of the second species (mandatory).
-  --hyb_id HYBRID_ID    Identification of the hybrid or NONE; default NONE.
-  --imd_id IMPUTED_MD_ID
-                        Identification of the alternative allele for imputed
-                        missing data; default 99
-  --maxsep MAX_SEPARATION
-                        Maximum separation between variants of the same
-                        intergenic fragment (mandatory).
-  --outdir OUTPUT_DIR   Path of output directoty where files with allele data
-                        about scenario X are saved (mandatory).
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
   --verbose VERBOSE     Additional job status info during the run: Y (yes) or
                         N (no); default: N.
   --trace TRACE         Additional info useful to the developer team: Y (yes)
                         or N (no); default: N.
-  --tsi TSI_LIST        Sequence identification list to trace with format
-                        seq_id,seq_id_2,...,seq_id_n or NONE; default: NONE.
 
 **********************************************************************
 
-NGShelper v0.76 - reduce-vcf.py
+NGShelper v0.81 - recreate-database.py
+
+Description: This program creates a SQLite database or recreates it if exists.
+
+Usage: recreate-database.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --db SQLITE_DATABASE  Path of the SQLite database (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - reduce-vcf.py
 
 Description: This program reduces variants from a VCF file.
 
-reduce-vcf.py arguments
+Usage: reduce-vcf.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -1140,11 +1422,32 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - simNGS-read-fixing.py
+NGShelper v0.81 - simhyb2structure.py
+
+Description: This program converts a output SimHyb file to the input Structure format in two lines.
+
+Usage: simhyb2structure.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --simhyb SIMHYB_FILE  Path of the SimHyb file in TSV format (mandatory).
+  --headernum HEADER_ROW_NUMBER
+                        Number of the header rows in the SimHyb file
+                        (mandatory).
+  --structure STRUCTURE_FILE
+                        Path of the converted Structure file (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - simNGS-read-fixing.py
 
 Description: This program fixes sequence identifiers of a read file generated by simNGS to compatible format with CASAVA.
 
-simNGS-read-fixing.py arguments
+Usage: simNGS-read-fixing.py arguments
 
 Arguments:
   -h, --help           show this help message and exit
@@ -1154,11 +1457,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - simulate-md.py
+NGShelper v0.81 - simulate-md.py
 
 Description: This program simulates missing data in a VCF file.
 
-simulate-md.py arguments
+Usage: simulate-md.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -1181,11 +1484,56 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - swap-structure-format.py
+NGShelper v0.81 - split-fasta-file.py
+
+Description: This program splits a FASTA file in several files.
+
+Usage: split-fasta-file.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --fasta INPUT_FASTA_FILE
+                        Path of the input FASTA file (mandatory).
+  --nseq NSEQ_PERFILE   Number of sequences per output file (mandatory).
+  --outdir OUTPUT_DIR   Path of the output directory where the files will be
+                        saved (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - split-mmseqs2-clusters.py
+
+Description: This program splits a *all_seqs.fasta file yielded by MMseqs2
+in several files each containing a sequence cluster.
+
+Usage: split-mmseqs2-clusters.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --allseqs ALLSEQS_FILE
+                        Path of the *all_seqs.fasta file yielded by MMseqs2
+                        (mandatory).
+  --relationships RELATIONSHIP_FILE
+                        Path of the output file to keep the relationships
+                        between sequence identifications and cluster
+                        identifications (mandatory).
+  --outdir OUTPUT_DIR   Path of the output directory where the files will be
+                        saved (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - swap-structure-format.py
 
 Description: This program purges a Structure input file.
 
-swap-structure-format.py arguments
+Usage: swap-structure-format.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -1204,11 +1552,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - tab2vcf.py
+NGShelper v0.81 - tab2vcf.py
 
 Description: This program converts a file in tabular format to a VCF file.
 
-tab2vcf.py arguments
+Usage: tab2vcf.py arguments
 
 Arguments:
   -h, --help           show this help message and exit
@@ -1222,13 +1570,13 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - transcript-filter.py
+NGShelper v0.81 - transcript-filter.py
 
 Description: This program filters transcripts according to their length, FPKM and TPM calculated by DETONATE.
 
-transcript-filter.py arguments
+Usage: transcript-filter.py arguments
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --assembler ASSEMBLY_SOFTWARE_CODE
                         trinity (Trinity) or sdnt (SOAPdenovo-Trans).
@@ -1254,7 +1602,7 @@ optional arguments:
 
 **********************************************************************
 
-transcriptome-blastx.py [options]
+Usage: transcriptome-blastx.py [options]
 
 Options:
   -h, --help            show this help message and exit
@@ -1294,11 +1642,11 @@ Options:
 
 **********************************************************************
 
-NGShelper v0.76 - transcriptome-stats.py
+NGShelper v0.81 - transcriptome-stats.py
 
 Description: This program calculates statistics of a transcriptome.
 
-transcriptome-stats.py arguments
+Usage: transcriptome-stats.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -1315,11 +1663,157 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - vcf2phase.py
+NGShelper v0.81 - unify-consensus-seqs.py
+
+Description: This program unifies the FASTA files of the consensus sequences of a set of clusters into a single file.
+
+Usage: unify-consensus-seqs.py arguments
+
+Arguments:
+  -h, --help         show this help message and exit
+  --indir INPUT_DIR  Path of the directory where FASTA files of consensus
+                     sequences are located(mandatory).
+  --pattern PATTERN  Pattern for selecting FASTA files of consensus sequences
+                     (mandatory).
+  --out OUTPUT_FILE  Path of FASTA file with unified consensus sequences
+                     (mandatory).
+  --verbose VERBOSE  Additional job status info during the run: Y (yes) or N
+                     (no); default: N.
+  --trace TRACE      Additional info useful to the developer team: Y (yes) or
+                     N (no); default: N.
+
+**********************************************************************
+
+NGShelper v0.81 - update-vcf-fastphase-analysis.py
+
+Description: This program updates the missing data in a VCF file with the results of a fastPHASE analysis.
+
+Usage: update-vcf-fastphase-analysis.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --invcf INPUT_VCF_FILE
+                        Path of the VCF file wih missing data (mandatory).
+  --outvcf OUTPUT_VCF_FILE
+                        Path of the output VCF file with imputed data
+                        (mandatory).
+  --analdir ANALYSIS_DIR
+                        Path of directoty where fastPHASE analysis files are
+                        saved (mandatory).
+  --prefix PREFIX       Prefix of fastPHASE analysis files (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tsi TSI_LIST        Sequence identification list to trace with format
+                        seq_id,seq_id_2,...,seq_id or NONE; default: NONE.
+
+**********************************************************************
+
+NGShelper v0.81 - update-vcf-mach-analysis.py
+
+Description: This program updates the missing data in a VCF file with the results of an analysis
+performed using MACH.
+
+Usage: update-vcf-mach-analysis.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --mdvcffile MD_VCF_FILE
+                        Path of the VCF file wih missing data (mandatory).
+  --impvcffile IMPUTED_VCF_FILE
+                        Path of the output VCF file with imputed data
+                        (mandatory).
+  --analfile ANALYSIS_FILE
+                        Path of file with the analysis performed with MACH
+                        (mandatory).
+  --varfile VARIANT_FILE
+                        Path of file with variant list (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tsi TSI_LIST        Sequence identification list to trace with format
+                        seq_id,seq_id_2,...,seq_id or NONE; default: NONE.
+
+**********************************************************************
+
+NGShelper v0.81 - update-vcf-rlib-analysis.py
+
+Description: This program updates the missing data in a VCF file with the results of an analysis
+performed using a R library such as bpca, missForest, nipals, nlpca, ppca or svdImpute.
+The row of result matrix must layout similar to a VCF file with the format: 
+    seq_id \t possition \t genotype-1 \t genotype-2 \t ... \t genotype-n 
+The first row must contain the list of sample identifiers separated by the character "\t"
+
+Usage: update-vcf-rlib-analysis.py arguments
+
+Arguments:
+  -h, --help            show this help message and exit
+  --mdvcffile MD_VCF_FILE
+                        Path of the VCF file wih missing data (mandatory).
+  --impvcffile IMPUTED_VCF_FILE
+                        Path of the output VCF file with imputed data
+                        (mandatory).
+  --analfile ANALYSIS_FILE
+                        Path of result analysis file performed with an R
+                        library (mandatory).
+  --verbose VERBOSE     Additional job status info during the run: Y (yes) or
+                        N (no); default: N.
+  --trace TRACE         Additional info useful to the developer team: Y (yes)
+                        or N (no); default: N.
+  --tsi TSI_LIST        Sequence identification list to trace with format
+                        seq_id,seq_id_2,...,seq_id or NONE; default: NONE.
+
+**********************************************************************
+
+NGShelper v0.81 - vcf2mach.py
+
+Description: This program converts a VCF file to files (.dat & .ped) used by MACH.
+
+Usage: vcf2mach.py arguments
+
+Arguments:
+  -h, --help           show this help message and exit
+  --vcf VCF_FILE       Path of the input VCF file (mandatory).
+  --dat DAT_FILE       Path of the output file .dat (mandatory).
+  --ped PED_FILE       Path of the output file .ped (mandatory).
+  --mdc MD_CHARACTERS  Characters representing missing data (mandatory).
+  --verbose VERBOSE    Additional job status info during the run: Y (yes) or N
+                       (no); default: N.
+  --trace TRACE        Additional info useful to the developer team: Y (yes)
+                       or N (no); default: N.
+  --tvi TVI_LIST       Variant identification list to trace with format
+                       seq_id_1-pos_1,seq_id_2-pos_2,...,seq_id_n-pos_n or
+                       NONE; default: NONE.
+
+**********************************************************************
+
+NGShelper v0.81 - vcf2fastphase.py
+
+Description: This program converts a VCF file to the fastPHASE input format.
+
+Usage: vcf2fastphase.py arguments
+
+Arguments:
+  -h, --help           show this help message and exit
+  --vcf VCF_FILE       Path of the VCF file (mandatory).
+  --outdir OUTPUT_DIR  Path of output directoty where files for fastPHASE
+                       application are saved (mandatory).
+  --verbose VERBOSE    Additional job status info during the run: Y (yes) or N
+                       (no); default: N.
+  --trace TRACE        Additional info useful to the developer team: Y (yes)
+                       or N (no); default: N.
+  --tsi TSI_LIST       Sequence identification list to trace with format
+                       seq_id,seq_id_2,...,seq_id or NONE; default: NONE.
+
+**********************************************************************
+
+NGShelper v0.81 - vcf2phase.py
 
 Description: This program converts a VCF file to the PHASE input format.
 
-vcf2phase.py arguments
+Usage: vcf2phase.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -1347,11 +1841,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - vcf2structure.py
+NGShelper v0.81 - vcf2structure.py
 
 Description: This program converts a VCF file to the Structure input formats.
 
-vcf2structure.py arguments
+Usage: vcf2structure.py arguments
 
 Arguments:
   -h, --help            show this help message and exit
@@ -1386,11 +1880,11 @@ Arguments:
 
 **********************************************************************
 
-NGShelper v0.76 - vcf2tab.py
+NGShelper v0.81 - vcf2tab.py
 
-Description: This program converts a VCF file to a file in tabular.
+Description: This program converts a VCF file to a file in tabular format.
 
-vcf2tab.py arguments
+Usage: vcf2tab.py arguments
 
 Arguments:
   -h, --help           show this help message and exit

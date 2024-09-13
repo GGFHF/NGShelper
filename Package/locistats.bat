@@ -6,6 +6,7 @@ rem This script runs the program locistats.py in a Windows environment.
 rem
 rem This software has been developed by:
 rem
+rem     GI en especies leñosas (WooSp)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -26,8 +27,9 @@ set PYTHON_OPTIONS=
 set ARGV=
 set PYTHONPATH=.
 
-set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
+set NGSHELPER_DIR=%NGSHELPER%
 
+set INITIAL_DIR=%cd%
 cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
@@ -42,6 +44,8 @@ if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 rem ----------------------------------------------------------------------------
 
 :END
+
+cd %INITIAL_DIR%
 
 if %ERROR% equ 0 (
     rem -- exit 0

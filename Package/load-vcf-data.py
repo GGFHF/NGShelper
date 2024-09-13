@@ -9,10 +9,11 @@
 #-------------------------------------------------------------------------------
 
 '''
-This program loads data of a VCF file into NGShelper database.
+This program loads data of a VCF file into SQLite database.
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -46,8 +47,8 @@ def main():
     args = parser.parse_args()
     check_args(args)
 
-    # connect to the NGShelper database
-    conn = xsqlite.connect_database(args.ngshelper_database)
+    # connect to the SQLite database
+    conn = xsqlite.connect_database(args.sqlite_database)
 
     # load data of a VCF file
     load_vcf_data(conn, args.vcf_file, args.sample_file, args.sp1_id, args.sp2_id, args.hybrid_id, args.imputed_md_id, args.new_md_id, args.allele_transformation, args.tvi_list)
@@ -60,12 +61,12 @@ def build_parser():
     '''
 
     # create the parser and add arguments
-    description = 'Description: This program loads data of a VCF file into NGShelper database.'
+    description = 'Description: This program loads data of a VCF file into SQLite database.'
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'
-    parser.add_argument('--db', dest='ngshelper_database', help='Path of the NGShelper database (mandatory).')
+    parser.add_argument('--db', dest='sqlite_database', help='Path of the SQLite database (mandatory).')
     parser.add_argument('--vcf', dest='vcf_file', help='Path of input VCF file (mandatory).')
     parser.add_argument('--samples', dest='sample_file', help='Path of the sample file in the following record format: "sample_id;species_id;mother_id" (mandatory).')
     parser.add_argument('--sp1_id', dest='sp1_id', help='Identification of the first species (mandatory)')
@@ -91,9 +92,9 @@ def check_args(args):
     # initialize the control variable
     OK = True
 
-    # check "ngshelper_database"
-    if args.ngshelper_database is None:
-        xlib.Message.print('error', '*** The NGShelper database is not indicated in the input arguments.')
+    # check "sqlite_database"
+    if args.sqlite_database is None:
+        xlib.Message.print('error', '*** The SQLite database is not indicated in the input arguments.')
         OK = False
 
     # check "vcf_file"
@@ -554,8 +555,8 @@ def load_vcf_data(conn, vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, impute
     xsqlite.create_vcf_samples_genotypes_index(conn)
     xlib.Message.print('verbose', 'The index is created.\n')
 
-    # save changes into NGShelper database
-    xlib.Message.print('verbose', 'Saving changes into NGShelper database ...\n')
+    # save changes into SQLite database
+    xlib.Message.print('verbose', 'Saving changes into SQLite database ...\n')
     conn.commit()
     xlib.Message.print('verbose', 'Changes are saved.\n')
 

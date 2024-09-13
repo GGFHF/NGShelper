@@ -7,6 +7,7 @@
 #
 # This software has been developed by:
 #
+#    GI en especies leñosas (WooSp)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -25,7 +26,7 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 # Set environment
 
 BLASTPLUS_DIR=$APPS/Miniconda3/envs/blast/bin
-NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
+NGSHELPER_DIR=$NGSHELPER
 
 export PATH=$BLASTPLUS_DIR:$NGSHELPER_DIR:$PATH
 

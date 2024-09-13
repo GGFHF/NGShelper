@@ -1,0 +1,7 @@
+esearch -db protein -query "Pinus taeda[Organism]" | efetch -format fasta >protein_Pinus_taeda.fasta (33908[33876] - 33908[33876] - 33908[33876]) 16m9.321s
+
+esearch -db nuccore -query "Pinus taeda[Organism]" | efetch -format fasta >nucleotide_Pinus_taeda.fasta (1698[1697] - 450062[453403] - 450062[453403]) 244m28.312s
+
+esearch -db protein -query "Pinopsida [Organism]" | efetch -format fasta >protein_Pinopsida.fasta (424366[33879] - 424366[33879] - 424829[33879]) 216m24.512s
+
+esearch -db nuccore -query "Pinopsida [Organism]" | efetch -format fasta >nucleotide_Pinopsida.fasta (error - error - error) 108m48.213s

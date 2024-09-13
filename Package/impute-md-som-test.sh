@@ -7,6 +7,7 @@
 #
 # This software has been developed by:
 #
+#    GI en especies leñosas (WooSp)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -24,12 +25,17 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 # Set environment
 
-NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
-DATA_DIR=$TRABAJO/ProyectosVScode/NGShelper/data
-OUTPUT_DIR=$TRABAJO/ProyectosVScode/NGShelper/output
+PYTHON=python3
+PYTHON_OPTIONS=
+PYTHONPATH=.
+
+NGSHELPER_DIR=$NGSHELPER
+DATA_DIR=$NGSHELPER/data
+OUTPUT_DIR=$NGSHELPER/output
 
 if [ ! -d "$OUTPUT_DIR" ]; then mkdir --parents $OUTPUT_DIR; fi
 
+INITIAL_DIR=$(pwd)
 cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
@@ -37,11 +43,12 @@ cd $NGSHELPER_DIR
 # Run the program impute-md-som.py
 
 /usr/bin/time \
-    ./impute-md-som.py \
+    $PYTHON $PYTHON_OPTIONS impute-md-som.py \
         --threads=4 \
         --db=$DATA_DIR/ddRADseqTools2.db \
-        --vcf=$DATA_DIR/variants-nonko.vcf \
-        --out=$OUTPUT_DIR/variants-nonko-imputed.vcf \
+        --input_vcf=$DATA_DIR/variants-nonko.vcf \
+        --output_vcf=$OUTPUT_DIR/variants-nonko-imputed.vcf \
+        --impdata=$OUTPUT_DIR/imputation_data.csv \
         --xdim=5 \
         --ydim=5 \
         --sigma=1.0 \
@@ -59,6 +66,8 @@ if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
 #-------------------------------------------------------------------------------
 
 # End
+
+cd $INITIAL_DIR
 
 exit 0
 

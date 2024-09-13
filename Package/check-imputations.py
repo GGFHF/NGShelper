@@ -13,6 +13,7 @@ This program checks the missing data imputations in a VCF whose missing data wer
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -47,8 +48,8 @@ def main():
     args = parser.parse_args()
     check_args(args)
 
-    # connect to the NGShelper database
-    conn = xsqlite.connect_database(args.ngshelper_database)
+    # connect to the SQLite database
+    conn = xsqlite.connect_database(args.sqlite_database)
 
     # check the missing data imputation
     check_imputations(conn, args.ch_vcf_file, args.md_vcf_file, args.imputations_map_file, args.summary_file, args.confusion_matrix_file, args.experiment_data, args.tsi_list)
@@ -66,7 +67,7 @@ def build_parser():
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'
-    parser.add_argument('--db', dest='ngshelper_database', help='Path of the NGShelper database (mandatory).')
+    parser.add_argument('--db', dest='sqlite_database', help='Path of the SQLite database (mandatory).')
     parser.add_argument('--chvcffile', dest='ch_vcf_file', help='Path of the VCF file with imputations to be checked (mandatory).')
     parser.add_argument('--mdvcffile', dest='md_vcf_file', help='Path of the VCF file with missing data (mandatory).')
     parser.add_argument('--mapfile', dest='imputations_map_file', help='Path of the CSV file with the imputations map (mandatory).')
@@ -90,9 +91,9 @@ def check_args(args):
     # initialize the control variable
     OK = True
 
-    # check "ngshelper_database"
-    if args.ngshelper_database is None:
-        xlib.Message.print('error', '*** The NGShelper database is not indicated in the input arguments.')
+    # check "sqlite_database"
+    if args.sqlite_database is None:
+        xlib.Message.print('error', '*** The SQLite database is not indicated in the input arguments.')
         OK = False
 
     # check "ch_vcf_file"

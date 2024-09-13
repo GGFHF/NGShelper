@@ -7,6 +7,7 @@
 #
 # This software has been developed by:
 #
+#    GI en especies leñosas (WooSp)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -26,11 +27,17 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 SEP="#########################################"
 
-NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
-OUTPUT_DIR=$TRABAJO/ProyectosVScode/NGShelper/output
+PYTHON=python3
+PYTHON_OPTIONS=
+PYTHONPATH=.
+
+NGSHELPER_DIR=$NGSHELPER
+DATA_DIR=$NGSHELPER/data
+OUTPUT_DIR=$NGSHELPER/output
 
 if [ ! -d "$OUTPUT_DIR" ]; then mkdir --parents $OUTPUT_DIR; fi
 
+INITIAL_DIR=$(pwd)
 cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
@@ -41,7 +48,7 @@ DATA_DIR=$TRABAJO/SUBERINTRO-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/test-SUBERINTRO-AL-samples-filtered2.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/test-SUBERINTRO-AL-samples-filtered2.db \
         --vcf=$DATA_DIR/test-SUBERINTRO-AL-samples-filtered2.vcf \
@@ -54,7 +61,7 @@ DATA_DIR=$TRABAJO/SUBERINTRO-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/test-SUBERINTRO-EN-samples-filtered2.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/test-SUBERINTRO-EN-samples-filtered2.db \
         --vcf=$DATA_DIR/test-SUBERINTRO-EN-samples-filtered2.vcf \
@@ -67,7 +74,7 @@ DATA_DIR=$TRABAJO/SUBERINTRO-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/test-SUBERINTRO-EFS-samples-filtered2.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/test-SUBERINTRO-EFS-samples-filtered2.db \
         --vcf=$DATA_DIR/test-SUBERINTRO-EFS-samples-filtered2.vcf \
@@ -80,7 +87,7 @@ DATA_DIR=$TRABAJO/SUBERINTRO-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/test-SUBERINTRO-A07-samples-filtered.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/test-SUBERINTRO-A07-samples-filtered.db \
         --vcf=$DATA_DIR/test-SUBERINTRO-A07-samples-filtered.vcf \
@@ -93,7 +100,7 @@ DATA_DIR=$TRABAJO/SUBERINTRO-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/test-SUBERINTRO-E96-samples-filtered.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/test-SUBERINTRO-E96-samples-filtered.db \
         --vcf=$DATA_DIR/test-SUBERINTRO-E96-samples-filtered.vcf \
@@ -106,7 +113,7 @@ DATA_DIR=$TRABAJO/SUBERINTRO-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/test-SUBERINTRO-FS20-samples-filtered.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/test-SUBERINTRO-FS20-samples-filtered.db \
         --vcf=$DATA_DIR/test-SUBERINTRO-FS20-samples-filtered.vcf \
@@ -119,7 +126,7 @@ DATA_DIR=$TRABAJO/MOUSE-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/reference.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/reference.db \
         --vcf=$DATA_DIR/reference.vcf \
@@ -132,7 +139,7 @@ DATA_DIR=$TRABAJO/MOUSE-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/reference-98inds.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/reference-98inds.db \
         --vcf=$DATA_DIR/reference-98inds.vcf \
@@ -145,7 +152,7 @@ DATA_DIR=$TRABAJO/SUBERINTRO-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/test-SUBERINTRO-AL-samples-filtered2-reducted.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/test-SUBERINTRO-AL-samples-filtered2-reducted.db \
         --vcf=$DATA_DIR/test-SUBERINTRO-AL-samples-filtered2-reducted.vcf \
@@ -158,7 +165,7 @@ DATA_DIR=$TRABAJO/SUBERINTRO-data
 echo "$SEP"
 echo "VCF: $DATA_DIR/test-SUBERINTRO-ALandEN-samples-filtered2.vcf"
 /usr/bin/time \
-    ./characterize-population.py \
+    $PYTHON $PYTHON_OPTIONS characterize-population.py \
         --threads=1 \
         --db=$DATA_DIR/test-SUBERINTRO-ALandEN-2-filtered.db \
         --vcf=$DATA_DIR/test-SUBERINTRO-ALandEN-2-filtered.vcf \
@@ -170,6 +177,8 @@ if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
 #-------------------------------------------------------------------------------
 
 # End
+
+cd $INITIAL_DIR
 
 exit 0
 

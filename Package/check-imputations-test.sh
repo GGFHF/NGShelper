@@ -7,6 +7,7 @@
 #
 # This software has been developed by:
 #
+#    GI en especies leñosas (WooSp)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -24,9 +25,13 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 # Set environment
 
-NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
-DATA_DIR=$TRABAJO/ProyectosVScode/NGShelper/data
-OUTPUT_DIR=$TRABAJO/ProyectosVScode/NGShelper/output
+PYTHON=python3
+PYTHON_OPTIONS=
+PYTHONPATH=.
+
+NGSHELPER_DIR=$NGSHELPER
+DATA_DIR=$NGSHELPER/data
+OUTPUT_DIR=$NGSHELPER/output
 
 DATASET_ID=AL
 PROCESS_ID=J
@@ -103,6 +108,7 @@ EXPDATA=$ALGORITHM';'$EXPERIMENT_ID';'$DATASET_ID';RANDOM;'$MDP';'$MPIWMD';'$DIM
 
 if [ ! -d "$OUTPUT_DIR" ]; then mkdir --parents $OUTPUT_DIR; fi
 
+INITIAL_DIR=$(pwd)
 cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
@@ -112,7 +118,7 @@ cd $NGSHELPER_DIR
 echo 'file_name;algorithm;experiment_id;dataset_id;method;mdp;mpiwmd;dim;sigma;lr;iter;mr2;snps;gim;high_ld_sites;nn;max_dist;ok_genotypes_counter;ko_genotypes_counter;genotypes_withmd_counter;ok_imputed_genotypes_counter;ko_imputed_genotypes_counter;average_accuracy;error_rate;micro_precision;micro_recall;micro_fscore;macro_precision;macro_recall;macro_fscore;macro_precision_zde;macro_recall_zde' > $SUMMARY_PATH
 
 /usr/bin/time \
-    ./check-imputations.py \
+    $PYTHON $PYTHON_OPTIONS check-imputations.py \
         --db=$DB_PATH \
         --chvcffile=$IMPUTED_VCF_PATH \
         --mdvcffile=$VCF_WMD_PATH \
@@ -128,6 +134,8 @@ if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
 #-------------------------------------------------------------------------------
 
 # End
+
+cd $INITIAL_DIR
 
 exit 0
 

@@ -7,6 +7,7 @@
 #
 # This software has been developed by:
 #
+#    GI en especies leñosas (WooSp)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -24,12 +25,17 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 # Set environment
 
-NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
-DATA_DIR=$TRABAJO/ProyectosVScode/NGShelper/data
-OUTPUT_DIR=$TRABAJO/ProyectosVScode/NGShelper/output
+PYTHON=python3
+PYTHON_OPTIONS=
+PYTHONPATH=.
+
+NGSHELPER_DIR=$NGSHELPER
+DATA_DIR=$NGSHELPER/data
+OUTPUT_DIR=$NGSHELPER/output
 
 if [ ! -d "$OUTPUT_DIR" ]; then mkdir --parents $OUTPUT_DIR; fi
 
+INITIAL_DIR=$(pwd)
 cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
@@ -37,7 +43,7 @@ cd $NGSHELPER_DIR
 # Run the program loci2nexus.py
 
 /usr/bin/time \
-    ./loci2nexus.py \
+    $PYTHON $PYTHON_OPTIONS loci2nexus.py \
         --loci_id_file=$DATA_DIR/Lapa_GC_Less-CLUST85_SNP40_MIN80-loci-list.txt \
         --complete_loci_file=$DATA_DIR/Lapa_GC_Less-CLUST85_SNP40_MIN80.loci \
         --selected_loci_file=$OUTPUT_DIR/Lapa_GC_Less-CLUST85_SNP40_MIN80-selected.loci \
@@ -49,6 +55,8 @@ if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
 #-------------------------------------------------------------------------------
 
 # End
+
+cd $INITIAL_DIR
 
 exit 0
 

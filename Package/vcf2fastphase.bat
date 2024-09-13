@@ -2,9 +2,11 @@
 
 rem ----------------------------------------------------------------------------
 
+rem This script runs the program vcf2fastphase.py in a Windows environment.
+rem
 rem This software has been developed by:
 rem
-rem     GI Sistemas Naturales e Historia Forestal (formerly known as GI Genetica, Fisiologia e Historia Forestal)
+rem     GI en especies leñosas (WooSp)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -14,34 +16,34 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem This script parses a GAMP alignment (-n 0 -m) in order to get data about the coverage, identity and coordinates of exons.
-
-rem ----------------------------------------------------------------------------
-
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
 set ERROR=0
 
-set PYTHONPATH=.
+set PYTHON=python.exe
 set PYTHON_OPTIONS=
 set ARGV=
+set PYTHONPATH=.
 
-set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
+set NGSHELPER_DIR=%NGSHELPER%
 
+set INITIAL_DIR=%cd%
 cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program get-exon-data.py
+rem Run the program vcf2fastphase.py
 
-python.exe %PYTHON_OPTIONS% get-exon-data.py %* %ARGV%
+%PYTHON% %PYTHON_OPTIONS% vcf2fastphase.py %* %ARGV%
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------
 
 :END
+
+cd %INITIAL_DIR%
 
 if %ERROR% equ 0 (
     rem -- exit 0

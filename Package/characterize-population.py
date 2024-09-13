@@ -10,7 +10,7 @@
 
 '''
 This program characterizes a population from a VCF file with a single population using:
-    * linkage desequilibrium between each pair of SNPs
+    * linkage disequilibrium between each pair of SNPs
         (Ragsdale, Gravel - 2020 - Unbiased Estimation of Linkage Disequilibrium from Unphased Data - DOI: 10.1093/molbev/msz265)
     * sample kinship
         (Goudet, Kay, Weir - 2018 - How to estimate kinship - DOI: 10.1111/mec.14833)
@@ -18,6 +18,7 @@ Multiallelic loci and other types of variants are not considered.
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -54,8 +55,8 @@ def main():
     args = parser.parse_args()
     check_args(args)
 
-    # connect to the NGShelper database
-    conn = xsqlite.connect_database(args.ngshelper_database, check_same_thread=False)
+    # connect to the SQLite database
+    conn = xsqlite.connect_database(args.sqlite_database, check_same_thread=False)
 
     # characterize a population from a VCF file
     characterize_population(conn, args.threads_num, args.vcf_file, args.tvi_list)
@@ -69,13 +70,13 @@ def build_parser():
 
     # create the parser and add arguments
     description = 'Description: This program characterizes a population from a VCF file with a single population using\n' \
-        'linkage desequilibrium and kinship data).'
+        'linkage disequilibrium and kinship data).'
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'
     parser.add_argument('--threads', dest='threads_num', help='Number of threads (mandatory).')
-    parser.add_argument('--db', dest='ngshelper_database', help='Path of the NGShelper database (mandatory).')
+    parser.add_argument('--db', dest='sqlite_database', help='Path of the SQLite database (mandatory).')
     parser.add_argument('--vcf', dest='vcf_file', help='Path of the input VCF file (mandatory).')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')
     parser.add_argument('--trace', dest='trace', help=f'Additional info useful to the developer team: {xlib.get_trace_code_list_text()}; default: {xlib.Const.DEFAULT_TRACE}.')
@@ -104,9 +105,9 @@ def check_args(args):
     else:
         args.threads_num = int(args.threads_num)
 
-    # check "ngshelper_database"
-    if args.ngshelper_database is None:
-        xlib.Message.print('error', '*** The NGShelper database is not indicated in the input arguments.')
+    # check "sqlite_database"
+    if args.sqlite_database is None:
+        xlib.Message.print('error', '*** The SQLite database is not indicated in the input arguments.')
         OK = False
 
     # check "vcf_file"
@@ -150,7 +151,7 @@ def check_args(args):
 def characterize_population(conn, threads_num, vcf_file, tvi_list):
     '''
     Characterize a population from a VCF file with a single population using:
-        * linkage desequilibrium between each pair of SNPs
+        * linkage disequilibrium between each pair of SNPs
           (Ragsdale, Gravel - 2020 - Unbiased Estimation of Linkage Disequilibrium from Unphased Data - DOI: 10.1093/molbev/msz265)
         * sample kinship
           (Goudet, Kay, Weir - 2018 - How to estimate kinship - DOI: 10.1111/mec.14833)
@@ -192,14 +193,14 @@ def characterize_population(conn, threads_num, vcf_file, tvi_list):
     xsqlite.create_vcf_snps(conn)
     xlib.Message.print('verbose', 'The table is created.\n')
 
-    # drop the table "vcf_linkage_desequilibrium" (if it exists)
-    xlib.Message.print('verbose', 'Droping the table "vcf_linkage_desequilibrium" ...\n')
-    xsqlite.drop_vcf_linkage_desequilibrium(conn)
+    # drop the table "vcf_linkage_disequilibrium" (if it exists)
+    xlib.Message.print('verbose', 'Droping the table "vcf_linkage_disequilibrium" ...\n')
+    xsqlite.drop_vcf_linkage_disequilibrium(conn)
     xlib.Message.print('verbose', 'The table is droped.\n')
 
-    # create the table "vcf_linkage_desequilibrium"
-    xlib.Message.print('verbose', 'Creating the table "vcf_linkage_desequilibrium" ...\n')
-    xsqlite.create_vcf_linkage_desequilibrium(conn)
+    # create the table "vcf_linkage_disequilibrium"
+    xlib.Message.print('verbose', 'Creating the table "vcf_linkage_disequilibrium" ...\n')
+    xsqlite.create_vcf_linkage_disequilibrium(conn)
     xlib.Message.print('verbose', 'The table is created.\n')
 
     # drop the table "vcf_kinship" (if it exists)
@@ -432,8 +433,8 @@ def characterize_population(conn, threads_num, vcf_file, tvi_list):
     xsqlite.create_vcf_snps_index(conn)
     xlib.Message.print('verbose', 'The index is created.\n')
 
-    # save changes into NGShelper database
-    xlib.Message.print('verbose', 'Saving changes into NGShelper database ...\n')
+    # save changes into SQLite database
+    xlib.Message.print('verbose', 'Saving changes into SQLite database ...\n')
     conn.commit()
     xlib.Message.print('verbose', 'Changes are saved.\n')
 
@@ -459,12 +460,12 @@ def characterize_population(conn, threads_num, vcf_file, tvi_list):
     xsqlite.create_vcf_kinship_index(conn)
     xlib.Message.print('verbose', 'The index is created.\n')
 
-    # save changes into NGShelper database
-    xlib.Message.print('verbose', 'Saving changes into NGShelper database ...\n')
+    # save changes into SQLite database
+    xlib.Message.print('verbose', 'Saving changes into SQLite database ...\n')
     conn.commit()
     xlib.Message.print('verbose', 'Changes are saved.\n')
 
-    xlib.Message.print('verbose', 'Calculating the linkage desequilibrium ...\n')
+    xlib.Message.print('verbose', 'Calculating the linkage disequilibrium ...\n')
 
     # initialice the counter and total of SNPs
     snps_counter = 0
@@ -473,7 +474,7 @@ def characterize_population(conn, threads_num, vcf_file, tvi_list):
     # create ...
     semaphore = Semaphore(1)
 
-    # calculate the linkage desequilibrium between each pair of SNPs
+    # calculate the linkage disequilibrium between each pair of SNPs
     while snps_counter < snps_total:
 
         # initialize working threads number
@@ -496,7 +497,7 @@ def characterize_population(conn, threads_num, vcf_file, tvi_list):
         # create and start threads
         threads_list = []
         for thread_id in range(w_threads_num):
-            threads_list.append(threading.Thread(target=calculate_snp_linkage_desequilibrium, args=[semaphore, conn, sample_number, group_snp_id_list[thread_id], snp_id_list]))
+            threads_list.append(threading.Thread(target=calculate_snp_linkage_disequilibrium, args=[semaphore, conn, sample_number, group_snp_id_list[thread_id], snp_id_list]))
             threads_list[thread_id].start()
 
         # wait until all threads terminate
@@ -506,20 +507,20 @@ def characterize_population(conn, threads_num, vcf_file, tvi_list):
         xlib.Message.print('verbose', f'\r... SNPs counter: {snps_counter}/{snps_total} ...              ')
 
     xlib.Message.print('verbose', '\n')
-    xlib.Message.print('verbose', 'The linkage desequilibrium is calculated.\n')
+    xlib.Message.print('verbose', 'The linkage disequilibrium is calculated.\n')
 
-    # create the index "vcf_linkage_desequilibrium_index" on the table "vcf_linkage_desequilibrium"
-    xlib.Message.print('verbose', 'Creating the index on the table "vcf_linkage_desequilibrium" ...\n')
-    xsqlite.create_vcf_linkage_desequilibrium_index(conn)
+    # create the index "vcf_linkage_disequilibrium_index" on the table "vcf_linkage_disequilibrium"
+    xlib.Message.print('verbose', 'Creating the index on the table "vcf_linkage_disequilibrium" ...\n')
+    xsqlite.create_vcf_linkage_disequilibrium_index(conn)
     xlib.Message.print('verbose', 'The index is created.\n')
 
-    # save changes into NGShelper database
-    xlib.Message.print('verbose', 'Saving changes into NGShelper database ...\n')
+    # save changes into SQLite database
+    xlib.Message.print('verbose', 'Saving changes into SQLite database ...\n')
     conn.commit()
     xlib.Message.print('verbose', 'Changes are saved.\n')
 
-    # get global measures of r2 from linkage desequilibrium data
-    r2_mean, r2_sd = xsqlite.get_vcf_linkage_desequilibrium_r2_measures(conn)
+    # get global measures of r2 from linkage disequilibrium data
+    r2_mean, r2_sd = xsqlite.get_vcf_linkage_disequilibrium_r2_measures(conn)
 
     # show polupation characterization
     xlib.Message.print('info',  '*************************')
@@ -531,9 +532,9 @@ def characterize_population(conn, threads_num, vcf_file, tvi_list):
 
 #-------------------------------------------------------------------------------
 
-def calculate_snp_linkage_desequilibrium(semaphore, conn, sample_number, snp_id_1, snp_id_list_1):
+def calculate_snp_linkage_disequilibrium(semaphore, conn, sample_number, snp_id_1, snp_id_list_1):
     '''
-    Calculate the linkage desequilibrium of a SNP.
+    Calculate the linkage disequilibrium of a SNP.
     '''
 
     # get data of the first SNP from table "vcf_snps"
@@ -548,7 +549,7 @@ def calculate_snp_linkage_desequilibrium(semaphore, conn, sample_number, snp_id_
     w_snp_id_list_2 = snp_id_list_1.copy()
     w_snp_id_list_2.remove(snp_id_1)
 
-    # calculate the linkage desequilibrium
+    # calculate the linkage disequilibrium
     for snp_id_2 in w_snp_id_list_2:
 
         # get data of the first SNP from table "vcf_snps"
@@ -644,7 +645,7 @@ def calculate_snp_linkage_desequilibrium(semaphore, conn, sample_number, snp_id_
             xlib.Message.print('trace', f'n: {n} - n1: {n1} - n2: {n2} - n3: {n3} - n4: {n4} - n5: {n5} - n6: {n6} - n7: {n7} - n8: {n8} - n9: {n9}')
             xlib.Message.print('trace', f'rf1: {rf1} - af1: {af1} - rf2: {rf2} - af2: {af2}')
 
-        # save linkage desequilibrium data into the table "vcf_linkage_desequilibrium"
+        # save linkage disequilibrium data into the table "vcf_linkage_disequilibrium"
         ld_row_dict = {}
         ld_row_dict['snp_id_1'] = snp_id_1
         ld_row_dict['snp_id_2'] = snp_id_2
@@ -652,7 +653,7 @@ def calculate_snp_linkage_desequilibrium(semaphore, conn, sample_number, snp_id_
         ld_row_dict['r2'] = r2
         ld_row_dict['sample_withmd_list_2'] = snp_data_dict_2['sample_withmd_list']
         semaphore.acquire()
-        xsqlite.insert_vcf_linkage_desequilibrium_row(conn, ld_row_dict)
+        xsqlite.insert_vcf_linkage_disequilibrium_row(conn, ld_row_dict)
         semaphore.release()
 
 #-------------------------------------------------------------------------------

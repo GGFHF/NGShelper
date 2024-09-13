@@ -7,6 +7,7 @@
 #
 # This software has been developed by:
 #
+#    GI en especies leñosas (WooSp)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -24,12 +25,17 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 # Set environment
 
-NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
-DATA_DIR=$TRABAJO/ProyectosVScode/NGShelper/data
-OUTPUT_DIR=$TRABAJO/ProyectosVScode/NGShelper/output
+PYTHON=python3
+PYTHON_OPTIONS=
+PYTHONPATH=.
+
+NGSHELPER_DIR=$NGSHELPER
+DATA_DIR=$NGSHELPER/data
+OUTPUT_DIR=$NGSHELPER/output
 
 if [ ! -d "$OUTPUT_DIR" ]; then mkdir --parents $OUTPUT_DIR; fi
 
+INITIAL_DIR=$(pwd)
 cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
@@ -37,7 +43,7 @@ cd $NGSHELPER_DIR
 # Run the program build-allele-frequency.py
 
 # -- /usr/bin/time \
-# --     ./build-allele-frequency.py \
+# --     $PYTHON $PYTHON_OPTIONS build-allele-frequency.py \
 # --         --vcf=$DATA_DIR/concatenated_imputed_progenies-6000DP-scenario2.vcf \
 # --         --samples=$DATA_DIR/IDs-total.txt \
 # --         --sp1_id=AL \
@@ -52,7 +58,7 @@ cd $NGSHELPER_DIR
 # -- if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
 
 /usr/bin/time \
-    ./build-allele-frequency.py \
+    $PYTHON $PYTHON_OPTIONS build-allele-frequency.py \
         --vcf=$DATA_DIR/Selected-for-simhyb.recode.vcf \
         --samples=$DATA_DIR/keep-adults-simhyb.txt \
         --sp1_id=AL \
@@ -69,6 +75,8 @@ if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
 #-------------------------------------------------------------------------------
 
 # End
+
+cd $INITIAL_DIR
 
 exit 0
 

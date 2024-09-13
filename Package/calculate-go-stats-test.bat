@@ -7,6 +7,7 @@ rem in a Linux environment.
 rem
 rem This software has been developed by:
 rem
+rem     GI en especies leñosas (WooSp)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -38,6 +39,7 @@ set ERROR=0
 
 if not exist %OUTPUT_DIR% (mkdir %OUTPUT_DIR%)
 
+set INITIAL_DIR=%cd%
 cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
@@ -93,6 +95,8 @@ if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 rem ----------------------------------------------------------------------------
 
 :END
+
+cd %INITIAL_DIR%
 
 if %ERROR% equ 0 (
     rem -- exit 0

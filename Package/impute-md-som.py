@@ -13,6 +13,7 @@ This program imputes genotypes with missing data in a VCF file using Self-Organi
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -52,8 +53,8 @@ def main():
     args = parser.parse_args()
     check_args(args)
 
-    # connect to the NGShelper database
-    conn = xsqlite.connect_database(args.ngshelper_database, check_same_thread=False)
+    # connect to the SQLite database
+    conn = xsqlite.connect_database(args.sqlite_database, check_same_thread=False)
 
     # impute genotypes with missing data in a VCF file using Self-Organizing Maps
     impute_md_som(conn, args.threads_num, args.input_vcf_file, args.output_vcf_file, args.minimum_r2, args.r_estimator, args.snps_num, args.xdim, args.ydim, args.sigma, args.learning_rate, args.num_iteration, args.genotype_imputation_method, args.tvi_list)
@@ -72,7 +73,7 @@ def build_parser():
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'    #pylint: disable=protected-access
     parser.add_argument('--threads', dest='threads_num', help='Number of threads (mandatory).')
-    parser.add_argument('--db', dest='ngshelper_database', help='Path of the NGShelper database (mandatory).')
+    parser.add_argument('--db', dest='sqlite_database', help='Path of the SQLite database (mandatory).')
     parser.add_argument('--vcf', dest='input_vcf_file', help='Path of the input VCF file (mandatory).')
     parser.add_argument('--out', dest='output_vcf_file', help='Path of the output VCF file with missing data imputed (mandatory).')
     parser.add_argument('--xdim', dest='xdim', help='X dimension of the SOM (mandatory).')
@@ -111,9 +112,9 @@ def check_args(args):
     else:
         args.threads_num = int(args.threads_num)
 
-    # check "ngshelper_database"
-    if args.ngshelper_database is None:
-        xlib.Message.print('error', '*** The NGShelper database is not indicated in the input arguments.')
+    # check "sqlite_database"
+    if args.sqlite_database is None:
+        xlib.Message.print('error', '*** The SQLite database is not indicated in the input arguments.')
         OK = False
 
     # check "input_vcf_file"
@@ -279,8 +280,8 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
     # get the kinship dictionary
     kinship_dict = xsqlite.get_vcf_kinship_dict(conn)
 
-    # get the list of snp identification with  missing data from table "vcf_linkage_desequilibrium_snp_id_1_list"
-    snp_id_1_list = sorted(xsqlite.get_vcf_linkage_desequilibrium_snp_id_1_list(conn))
+    # get the list of snp identification with  missing data from table "vcf_linkage_disequilibrium_snp_id_1_list"
+    snp_id_1_list = sorted(xsqlite.get_vcf_linkage_disequilibrium_snp_id_1_list(conn))
 
     # open the input VCF file
     if input_vcf_file.endswith('.gz'):
@@ -511,9 +512,9 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
 
         if variant_id in tvi_list: xlib.Message.print('trace', f'thread_id: {thread_id} - variant_id: {variant_id} - There is missing data')
 
-        # get the linkage desequilibrium dictionary
+        # get the linkage disequilibrium dictionary
         semaphore.acquire()
-        ld_list = xsqlite.get_vcf_linkage_desequilibrium_list(conn, variant_id)
+        ld_list = xsqlite.get_vcf_linkage_disequilibrium_list(conn, variant_id)
         semaphore.release()
 
         # build the genotype text before imputation

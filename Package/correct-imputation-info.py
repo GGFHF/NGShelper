@@ -13,6 +13,7 @@ This program corrects columns of info data in a summay file yielded by a SOM imp
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid

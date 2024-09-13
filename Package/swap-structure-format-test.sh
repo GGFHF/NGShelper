@@ -8,6 +8,7 @@
 #
 # This software has been developed by:
 #
+#    GI en especies leñosas (WooSp)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -25,12 +26,17 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 # Set environment
 
-NGSHELPER_DIR=$TRABAJO/ProyectosVScode/NGShelper
-DATA_DIR=$TRABAJO/ProyectosVScode/NGShelper/data
-OUTPUT_DIR=$TRABAJO/ProyectosVScode/NGShelper/output
+PYTHON=python3
+PYTHON_OPTIONS=
+PYTHONPATH=.
+
+NGSHELPER_DIR=$NGSHELPER
+DATA_DIR=$NGSHELPER/data
+OUTPUT_DIR=$NGSHELPER/output
 
 if [ ! -d "$OUTPUT_DIR" ]; then mkdir --parents $OUTPUT_DIR; fi
 
+INITIAL_DIR=$(pwd)
 cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
@@ -38,7 +44,7 @@ cd $NGSHELPER_DIR
 # Run the program swap-structure-format.py
 
 /usr/bin/time \
-    ./swap-structure-format.py \
+    $PYTHON $PYTHON_OPTIONS swap-structure-format.py \
         --input=$DATA_DIR/Scn3-real-prevalencia1.tsv \
         --out=$OUTPUT_DIR/Scn3-real-prevalencia1-type1.tsv \
         --type=2TO1 \
@@ -50,6 +56,8 @@ if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi
 #-------------------------------------------------------------------------------
 
 # End
+
+cd $INITIAL_DIR
 
 exit 0
 

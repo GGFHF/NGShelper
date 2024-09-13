@@ -7,6 +7,7 @@ rem in a Windows environment.
 rem
 rem This software has been developed by:
 rem
+rem     GI en especies leñosas (WooSp)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
@@ -32,9 +33,9 @@ set PYTHON=python.exe
 set PYTHON_OPTIONS=
 set PYTHONPATH=.
 
-set NGSHELPER_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper"
-set DATA_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\data"
-set OUTPUT_DIR="C:\Users\FMM\Documents\ProyectosVS\NGShelper\NGShelper\output"
+set NGSHELPER_DIR=%NGSHELPER%
+set DATA_DIR=%NGSHELPER%\data
+set OUTPUT_DIR=%NGSHELPER%\output
 
 set DATASET_ID=AL
 set PROCESS_ID=J
@@ -111,6 +112,7 @@ set EXPDATA=%ALGORITHM%;%EXPERIMENT_ID%;%DATASET_ID%;RANDOM;%MDP%;%MPIWMD%;%DIM%
 
 if not exist %OUTPUT_DIR% (mkdir %OUTPUT_DIR%)
 
+set INITIAL_DIR=%cd%
 cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
@@ -135,6 +137,8 @@ if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 rem ----------------------------------------------------------------------------
 
 :END
+
+cd %INITIAL_DIR%
 
 if %ERROR% equ 0 (
     rem -- exit 0

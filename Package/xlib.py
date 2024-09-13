@@ -14,6 +14,7 @@ software package used in both console mode and gui mode.
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -57,7 +58,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.76'
+    return '0.81'
 
 #-------------------------------------------------------------------------------
 
@@ -253,6 +254,23 @@ def split_literal_to_string_list(literal):
 
     # return the string values list
     return string_list
+
+#-------------------------------------------------------------------------------
+
+def join_string_list_to_string(string_list):
+    '''
+    Join a string value list in a literal (strings with simple quote and separated by comma).
+    '''
+
+    # initialize the literal
+    literal = ''
+
+    # concat the string items of string_list
+    for string in string_list:
+        literal = f"'{string}'" if literal == '' else f"{literal},'{string}'"
+
+    # return the literal
+    return literal
 
 #-------------------------------------------------------------------------------
 
@@ -740,6 +758,7 @@ def get_taxonomy_dict(type, value):
 
 def read_toa_annotation_record(file_name, file_id, type, record_counter):
     '''
+    Read the next record of the functional annotation file built by TOA application.
     '''
 
 # initialize the data dictionary
@@ -799,7 +818,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
                 kegg_id = data_list[27]
                 metacyc_id = data_list[28]
             except Exception as e:
-                raise ProgramException(e, 'F006', os.path.basename(file_name), record_counter)
+                raise ProgramException(e, 'F006', os.path.basename(file_name), record_counter) from e
 
             # set the key
             key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
@@ -855,7 +874,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
                 kegg_id = data_list[33]
                 metacyc_id = data_list[34]
             except Exception as e:
-                raise ProgramException('F006', os.path.basename(file_name), record_counter)
+                raise ProgramException('F006', os.path.basename(file_name), record_counter) from e
 
             # set the key
             key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
@@ -896,7 +915,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
                 desc = data_list[18]
                 databases = data_list[19]
             except Exception as e:
-                raise ProgramException('F006', os.path.basename(file_name), record_counter)
+                raise ProgramException('F006', os.path.basename(file_name), record_counter) from e
 
             # set the key
             key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
@@ -952,7 +971,7 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
                 refseq_genomic_nucleotide_accession = data_list[33]
                 refseq_gene_symbol = data_list[34]
             except Exception as e:
-                raise ProgramException('F006', os.path.basename(file_name), record_counter)
+                raise ProgramException('F006', os.path.basename(file_name), record_counter) from e
 
             # set the key
             key = f'{nt_seq_id}-{aa_seq_id}-{hit_num}-{hsp_num}'
@@ -971,8 +990,89 @@ def read_toa_annotation_record(file_name, file_id, type, record_counter):
 
 #-------------------------------------------------------------------------------
 
+def read_gymnotoa_annotation_record(file_name, file_id, record_counter):
+    '''
+    Read the next record of the functional annotation file built by gymnoTOA application.
+    '''
+
+    # initialize the data dictionary
+    data_dict = {}
+
+    # initialize the key
+    key = None
+
+    # read next record
+    record = file_id.readline()
+
+    # if there is record
+    if record != '':
+
+        # extract data
+        # record format: qseqid <field_sep> sseqid <field_sep> pident <field_sep> length <field_sep> mismatch <field_sep> gapopen <field_sep> qstart <field_sep> qend <field_sep> sstart <field_sep> send <field_sep> evalue <field_sep> bitscore <record_sep>
+        field_sep = ';'
+        record_sep = '\n'
+        data_list = re.split(field_sep, record.replace(record_sep,''))
+        try:
+            qseqid = data_list[0].strip()
+            sseqid = data_list[1].strip()
+            pident = data_list[2].strip()
+            length = data_list[3].strip()
+            mismatch = data_list[4].strip()
+            gapopen = data_list[5].strip()
+            qstart = data_list[6].strip()
+            qend = data_list[7].strip()
+            sstart = data_list[8].strip()
+            send = data_list[9].strip()
+            evalue = data_list[10].strip()
+            bitscore = data_list[11].strip()
+            aligner = data_list[12].strip()
+            ncbi_description = data_list[13].strip()
+            ncbi_species = data_list[14].strip()
+            tair10_ortholog_seq_id = data_list[15].strip()
+            interpro_goterms = data_list[16].strip()
+            panther_goterms = data_list[17].strip()
+            metacyc_pathways = data_list[18].strip()
+            # -- reactome_pathways = data_list[x].strip()
+            eggnog_ortholog_seq_id = data_list[19].strip()
+            eggnog_ortholog_species = data_list[20].strip()
+            eggnog_ogs = data_list[21].strip()
+            cog_category = data_list[22].strip()
+            eggnog_description = data_list[23].strip()
+            eggnog_goterms = data_list[24].strip()
+            ec = data_list[25].strip()
+            kegg_kos = data_list[26].strip()
+            kegg_pathways = data_list[27].strip()
+            kegg_modules = data_list[28].strip()
+            kegg_reactions = data_list[29].strip()
+            kegg_rclasses = data_list[30].strip()
+            brite = data_list[31].strip()
+            kegg_tc = data_list[32].strip()
+            cazy = data_list[33].strip()
+            pfams = data_list[34].strip()
+        except Exception as e:
+            raise ProgramException(e, 'F006', os.path.basename(file_name), record_counter) from e
+
+        # set the key
+        key = f'{qseqid}-{sseqid}'
+
+        # get the record data dictionary
+        # -- data_dict = {'qseqid': qseqid, 'sseqid': sseqid, 'pident': pident, 'length': length, 'mismatch': mismatch, 'gapopen': gapopen, 'qstart': qstart, 'qend': qend, 'sstart': sstart, 'send': send, 'evalue': evalue, 'bitscore': bitscore, 'aligner': aligner, 'ncbi_description': ncbi_description, 'ncbi_species': ncbi_species, 'tair10_ortholog_seq_id': tair10_ortholog_seq_id, 'interpro_goterms': interpro_goterms, 'panther_goterms': panther_goterms, 'metacyc_pathways': metacyc_pathways, 'reactome_pathways': reactome_pathways, 'eggnog_ortholog_seq_id': eggnog_ortholog_seq_id, 'eggnog_ortholog_species': eggnog_ortholog_species, 'eggnog_ogs': eggnog_ogs, 'cog_category': cog_category, 'eggnog_description': eggnog_description, 'eggnog_goterms': eggnog_goterms, 'ec': ec, 'kegg_kos': kegg_kos, 'kegg_pathways': kegg_pathways, 'kegg_modules': kegg_modules, 'kegg_reactions': kegg_reactions, 'kegg_rclasses': kegg_rclasses, 'brite': brite, 'kegg_tc': kegg_tc, 'cazy': cazy, 'pfams': pfams}
+        data_dict = {'qseqid': qseqid, 'sseqid': sseqid, 'pident': pident, 'length': length, 'mismatch': mismatch, 'gapopen': gapopen, 'qstart': qstart, 'qend': qend, 'sstart': sstart, 'send': send, 'evalue': evalue, 'bitscore': bitscore, 'aligner': aligner, 'ncbi_description': ncbi_description, 'ncbi_species': ncbi_species, 'tair10_ortholog_seq_id': tair10_ortholog_seq_id, 'interpro_goterms': interpro_goterms, 'panther_goterms': panther_goterms, 'metacyc_pathways': metacyc_pathways, 'eggnog_ortholog_seq_id': eggnog_ortholog_seq_id, 'eggnog_ortholog_species': eggnog_ortholog_species, 'eggnog_ogs': eggnog_ogs, 'cog_category': cog_category, 'eggnog_description': eggnog_description, 'eggnog_goterms': eggnog_goterms, 'ec': ec, 'kegg_kos': kegg_kos, 'kegg_pathways': kegg_pathways, 'kegg_modules': kegg_modules, 'kegg_reactions': kegg_reactions, 'kegg_rclasses': kegg_rclasses, 'brite': brite, 'kegg_tc': kegg_tc, 'cazy': cazy, 'pfams': pfams}
+
+    # if there is not record
+    else:
+
+        # set the key
+        key = bytes.fromhex('7E').decode('utf-8')
+
+    # return the record, key and data dictionary
+    return record, key, data_dict
+
+#-------------------------------------------------------------------------------
+
 def read_blast2go_annotation_record(file_name, file_id, record_counter):
     '''
+    Read the next record of the functional annotation file built by Blast2GO application.
     '''
 
     # initialize the data dictionary
@@ -1016,7 +1116,7 @@ def read_blast2go_annotation_record(file_name, file_id, record_counter):
             interpro_go_ids = data_list[14]
             interpro_go_names = data_list[15]
         except Exception as e:
-            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter) from e
 
         # get the record data dictionary
         data_dict = {'tags': tags, 'seq_name': seq_name, 'description': description, 'length': length, 'hit_counter': hit_counter, 'e_value': e_value, 'sim_mean': sim_mean, 'go_counter': go_counter, 'go_ids': go_ids, 'go_names': go_names, 'enzyme_codes': enzyme_codes, 'enzyme_names': enzyme_names, 'interpro_ids': interpro_ids, 'interpro_go_ids': interpro_go_ids, 'interpro_go_names': interpro_go_names}
@@ -1032,8 +1132,9 @@ def read_blast2go_annotation_record(file_name, file_id, record_counter):
 
 #-------------------------------------------------------------------------------
 
-def read_entap_annotation_record(file_name, file_id, record_counter):
+def read_entap_runn_annotation_record(file_name, file_id, record_counter):
     '''
+    Read the next record of the functional annotation file built by EnTAP application using the runN option.
     '''
 
     # initialize the data dictionary
@@ -1052,7 +1153,8 @@ def read_entap_annotation_record(file_name, file_id, record_counter):
         record = record.strip('\n')
 
         # extract data
-        # EnTAP record format: Query Sequence	Subject Sequence	Percent Identical	Alignment Length	Mismatches	Gap Openings	Query Start	Query End	Subject Start	Subject End	E Value	Coverage	Description	Species	Taxonomic Lineage	Origin Database	Contaminant	Informative	Seed Ortholog	Seed E-Value	Seed Score	Predicted Gene	Tax Scope	Tax Scope Max	Member OGs	KEGG Terms	GO Biological	GO Cellular	GO Molecular
+        # -- EnTAP record format: Query Sequence	Subject Sequence	Percent Identical	Alignment Length	Mismatches	Gap Openings	Query Start	Query End	Subject Start	Subject End	E Value	Coverage	Description	Species	Taxonomic Lineage	Origin Database	Contaminant	Informative	Seed Ortholog	Seed E-Value	Seed Score	Predicted Gene	Tax Scope	Tax Scope Max	Member OGs	KEGG Terms	GO Biological	GO Cellular	GO Molecular
+        # EnTAP record format: Query Sequence	Subject Sequence	Percent Identical	Alignment Length	Mismatches	Gap Openings	Query Start	Query End	Subject Start	Subject End	E Value	Coverage	Description	Species	Taxonomic Lineage	Origin Database	Contaminant	Informative	EggNOG Seed Ortholog	EggNOG Seed E-Value	EggNOG Seed Score	EggNOG Tax Scope Max	EggNOG Member OGs	EggNOG Description	EggNOG COG Abbreviation	EggNOG COG Description	EggNOG BIGG Reaction	EggNOG KEGG KO	EggNOG KEGG Pathway	EggNOG KEGG Module	EggNOG KEGG Reaction	EggNOG KEGG RClass	EggNOG BRITE	EggNOG GO Biological	EggNOG GO Cellular	EggNOG GO Molecular	EggNOG Protein Domains
         data_list = []
         start = 0
         for end in [i for i, chr in enumerate(record) if chr == '\t']:
@@ -1078,22 +1180,139 @@ def read_entap_annotation_record(file_name, file_id, record_counter):
             origin_database = data_list[15]
             contaminant = data_list[16]
             informative = data_list[17]
-            seed_ortholog = data_list[18]
-            seed_e_value = data_list[19]
-            seed_score = data_list[20]
-            predicted_gene = data_list[21]
-            tax_scope = data_list[22]
-            tax_scope_max = data_list[23]
-            member_ogs = data_list[24]
-            kegg_terms = data_list[25]
-            go_biological = data_list[26]
-            go_cellular = data_list[27]
-            go_molecular = data_list[28]
+            # -- seed_ortholog = data_list[18]
+            # -- seed_e_value = data_list[19]
+            # -- seed_score = data_list[20]
+            # -- predicted_gene = data_list[21]
+            # -- tax_scope = data_list[22]
+            # -- tax_scope_max = data_list[23]
+            # -- member_ogs = data_list[24]
+            # -- kegg_terms = data_list[25]
+            # -- go_biological = data_list[26]
+            # -- go_cellular = data_list[27]
+            # -- go_molecular = data_list[28]
+            eggnog_seed_ortholog = data_list[18]
+            eggnog_seed_e_value = data_list[19]
+            eggnog_seed_score = data_list[20]
+            eggnog_tax_scope_max = data_list[21]
+            eggnog_member_ogs = data_list[22]
+            eggnog_description = data_list[23]
+            eggnog_cog_abbreviation = data_list[24]
+            eggnog_cog_description = data_list[25]
+            eggnog_bigg_reaction = data_list[26]
+            eggnog_kegg_ko = data_list[27]
+            eggnog_kegg_pathway  = data_list[28]
+            eggnog_kegg_module = data_list[29]
+            eggnog_kegg_reaction = data_list[30]
+            eggnog_kegg_rclass = data_list[31]
+            eggnog_brite = data_list[32]
+            eggnog_go_biological = data_list[33]
+            eggnog_go_cellular = data_list[34]
+            eggnog_go_molecular = data_list[35]
+            eggnog_protein_domains = data_list[36]
         except Exception as e:
-            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter) from e
 
         # get the record data dictionary
-        data_dict = {'query_sequence': query_sequence, 'subject_sequence': subject_sequence, 'percent_identical': percent_identical, 'alignment_length': alignment_length, 'mismatches': mismatches, 'gap_openings': gap_openings, 'query_start': query_start, 'query_end': query_end, 'subject_start': subject_start, 'subject_end': subject_end, 'e_value': e_value, 'coverage': coverage, 'description': description, 'species': species, 'taxonomic_lineage': taxonomic_lineage, 'origin_databasem': origin_database, 'contaminant': contaminant, 'informative': informative, 'seed_ortholog': seed_ortholog, 'seed_e_value': seed_e_value, 'seed_score': seed_score, 'predicted_gene': predicted_gene, 'tax_scope': tax_scope, 'tax_scope_max': tax_scope_max, 'member_ogs': member_ogs, 'kegg_terms': kegg_terms, 'go_biological': go_biological, 'go_cellular': go_cellular, 'go_molecular': go_molecular}
+        # -- data_dict = {'query_sequence': query_sequence, 'subject_sequence': subject_sequence, 'percent_identical': percent_identical, 'alignment_length': alignment_length, 'mismatches': mismatches, 'gap_openings': gap_openings, 'query_start': query_start, 'query_end': query_end, 'subject_start': subject_start, 'subject_end': subject_end, 'e_value': e_value, 'coverage': coverage, 'description': description, 'species': species, 'taxonomic_lineage': taxonomic_lineage, 'origin_databasem': origin_database, 'contaminant': contaminant, 'informative': informative, 'seed_ortholog': seed_ortholog, 'seed_e_value': seed_e_value, 'seed_score': seed_score, 'predicted_gene': predicted_gene, 'tax_scope': tax_scope, 'tax_scope_max': tax_scope_max, 'member_ogs': member_ogs, 'kegg_terms': kegg_terms, 'go_biological': go_biological, 'go_cellular': go_cellular, 'go_molecular': go_molecular}
+        data_dict = {'query_sequence': query_sequence, 'subject_sequence': subject_sequence, 'percent_identical': percent_identical, 'alignment_length': alignment_length, 'mismatches': mismatches, 'gap_openings': gap_openings, 'query_start': query_start, 'query_end': query_end, 'subject_start': subject_start, 'subject_end': subject_end, 'e_value': e_value, 'coverage': coverage, 'description': description, 'species': species, 'taxonomic_lineage': taxonomic_lineage, 'origin_databasem': origin_database, 'contaminant': contaminant, 'informative': informative, 'eggnog_seed_ortholog': eggnog_seed_ortholog, 'eggnog_seed_e_value': eggnog_seed_e_value, 'eggnog_seed_score': eggnog_seed_score, 'eggnog_tax_scope_max': eggnog_tax_scope_max, 'eggnog_member_ogs': eggnog_member_ogs, 'eggnog_description': eggnog_description, 'eggnog_cog_abbreviation': eggnog_cog_abbreviation, 'eggnog_cog_description': eggnog_cog_description, 'eggnog_bigg_reaction': eggnog_bigg_reaction, 'eggnog_kegg_ko': eggnog_kegg_ko, 'eggnog_kegg_pathway': eggnog_kegg_pathway, 'eggnog_kegg_module': eggnog_kegg_module, 'eggnog_kegg_reaction': eggnog_kegg_reaction, 'eggnog_kegg_rclass': eggnog_kegg_rclass, 'eggnog_brite': eggnog_brite, 'eggnog_go_biological': eggnog_go_biological, 'eggnog_go_cellular': eggnog_go_cellular, 'eggnog_go_molecular': eggnog_go_molecular, 'eggnog_protein_domains': eggnog_protein_domains}
+
+    # if there is not record
+    else:
+
+        # set the key
+        key = bytes.fromhex('7E').decode('utf-8')
+
+    # return the record, key and data dictionary
+    return record, key, data_dict
+
+#-------------------------------------------------------------------------------
+
+def read_entap_runp_annotation_record(file_name, file_id, record_counter):
+    '''
+    Read the next record of the functional annotation file built by EnTAP application using the runP option.
+    '''
+
+    # initialize the data dictionary
+    data_dict = {}
+
+    # initialize the key
+    key = None
+
+    # read next record
+    record = file_id.readline()
+
+    # if there is record
+    if record != '':
+
+        # remove EOL
+        record = record.strip('\n')
+
+        # extract data
+        # -- EnTAP record format: Query Sequence	Frame	Subject Sequence	Percent Identical	Alignment Length	Mismatches	Gap Openings	Query Start	Query End	Subject Start	Subject End	E Value	Coverage	Description	Species	Taxonomic Lineage	Origin Database	Contaminant	Informative	Seed Ortholog	Seed E-Value	Seed Score	Predicted Gene	Tax Scope	Tax Scope Max	Member OGs	KEGG Terms	GO Biological	GO Cellular	GO Molecular
+        # EnTAP record format: Query Sequence	Frame	Subject Sequence	Percent Identical	Alignment Length	Mismatches	Gap Openings	Query Start	Query End	Subject Start	Subject End	E Value	Coverage	Description	Species	Taxonomic Lineage	Origin Database	Contaminant	Informative	EggNOG Seed Ortholog	EggNOG Seed E-Value	EggNOG Seed Score	EggNOG Tax Scope Max	EggNOG Member OGs	EggNOG Description	EggNOG COG Abbreviation	EggNOG COG Description	EggNOG BIGG Reaction	EggNOG KEGG KO	EggNOG KEGG Pathway	EggNOG KEGG Module	EggNOG KEGG Reaction	EggNOG KEGG RClass	EggNOG BRITE	EggNOG GO Biological	EggNOG GO Cellular	EggNOG GO Molecular	EggNOG Protein Domains
+        data_list = []
+        start = 0
+        for end in [i for i, chr in enumerate(record) if chr == '\t']:
+            data_list.append(record[start:end])
+            start = end + 1
+        data_list.append(record[start:].strip('\n'))
+        try:
+            query_sequence = data_list[0]
+            frame = data_list[1]
+            subject_sequence = data_list[2]
+            percent_identical = data_list[3]
+            alignment_length = data_list[4]
+            mismatches = data_list[5]
+            gap_openings = data_list[6]
+            query_start = data_list[7]
+            query_end = data_list[8]
+            subject_start = data_list[9]
+            subject_end = data_list[10]
+            e_value = data_list[11]
+            coverage = data_list[12]
+            description = data_list[13]
+            species = data_list[14]
+            taxonomic_lineage = data_list[15]
+            origin_database = data_list[16]
+            contaminant = data_list[17]
+            informative = data_list[18]
+            # -- seed_ortholog = data_list[19]
+            # -- seed_e_value = data_list[20]
+            # -- seed_score = data_list[21]
+            # -- predicted_gene = data_list[22]
+            # -- tax_scope = data_list[23]
+            # -- tax_scope_max = data_list[24]
+            # -- member_ogs = data_list[25]
+            # -- kegg_terms = data_list[26]
+            # -- go_biological = data_list[27]
+            # -- go_cellular = data_list[28]
+            # -- go_molecular = data_list[29]
+            eggnog_seed_ortholog = data_list[19]
+            eggnog_seed_e_value = data_list[20]
+            eggnog_seed_score = data_list[21]
+            eggnog_tax_scope_max = data_list[22]
+            eggnog_member_ogs = data_list[23]
+            eggnog_description = data_list[24]
+            eggnog_cog_abbreviation = data_list[25]
+            eggnog_cog_description = data_list[26]
+            eggnog_bigg_reaction = data_list[27]
+            eggnog_kegg_ko = data_list[28]
+            eggnog_kegg_pathway  = data_list[29]
+            eggnog_kegg_module = data_list[30]
+            eggnog_kegg_reaction = data_list[31]
+            eggnog_kegg_rclass = data_list[32]
+            eggnog_brite = data_list[33]
+            eggnog_go_biological = data_list[34]
+            eggnog_go_cellular = data_list[35]
+            eggnog_go_molecular = data_list[36]
+            eggnog_protein_domains = data_list[37]
+        except Exception as e:
+            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter) from e
+
+        # get the record data dictionary
+        # -- data_dict = {'query_sequence': query_sequence, 'frame': frame, 'subject_sequence': subject_sequence, 'percent_identical': percent_identical, 'alignment_length': alignment_length, 'mismatches': mismatches, 'gap_openings': gap_openings, 'query_start': query_start, 'query_end': query_end, 'subject_start': subject_start, 'subject_end': subject_end, 'e_value': e_value, 'coverage': coverage, 'description': description, 'species': species, 'taxonomic_lineage': taxonomic_lineage, 'origin_databasem': origin_database, 'contaminant': contaminant, 'informative': informative, 'seed_ortholog': seed_ortholog, 'seed_e_value': seed_e_value, 'seed_score': seed_score, 'predicted_gene': predicted_gene, 'tax_scope': tax_scope, 'tax_scope_max': tax_scope_max, 'member_ogs': member_ogs, 'kegg_terms': kegg_terms, 'go_biological': go_biological, 'go_cellular': go_cellular, 'go_molecular': go_molecular}
+        data_dict = {'query_sequence': query_sequence, 'frame': frame, 'subject_sequence': subject_sequence, 'percent_identical': percent_identical, 'alignment_length': alignment_length, 'mismatches': mismatches, 'gap_openings': gap_openings, 'query_start': query_start, 'query_end': query_end, 'subject_start': subject_start, 'subject_end': subject_end, 'e_value': e_value, 'coverage': coverage, 'description': description, 'species': species, 'taxonomic_lineage': taxonomic_lineage, 'origin_databasem': origin_database, 'contaminant': contaminant, 'informative': informative, 'eggnog_seed_ortholog': eggnog_seed_ortholog, 'eggnog_seed_e_value': eggnog_seed_e_value, 'eggnog_seed_score': eggnog_seed_score, 'eggnog_tax_scope_max': eggnog_tax_scope_max, 'eggnog_member_ogs': eggnog_member_ogs, 'eggnog_description': eggnog_description, 'eggnog_cog_abbreviation': eggnog_cog_abbreviation, 'eggnog_cog_description': eggnog_cog_description, 'eggnog_bigg_reaction': eggnog_bigg_reaction, 'eggnog_kegg_ko': eggnog_kegg_ko, 'eggnog_kegg_pathway': eggnog_kegg_pathway, 'eggnog_kegg_module': eggnog_kegg_module, 'eggnog_kegg_reaction': eggnog_kegg_reaction, 'eggnog_kegg_rclass': eggnog_kegg_rclass, 'eggnog_brite': eggnog_brite, 'eggnog_go_biological': eggnog_go_biological, 'eggnog_go_cellular': eggnog_go_cellular, 'eggnog_go_molecular': eggnog_go_molecular, 'eggnog_protein_domains': eggnog_protein_domains}
 
     # if there is not record
     else:
@@ -1108,6 +1327,7 @@ def read_entap_annotation_record(file_name, file_id, record_counter):
 
 def read_trapid_annotation_record(file_name, file_id, record_counter):
     '''
+    Read the next record of the functional annotation file built by TRAPID application.
     '''
 
     # initialize the data dictionary
@@ -1141,7 +1361,7 @@ def read_trapid_annotation_record(file_name, file_id, record_counter):
             is_hidden = data_list[4]
             description = data_list[5]
         except Exception as e:
-            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter) from e
 
         # get the record data dictionary
         data_dict = {'counter': counter, 'transcript_id': transcript_id, 'go': go, 'evidence_code': evidence_code, 'is_hidden': is_hidden, 'description': description}
@@ -1159,6 +1379,7 @@ def read_trapid_annotation_record(file_name, file_id, record_counter):
 
 def read_trinotate_annotation_record(file_name, file_id, record_counter):
     '''
+    Read the next record of the functional annotation file built by Trinotate application.
     '''
 
     # initialize the data dictionary
@@ -1203,7 +1424,7 @@ def read_trinotate_annotation_record(file_name, file_id, record_counter):
             transcript = data_list[15]
             peptide = data_list[16]
         except Exception as e:
-            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter)
+            raise ProgramException(e, 'F009', os.path.basename(file_name), record_counter) from e
 
         # get the record data dictionary
         data_dict = {'gene_id': gene_id, 'transcript_id': transcript_id, 'sprot_top_blastx_hit': sprot_top_blastx_hit, 'rnammer': rnammer, 'prot_id': prot_id, 'prot_coords': prot_coords, 'sprot_top_blastp_hit': sprot_top_blastp_hit, 'pfam': pfam, 'signalp': signalp, 'tmhmmx': tmhmmx, 'eggnog': eggnog, 'kegg': kegg, 'gene_ontology_blastx': gene_ontology_blastx, 'gene_ontology_blastp': gene_ontology_blastp, 'gene_ontology_pfam': gene_ontology_pfam, 'transcript': transcript, 'peptide': peptide}
@@ -1232,12 +1453,12 @@ def build_go_ontology_dict(ontology_file):
         try:
             ontology_file_id = gzip.open(ontology_file, mode='rt', encoding='iso-8859-1')
         except Exception as e:
-            raise ProgramException(e, 'F002', ontology_file)
+            raise ProgramException(e, 'F002', ontology_file) from e
     else:
         try:
             ontology_file_id = open(ontology_file, mode='r', encoding='iso-8859-1')
         except Exception as e:
-            raise ProgramException(e, 'F001', ontology_file)
+            raise ProgramException(e, 'F001', ontology_file) from e
 
     # initialize the GO term counter
     go_term_counter = 0
@@ -1337,6 +1558,24 @@ def build_go_ontology_dict(ontology_file):
 
     # return the dictionary of GO ontology data
     return go_ontology_dict
+
+#-------------------------------------------------------------------------------
+
+def get_all_species_code():
+    '''
+    Get the code used to identify the selection by all species.
+    '''
+
+    return 'all_species'
+
+#-------------------------------------------------------------------------------
+
+def get_all_species_name():
+    '''
+    Get the text used to identify the selection by all species.
+    '''
+
+    return 'all species'
 
 #-------------------------------------------------------------------------------
 
@@ -1441,7 +1680,7 @@ def get_converted_file_type_code_list_text():
 
 def get_go_app_code_list():
     '''
-    Get the code list of applications with GO terms statistics.
+    Get the code list of applications applications that calculate the statistics of GO terms.
     '''
 
     return ['Blast2GO', 'EnTAP', 'TOA', 'TRAPID', 'Trinotate']
@@ -1450,10 +1689,28 @@ def get_go_app_code_list():
 
 def get_go_app_code_list_text():
     '''
-    Get the code list of applications with GO terms statistics as text.
+    Get the code list of applications applications that calculate the statistics of GO terms as text.
     '''
 
     return str(get_go_app_code_list()).strip('[]').replace('\'', '').replace(',', ' or')
+
+#-------------------------------------------------------------------------------
+
+def get_go_app_code_list_2():
+    '''
+    Get the code list of applications applications that calculate the enrichment analysis of GO terms.
+    '''
+
+    return ['EnTAP-runN', 'EnTAP-runP', 'gymnoTOA', 'TOA', 'TRAPID']
+
+#-------------------------------------------------------------------------------
+
+def get_go_app_code_list_2_text():
+    '''
+    Get the code list of applications applications that calculate the enrichment analysis of GO terms as text.
+    '''
+
+    return str(get_go_app_code_list_2()).strip('[]').replace('\'', '').replace(',', ' or')
 
 #-------------------------------------------------------------------------------
 
@@ -1641,6 +1898,33 @@ def get_vcf_filtering_action_code_list_text():
 
 #-------------------------------------------------------------------------------
 
+def get_fdr_method_code_list():
+    '''
+    Get the code list of "fdr_method".
+    '''
+
+    return ['bh', 'by']
+
+#-------------------------------------------------------------------------------
+
+def get_fdr_method_code_list_text():
+    '''
+    Get the code list of "fdr_method" as text.
+    '''
+
+    return 'bh (Benjamini-Hochberg) or by (Benjamini-Yekutieli)'
+
+#-------------------------------------------------------------------------------
+
+def get_fdr_method_text_list():
+    '''
+    Get the list of "fdr_method" as text.
+    '''
+
+    return ['Benjamini-Hochberg', 'Benjamini-Yekutieli']
+
+#-------------------------------------------------------------------------------
+
 def get_trace_code_list():
     '''
     Get the code list of "trace".
@@ -1723,6 +2007,7 @@ class Const():
     DEFAULT_BLASTX_THREADS_NUMBER = 1
     DEFAULT_BURN_IN = 100
     DEFAULT_E_VALUE = 1E-6
+    DEFAULT_FDR_METHOD = 'by'
     DEFAULT_GENOTYPE_IMPUTATION_METHOD = 'MF'
     DEFAULT_ID_TYPE = 'LITERAL'
     DEFAULT_IMPUTED_MD_ID = '99'
@@ -1733,6 +2018,8 @@ class Const():
     DEFAULT_MAX_TARGET_SEQS = 10
     DEFAULT_MAXLEN = 10000
     DEFAULT_MIN_DEPTH = 1
+    DEFAULT_MIN_SEQNUM_ANNOTATIONS = 5
+    DEFAULT_MIN_SEQNUM_SPECIES = 10
     DEFAULT_MINFPKM = 1.0
     DEFAULT_MINLEN = 200
     DEFAULT_MINTPM = 1.0
@@ -1795,18 +2082,21 @@ class Message():
 
     #---------------
 
+    @staticmethod
     def set_verbose_status(status):
 
         Message.verbose_status = status
 
     #---------------
 
+    @staticmethod
     def set_trace_status(status):
 
         Message.trace_status = status
 
     #---------------
 
+    @staticmethod
     def print(message_type, message_text):
 
         if message_type == 'info':
@@ -1835,6 +2125,9 @@ class ProgramException(Exception):
 
     def __init__(self, e, code_exception, param1='', param2='', param3='', param4='', param5='', param6=''):
         '''Initialize the object to manage a passed exception.'''
+
+        # call the init method of the parent class
+        super().__init__()
 
         # print the message of the exception
         if e != '':
@@ -1873,7 +2166,7 @@ class ProgramException(Exception):
         elif code_exception == 'F008':
             Message.print('error', f'*** ERROR {code_exception:} The output xml files can not be concatenated.')
         elif code_exception == 'F009':
-            Message.print('error', f'*** ERROR {code_exception}: The record format in record {param2} of the file {param1} is wrong.')
+            Message.print('error', f'*** ERROR {code_exception}: The record # {param1} of file {param1} has a wrong format.')
         elif code_exception == 'F010':
             Message.print('error', f'*** ERROR {code_exception}: The {param1} data is wrong in the transcript {param2}.')
         elif code_exception == 'F011':
@@ -1935,7 +2228,7 @@ class ProgramException(Exception):
         else:
             Message.print('error', f'*** ERROR {code_exception}: The exception is not managed.')
 
-        # exit with RC 1
+        # exit with error RC
         sys.exit(1)
 
    #---------------
@@ -1947,11 +2240,19 @@ class NestedDefaultDict(collections.defaultdict):
     This class is used to create nested dictionaries.
     '''
 
+    #---------------
+
     def __init__(self, *args, **kwargs):
+
         super(NestedDefaultDict, self).__init__(NestedDefaultDict, *args, **kwargs)
 
+    #---------------
+
     def __repr__(self):
+
         return repr(dict(self))
+
+    #---------------
 
 #-------------------------------------------------------------------------------
 

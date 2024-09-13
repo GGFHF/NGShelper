@@ -9,10 +9,11 @@
 #-------------------------------------------------------------------------------
 
 '''
-This program loads alignment data into NGShelper database.
+This program loads alignment data into SQLite database.
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -46,13 +47,13 @@ def main():
     args = parser.parse_args()
     check_args(args)
 
-    # connect to the NGShelper database
-    conn = xsqlite.connect_database(args.ngshelper_database)
+    # connect to the SQLite database
+    conn = xsqlite.connect_database(args.sqlite_database)
 
     # load alignment data
     load_alignments(conn, args.alignment_file)
 
-    # close connection to NGShelper database
+    # close connection to SQLite database
     conn.close()
 
 #-------------------------------------------------------------------------------
@@ -63,12 +64,12 @@ def build_parser():
     '''
 
     # create the parser and add arguments
-    description = 'Description: This program loads alignment data into NGShelper database.'
+    description = 'Description: This program loads alignment data into SQLite database.'
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'
-    parser.add_argument('--db', dest='ngshelper_database', help='Path of the NGShelper database (mandatory).')
+    parser.add_argument('--db', dest='sqlite_database', help='Path of the SQLite database (mandatory).')
     parser.add_argument('--alignment', dest='alignment_file', help='Path of alignmanet file in CSV format (mandatory).')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')
     parser.add_argument('--trace', dest='trace', help=f'Additional info useful to the developer team: {xlib.get_trace_code_list_text()}; default: {xlib.Const.DEFAULT_TRACE}.')
@@ -86,9 +87,9 @@ def check_args(args):
     # initialize the control variable
     OK = True
 
-    # check "ngshelper_database"
-    if args.ngshelper_database is None:
-        xlib.Message.print('error', '*** The NGShelper database is not indicated in the input arguments.')
+    # check "sqlite_database"
+    if args.sqlite_database is None:
+        xlib.Message.print('error', '*** The SQLite database is not indicated in the input arguments.')
         OK = False
 
     # check "alignment_file"
@@ -125,7 +126,7 @@ def check_args(args):
 
 def load_alignments(conn, alignment_file):
     '''
-    Load alignment data into NGShelper database.
+    Load alignment data into SQLite database.
     '''
 
     # drop the table "alignments" (if it exists)
@@ -209,8 +210,8 @@ def load_alignments(conn, alignment_file):
     xsqlite.create_alignments_index(conn)
     xlib.Message.print('verbose', 'The index is created.\n')
 
-    # save changes into NGShelper database
-    xlib.Message.print('verbose', 'Saving changes into NGShelper database ...\n')
+    # save changes into SQLite database
+    xlib.Message.print('verbose', 'Saving changes into SQLite database ...\n')
     conn.commit()
     xlib.Message.print('verbose', 'Changes are saved.\n')
 

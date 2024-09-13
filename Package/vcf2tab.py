@@ -9,10 +9,11 @@
 #-------------------------------------------------------------------------------
 
 '''
-This program converts a VCF file to a file in tabular.
+This program converts a VCF file to a file in tabular format.
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -56,7 +57,7 @@ def build_parser():
     '''
 
     # create the parser and add arguments
-    description = 'Description: This program converts a VCF file to a file in tabular.'
+    description = 'Description: This program converts a VCF file to a file in tabular format.'
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
@@ -195,9 +196,6 @@ def convert_vcf_to_tab(vcf_file, tab_file, md_characters, tvi_list):
 
         # process variant records
         while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
-
-            # add set the variant identification
-            variant_id = f'{data_dict["chrom"]}-{data_dict["pos"]}'
 
             # add 1 to the VCF record counter
             record_counter += 1

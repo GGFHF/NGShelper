@@ -13,6 +13,7 @@ This program lists data of variants and alleles and variant identifications to t
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -45,11 +46,11 @@ def main():
     args = parser.parse_args()
     check_args(args)
 
-    # connect to the NGShelper database
-    conn = xsqlite.connect_database(args.ngshelper_database)
+    # connect to the SQLite database
+    conn = xsqlite.connect_database(args.sqlite_database)
 
-    # get the NGShelper database name
-    file_name, _ = os.path.splitext(os.path.basename(args.ngshelper_database))
+    # get the SQLite database name
+    file_name, _ = os.path.splitext(os.path.basename(args.sqlite_database))
 
     # list data of variants and alleles and variant identifications to the scenario X
     query_data(conn, file_name, args.sp1_id, args.sp2_id, args.hybrid_id, args.imputed_md_id, args.max_separation, args.output_dir, args.tsi_list)
@@ -70,7 +71,7 @@ def build_parser():
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'
-    parser.add_argument('--db', dest='ngshelper_database', help='Path of the NGShelper database (mandatory).')
+    parser.add_argument('--db', dest='sqlite_database', help='Path of the SQLite database (mandatory).')
     parser.add_argument('--sp1_id', dest='sp1_id', help='Identification of the first species (mandatory)')
     parser.add_argument('--sp2_id', dest='sp2_id', help='Identification of the second species (mandatory).')
     parser.add_argument('--hyb_id', dest='hybrid_id', help='Identification of the hybrid or NONE; default NONE.')
@@ -95,9 +96,9 @@ def check_args(args):
     # initialize the control variable
     OK = True
 
-    # check "ngshelper_database"
-    if args.ngshelper_database is None:
-        xlib.Message.print('error', '*** The NGShelper database is not indicated in the input arguments.')
+    # check "sqlite_database"
+    if args.sqlite_database is None:
+        xlib.Message.print('error', '*** The SQLite database is not indicated in the input arguments.')
         OK = False
 
     # check "sp1_id"
@@ -216,7 +217,7 @@ def query_data(conn, file_name, sp1_id, sp2_id, hybrid_id, imputed_md_id, max_se
 
     # get the allele dictionary
     xlib.Message.print('verbose', 'Getting allele data ...\n')
-    allele_dict = xsqlite.get_vcf_alleles_dict(conn)
+    allele_dict = xsqlite.get_vcf_allele_dict(conn)
     xlib.Message.print('verbose', 'Data are got.\n')
 
     # get the imputated allele dictionary

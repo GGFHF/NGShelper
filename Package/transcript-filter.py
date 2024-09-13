@@ -13,6 +13,7 @@ This program filters transcripts according to their length, FPKM and TPM calcula
 
 This software has been developed by:
 
+    GI en especies leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
