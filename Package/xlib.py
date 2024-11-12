@@ -10,11 +10,11 @@
 
 '''
 This source contains general functions and classes used in NGShelper
-software package used in both console mode and gui mode.
+software package.
 
 This software has been developed by:
 
-    GI en especies leñosas (WooSp)
+    GI en Especies Leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -58,7 +58,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.81'
+    return '0.82'
 
 #-------------------------------------------------------------------------------
 
@@ -2266,7 +2266,7 @@ class BreakAllLoops(Exception):
 #-------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    print(f'This source contains general functions and classes used in {get_project_name()} software package used in both console mode and gui mode.')
+    print(f'This source contains general functions and classes used in {get_project_name()} software package.')
     sys.exit(0)
 
 #-------------------------------------------------------------------------------

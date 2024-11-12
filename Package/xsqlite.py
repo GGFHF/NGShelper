@@ -14,7 +14,7 @@ used in both console mode and gui mode.
 
 This software has been developed by:
 
-    GI en especies leñosas (WooSp)
+    GI en Especies Leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -3601,8 +3601,8 @@ def create_mmseqs2_relationships_index_1(conn):
     '''
 
     sentence = '''
-               CREATE UNIQUE INDEX mmseqs2_relationships_index_1
-                   ON mmseqs2_relationships (seq_id);
+               CREATE INDEX mmseqs2_relationships_index_1
+                   ON mmseqs2_relationships (cluster_id);
                '''
     try:
         conn.execute(sentence)
@@ -3617,7 +3617,7 @@ def create_mmseqs2_relationships_index_2(conn):
     '''
 
     sentence = '''
-               CREATE INDEX mmseqs2_relationships_index
+               CREATE UNIQUE INDEX mmseqs2_relationships_index_2
                    ON mmseqs2_relationships (seq_id);
                '''
     try:
@@ -4001,7 +4001,7 @@ def get_tair10_ortholog_seq_id(conn, cluster_id):
 # Statistics of gymnoTOA database
 #-------------------------------------------------------------------------------
 
-def get_gymnotoa_db_stats(conn):
+def get_quercustoa_db_stats(conn):
     '''
     Get the statistics of gymnoTOA database.
     '''
@@ -4139,6 +4139,149 @@ def get_gymnotoa_db_stats(conn):
 
     # return the ortholog sequence identification
     return seqnum_acrogymnospermae, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations
+
+#-------------------------------------------------------------------------------
+# Statistics of quercusTOA database
+#-------------------------------------------------------------------------------
+
+def get_quercustoa_db_stats(conn):
+    '''
+    Get the statistics of quercusTOA database.
+    '''
+
+    # count the sequences number of Quercus
+    sentence = '''
+               SELECT COUNT(*)
+                   FROM mmseqs2_relationships;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # set the sequences number of Quercus
+    seqnum_quercus = 0
+    for row in rows:
+        seqnum_quercus = int(row[0])
+        break
+
+    # count the total of clusters
+    sentence = '''
+               SELECT COUNT(DISTINCT cluster_id)
+                   FROM mmseqs2_relationships;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # set the total of clusters
+    clusternum_total = 0
+    for row in rows:
+        clusternum_total = int(row[0])
+        break
+
+    # count the clusters number with InterProScan annotations
+    sentence = '''
+               SELECT COUNT(*)
+                   FROM interproscan_annotations;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # set the clusters number with InterProScan annotations
+    clusternum_interproscan_annotations = 0
+    for row in rows:
+        clusternum_interproscan_annotations = int(row[0])
+        break
+
+    # count the clusters number with eggNOG-mapper annotations
+    sentence = '''
+               SELECT COUNT(*)
+                   FROM emapper_annotations;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # set the clusters number with eggNOG-mapper annotations
+    clusternum_emapper_annotations = 0
+    for row in rows:
+        clusternum_emapper_annotations = int(row[0])
+        break
+
+    # count the clusters number with TAIR10 orthologs
+    sentence = '''
+               SELECT COUNT(*)
+                   FROM tair10_orthologs;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # set the clusters number with TAIR10 orthologs
+    clusternum_tair10_ortologs = 0
+    for row in rows:
+        clusternum_tair10_ortologs = int(row[0])
+        break
+
+    # get the cluster identifications with InterProScan annotations
+    sentence = '''
+               SELECT cluster_id
+                   FROM interproscan_annotations;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # build the set of clusters identifications with InterProScan annotations
+    interproscan_cluster_id_set = set()
+    for row in rows:
+        interproscan_cluster_id_set.add(row[0])
+
+    # get the cluster identifications with eggNOG-mapper annotations
+    sentence = '''
+               SELECT cluster_id
+                   FROM emapper_annotations;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # build the set of clusters identifications with eggNOG-mapper annotations
+    emapper_cluster_id_set = set()
+    for row in rows:
+        emapper_cluster_id_set.add(row[0])
+
+    # get the cluster identifications with TAIR10 orthologs
+    sentence = '''
+               SELECT cluster_id
+                   FROM tair10_orthologs;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # build the set of clusters identifications with TAIR10 orthologs
+    tair10_cluster_id_set = set()
+    for row in rows:
+        tair10_cluster_id_set.add(row[0])
+
+    # calculate the
+    union_cluster_id_set = interproscan_cluster_id_set | emapper_cluster_id_set | tair10_cluster_id_set
+    clusternum_with_annotations = len(union_cluster_id_set)
+    clusternum_without_annotations = clusternum_total - clusternum_with_annotations
+
+
+    # return the ortholog sequence identification
+    return seqnum_quercus, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations
 
 #-------------------------------------------------------------------------------
 # General classes

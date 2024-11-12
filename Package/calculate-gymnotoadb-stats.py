@@ -13,7 +13,7 @@ This program calculates statistics of the gymnoTOA SQLite database.
 
 This software has been developed by:
 
-    GI en especies leñosas (WooSp)
+    GI en Especies Leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -138,7 +138,7 @@ def calculate_gymnotoadb_stats(conn, stats_file):
         except Exception as e:
             raise xlib.ProgramException(e, 'F003', stats_file)
 
-    (seqnum_acrogymnospermae, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations) = xsqlite.get_gymnotoa_db_stats(conn)
+    (seqnum_acrogymnospermae, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations) = xsqlite.get_quercustoa_db_stats(conn)
 
     # write records
     stats_file_id.write( '[statistics]\n')

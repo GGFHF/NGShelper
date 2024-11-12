@@ -6,7 +6,7 @@
 #
 # This software has been developed by:
 #
-#    GI en especies leñosas (WooSp)
+#    GI en Especies Leñosas (WooSp)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid
@@ -82,6 +82,12 @@
 #    $ [conda env remove --yes --name busco]
 #    $ mamba create --yes --name busco busco
 
+# DIAMOND
+# =======
+
+#    $ [conda env remove --yes --name diamond]
+#    $ mamba create --yes --name diamond diamond
+
 # eggNOG-mapper
 # =============
 
@@ -125,14 +131,16 @@
 # InterProScan
 # ============
 #
-#    $ sudo apt install libgomp1 (en Ubuntu 20.04) 
+#    $ [OLD_VERSION=5.70-102.0]
+#    $ NEW_VERSION=5.71-102.0
+#    $ sudo apt install libgomp1 (if Ubuntu 20.04) 
 #    $ cd /ngscloud2/apps
-#    $ wget http://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.68-100.0/interproscan-5.69-101.0-64-bit.tar.gz
+#    $ wget http://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/$NEW_VERSION/interproscan-$NEW_VERSION-64-bit.tar.gz
 #    $ [unlink InterProScan]
-#    $ [rm -fr InterProScan-5.69-101.0]
-#    $ tar -xzvf interproscan-5.69-101.0-64-bit.tar.gz
-#    $ mv interproscan-5.69-101.0 InterProScan-5.69-101.0
-#    $ ln -s InterProScan-5.69-101.0 InterProScan
+#    $ [rm -fr InterProScan-$OLD_VERSION]
+#    $ tar -xzvf interproscan-$NEW_VERSION-64-bit.tar.gz
+#    $ mv interproscan-$NEW_VERSION InterProScan-$NEW_VERSION
+#    $ ln -s InterProScan-$NEW_VERSION InterProScan
 #    $ cd InterProScan
 #    $ ./setup.py -f interproscan.properties
 
@@ -169,8 +177,6 @@ if [ "$ENVIRONMENT" = "$ENV_AWS" ]; then
 
     FASTA_FILE=$CLADE-protein-sequences.fasta
 
-    TAIR10_PEP_PATH=/ngscloud2/gymnotoa/TAIR10/TAIR10_pep_20101214
-
     THREADS=16
 
 elif [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
@@ -184,22 +190,19 @@ elif [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
 
     FASTA_FILE=$CLADE-protein-sequences-seq1000.fasta
 
-    TAIR10_PEP_PATH=$GYMNOTOA/TAIR10/TAIR10_pep_20101214
-
     THREADS=4
 
 else
     echo 'Environment error'; exit 3
 fi
 
-DB_PREFIX=gymnoTOA
-DB_NAME=$DB_PREFIX-DB
+DB_NAME=gymnoTOA-db
 DB_DIR=$OUTPUT_DIR/$DB_NAME
 TEMP_DIR=$OUTPUT_DIR/$DB_NAME/temp
 GYMNOTOA_DB_ZIP=$DB_NAME.zip
 OUTPUT_PREFIX=$TEMP_DIR/$CLADE-mmseqs2
 CLUSTER_DIR=$TEMP_DIR/clusters
-DB_FILE=$DB_PREFIX.db
+DB_FILE=$DB_NAME.db
 DB_PATH=$DB_DIR/$DB_FILE
 FASTA_PATH=$TEMP_DIR/$FASTA_FILE
 ALLSEQS_FILE=$CLADE-mmseqs2_all_seqs.fasta
@@ -214,12 +217,15 @@ CONSEQS_PATH=$TEMP_DIR/$CONSEQS_FILE
 CONSEQS_BLAST_DB_NAME=$CONSEQS_PREFIX-blastplus-db
 CONSEQS_BLAST_DB_DIR=$DB_DIR/$CONSEQS_PREFIX-blastplus-db
 CONSEQS_BLAST_DB_PATH=$CONSEQS_BLAST_DB_DIR/$CONSEQS_BLAST_DB_NAME
+CONSEQS_DIAMOND_DB_NAME=$CONSEQS_PREFIX-diamond-db
+CONSEQS_DIAMOND_DB_DIR=$DB_DIR/$CONSEQS_PREFIX-diamond-db
+CONSEQS_DIAMOND_DB_PATH=$CONSEQS_DIAMOND_DB_DIR/$CONSEQS_DIAMOND_DB_NAME
 INTERPRO_OUPUT=$TEMP_DIR/$CONSEQS_PREFIX-seqs.fasta.tsv
 INTERPRO_ANNOTATIONS_PATH=$TEMP_DIR/$CONSEQS_PREFIX-annotations-interpro.tsv
 EMAPPER_OUPUT=$TEMP_DIR/$CONSEQS_PREFIX.emapper.annotations
 EMAPPER_ANNOTATIONS_PATH=$TEMP_DIR/$CONSEQS_PREFIX-annotations-emapper.tsv
 ANNOTATIONS_FILE=$CONSEQS_PREFIX-seqs-annotations.csv
-STATS_FILE=$DB_PREFIX-stats.ini
+STATS_FILE=$DB_NAME-stats.ini
 STATS_PATH=$DB_DIR/$STATS_FILE
 
 # NCBI Taxonomy
@@ -239,13 +245,14 @@ BUSCO_ASSESSMENT_DATA_PATH=$DB_DIR/$BUSCO_ASSESSMENT_PATTERN.txt
 
 # TAIR10
 TAIR10_PREFIX=TAIR10
-TAIR10_PEP_URL=https://www.arabidopsis.org/download_files/Proteins/TAIR10_protein_lists/TAIR10_pep_20101214
+# -- TAIR10_PEP_URL=https://www.arabidopsis.org/download_files/Proteins/TAIR10_protein_lists/TAIR10_pep_20101214
+TAIR10_PEP_URL=https://www.arabidopsis.org/api/download-files/download?filePath=Proteins/TAIR10_protein_lists/TAIR10_pep_20101214
 TAIR10_PEP_FILE=$TAIR10_PREFIX-protein-sequences.fasta
-# -- TAIR10_PEP_PATH=$TEMP_DIR/$TAIR10_PEP_FILE
+TAIR10_PEP_PATH=$TEMP_DIR/$TAIR10_PEP_FILE
 TAIR10_BLAST_DB_NAME=$TAIR10_PREFIX-blastplus-db
 TAIR10_BLAST_DB_DIR=$TEMP_DIR/$TAIR10_PREFIX-blastplus-db
 TAIR10_BLAST_DB_PATH=$TAIR10_BLAST_DB_DIR/$TAIR10_BLAST_DB_NAME
-TAIR10_CONSEQS_ALIGNMENT_FILE=$CONSEQS_PREFIX-tair10-alingments.csv
+TAIR10_CONSEQS_ALIGNMENT_FILE=$CONSEQS_PREFIX-tair10-alignments.csv
 TAIR10_CONSEQS_ALIGNMENT_PATH=$TEMP_DIR/$TAIR10_CONSEQS_ALIGNMENT_FILE
 
 # Gene Ontology
@@ -253,21 +260,17 @@ GO_ONTOLOGY_FTP=http://purl.obolibrary.org/obo/go.obo
 GO_ONTOLOGY_FILE=$TEMP_DIR/go.obo
 
 # CANTATA data
-CANTATA_ARABIDOPSIS_THALIANA_FASTA_URL=http://cantata.amu.edu.pl/DOWNLOADS/Arabidopsis_thaliana_lncRNAs.fasta
+CANTATA_ARABIDOPSIS_THALIANA_FASTA_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Arabidopsis_thaliana_lncRNAs.fasta
 CANTATA_ARABIDOPSIS_THALIANA_FASTA_FILE=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.fasta
-CANTATA_ARABIDOPSIS_THALIANA_GTF_URL=http://cantata.amu.edu.pl/DOWNLOADS/Arabidopsis_thaliana_lncRNAs.gtf
+CANTATA_ARABIDOPSIS_THALIANA_GTF_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Arabidopsis_thaliana_lncRNAs.gtf
 CANTATA_ARABIDOPSIS_THALIANA_GTF_FILE=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.gtf
-CANTATA_PHYSCOMITRELLA_PATENS_FASTA_URL=http://cantata.amu.edu.pl/DOWNLOADS/Physcomitrella_patens_lncRNAs.fasta
-CANTATA_PHYSCOMITRELLA_PATENS_FASTA_FILE=$TEMP_DIR/Physcomitrella-patens-lncrnas.fasta
-CANTATA_PHYSCOMITRELLA_PATENS_GTF_URL=http://cantata.amu.edu.pl/DOWNLOADS/Physcomitrella_patens_lncRNAs.gtf
-CANTATA_PHYSCOMITRELLA_PATENS_GTF_FILE=$TEMP_DIR/Physcomitrella-patens-lncrnas.gtf
-CANTATA_POPULUS_TRICHOCARPA_FASTA_URL=http://cantata.amu.edu.pl/DOWNLOADS/Populus_trichocarpa_lncRNAs.fasta
+CANTATA_POPULUS_TRICHOCARPA_FASTA_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Populus_trichocarpa_lncRNAs.fasta
 CANTATA_POPULUS_TRICHOCARPA_FASTA_FILE=$TEMP_DIR/Populus-trichocarpa-lncrnas.fasta
-CANTATA_POPULUS_TRICHOCARPA_GTF_URL=http://cantata.amu.edu.pl/DOWNLOADS/Populus_trichocarpa_lncRNAs.gtf
+CANTATA_POPULUS_TRICHOCARPA_GTF_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Populus_trichocarpa_lncRNAs.gtf
 CANTATA_POPULUS_TRICHOCARPA_GTF_FILE=$TEMP_DIR/Populus-trichocarpa-lncrnas.gtf
-CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_URL=http://cantata.amu.edu.pl/DOWNLOADS/Selaginella_moellendorffii_lncRNAs.fasta
+CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Selaginella_moellendorffii_lncRNAs.fasta
 CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_FILE=$TEMP_DIR/Selaginella-moellendorffii-lncrnas.fasta
-CANTATA_SELAGINELLA_MOELLENDORFFII_GTF_URL=http://cantata.amu.edu.pl/DOWNLOADS/Selaginella_moellendorffii_lncRNAs.gtf
+CANTATA_SELAGINELLA_MOELLENDORFFII_GTF_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Selaginella_moellendorffii_lncRNAs.gtf
 CANTATA_SELAGINELLA_MOELLENDORFFII_GTF_FILE=$TEMP_DIR/Selaginella-moellendorffii-lncrnas.gtf
 LNCRNAS_PREFIX=lncRNA
 LNCRNAS_FILE=$LNCRNAS_PREFIX-seqs.fasta
@@ -330,6 +333,7 @@ function create_directories
     if [ -d "$TEMP_DIR" ]; then rm -rf $TEMP_DIR; fi; mkdir --parents $TEMP_DIR 
     if [ -d "$CLUSTER_DIR" ]; then rm -rf $CLUSTER_DIR; fi; mkdir --parents $CLUSTER_DIR
     if [ -d "$CONSEQS_BLAST_DB_DIR" ]; then rm -rf $CONSEQS_BLAST_DB_DIR; fi; mkdir --parents $CONSEQS_BLAST_DB_DIR
+    if [ -d "$CONSEQS_DIAMOND_DB_DIR" ]; then rm -rf $CONSEQS_DIAMOND_DB_DIR; fi; mkdir --parents $CONSEQS_DIAMOND_DB_DIR
     if [ -d "$LNCRNAS_BLAST_DB_DIR" ]; then rm -rf $LNCRNAS_BLAST_DB_DIR; fi; mkdir --parents $LNCRNAS_BLAST_DB_DIR
     echo 'Directories are created.'
 
@@ -659,6 +663,28 @@ function build_consensus_blast_db
 
 #-------------------------------------------------------------------------------
 
+function build_consensus_diamond_db
+{
+
+    source activate diamond
+
+    echo "$SEP"
+    echo "Generating DIAMOND database with the $CLADE consensus sequences ..."
+    /usr/bin/time \
+        diamond makedb \
+            --threads $THREADS \
+            --in $CONSEQS_PATH \
+            --db $CONSEQS_DIAMOND_DB_PATH
+    RC=$?
+    if [ $RC -ne 0 ]; then manage_error diamond-makedb $RC; fi
+    echo 'DIAMOND database is generated.'
+
+    conda deactivate
+
+}
+
+#-------------------------------------------------------------------------------
+
 function run_interscanpro_analysis
 {
 
@@ -928,28 +954,6 @@ function download_lncrna_sequences
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
     echo 'File is downloaded.'
 
-    # -- echo "$SEP"
-    # -- echo 'Downloading Physcomitrella patens lncRNA FASTA ...'
-    # -- /usr/bin/time \
-    # --     wget \
-    # --         --quiet \
-    # --         --output-document $CANTATA_PHYSCOMITRELLA_PATENS_FASTA_FILE \
-    # --         $CANTATA_PHYSCOMITRELLA_PATENS_FASTA_URL
-    # -- RC=$?
-    # -- if [ $RC -ne 0 ]; then manage_error wget $RC; fi
-    # -- echo 'File is downloaded.'
-
-    # -- echo "$SEP"
-    # -- echo 'Downloading Physcomitrella patens lncRNA GTF ...'
-    # --  /usr/bin/time \
-    # --     wget \
-    # --         --quiet \
-    # --         --output-document $CANTATA_PHYSCOMITRELLA_PATENS_GTF_FILE \
-    # --         $CANTATA_PHYSCOMITRELLA_PATENS_GTF_URL
-    # -- RC=$?
-    # -- if [ $RC -ne 0 ]; then manage_error wget $RC; fi
-    # -- echo 'File is downloaded.'
-
     echo "$SEP"
     echo 'Downloading Populus trichocarpa lncRNA FASTA ...'
     /usr/bin/time \
@@ -1003,13 +1007,6 @@ function concat_lncrna_sequences
 
     echo "$SEP"
     echo 'Concating the lncRNA FASTAS ...'
-    # -- /usr/bin/time \
-    # --     cat \
-    # --         $CANTATA_ARABIDOPSIS_THALIANA_FASTA_FILE \
-    # --         $CANTATA_PHYSCOMITRELLA_PATENS_FASTA_FILE \
-    # --         $CANTATA_POPULUS_TRICHOCARPA_FASTA_FILE \
-    # --         $CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_FILE \
-    # --         > $LNCRNAS_PATH
     /usr/bin/time \
         cat \
             $CANTATA_ARABIDOPSIS_THALIANA_FASTA_FILE \
@@ -1073,7 +1070,7 @@ function compress_gymnotoa_db
     echo "$SEP"
     echo 'Compressing gymnoTOA database ...'
     cd $OUTPUT_DIR
-    # zip -r gymnoTOA-DB.zip gymnoTOA-DB -x "gymnoTOA-DB/temp/*"
+    # zip -r gymnoTOA-db.zip gymnoTOA-db -x "gymnoTOA-db/temp/*"
     /usr/bin/time \
         zip \
             -r \
@@ -1147,11 +1144,12 @@ unify_consensus_seqs
 download_busco_dataset
 assess_consensus_seqs
 build_consensus_blast_db
+build_consensus_diamond_db
 run_interscanpro_analysis
 load_interproscan_annotations
 run_eggnog_mapper_analysis
 load_emapper_annotations
-# -- download_tair10_sequences
+download_tair10_sequences
 build_tair10_blast_db
 align_consensus_seqs_2_tair10_blast_db
 load_tair10_orthologs

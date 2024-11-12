@@ -13,7 +13,7 @@ This program imputes genotypes with missing data in a VCF file using a random pr
 
 This software has been developed by:
 
-    GI en especies leñosas (WooSp)
+    GI en Especies Leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid

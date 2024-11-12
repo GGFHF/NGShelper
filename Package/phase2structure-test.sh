@@ -8,7 +8,7 @@
 #
 # This software has been developed by:
 #
-#    GI en especies leñosas (WooSp)
+#    GI en Especies Leñosas (WooSp)
 #    Dpto. Sistemas y Recursos Naturales
 #    ETSI Montes, Forestal y del Medio Natural
 #    Universidad Politecnica de Madrid

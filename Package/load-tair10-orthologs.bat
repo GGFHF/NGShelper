@@ -6,7 +6,7 @@ rem This script runs the program load-tair10-orthologs.py in a Windows environme
 rem
 rem This software has been developed by:
 rem
-rem     GI en especies leñosas (WooSp)
+rem     GI en Especies Leñosas (WooSp)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid
