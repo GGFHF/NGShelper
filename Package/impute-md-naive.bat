@@ -6,7 +6,7 @@ rem This script runs the program impute-md-naive.py in a Windows environment.
 rem
 rem This software has been developed by:
 rem
-rem     GI en Especies Leñosas (WooSp)
+rem     GI en Desarrollo de Especies y Comunidades Leñosas (WooSp)
 rem     Dpto. Sistemas y Recursos Naturales
 rem     ETSI Montes, Forestal y del Medio Natural
 rem     Universidad Politecnica de Madrid

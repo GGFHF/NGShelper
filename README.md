@@ -8,9 +8,9 @@ Python programs.
 
 This software has been developed by:
 
-    GI en Especies Leñosas (WooSp)
+    GI en Desarrollo de Especies y Comunidades LeÃ±osas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
-    Universidad Politécnica de Madrid
+    Universidad PolitÃ©cnica de Madrid
     
     http://gfhforestal.com/

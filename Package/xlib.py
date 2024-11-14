@@ -14,7 +14,7 @@ software package.
 
 This software has been developed by:
 
-    GI en Especies Leñosas (WooSp)
+    GI en Desarrollo de Especies y Comunidades Leñosas (WooSp)
     Dpto. Sistemas y Recursos Naturales
     ETSI Montes, Forestal y del Medio Natural
     Universidad Politecnica de Madrid
@@ -58,7 +58,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.82'
+    return '0.83'
 
 #-------------------------------------------------------------------------------
 
