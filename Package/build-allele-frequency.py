@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--vcf', dest='vcf_file', help='Path of input VCF file (mandatory).')
     parser.add_argument('--samples', dest='sample_file', help='Path of the sample file in the following record format: "sample_id;species_id;mother_id" (mandatory).')
     parser.add_argument('--sp1_id', dest='sp1_id', help='Identification of the first species (mandatory)')
@@ -167,7 +167,7 @@ def check_args(args):
     if args.tvi_list is None or args.tvi_list == 'NONE':
         args.tvi_list = []
     else:
-        args.tvi_list = xlib.split_literal_to_string_list(args.tvi_list)
+        args.tvi_list = xlib.split_literal_to_text_list(args.tvi_list)
 
     # check the identification set
     if OK:
@@ -226,7 +226,7 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
             raise xlib.ProgramException(e, 'F001', vcf_file)
 
     # read the first record of input VCF file
-    (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+    (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
     # while there are records in input VCF file
     while record != '':
@@ -241,7 +241,7 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... { total_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
         # process the column description record
         if record.startswith('#CHROM'):
@@ -263,7 +263,7 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
                 mother_id_list.append(mother_id)
 
             # check if the sample species list is empty
-            if species_id_list == []:
+            if not species_id_list:
                 raise xlib.ProgramException(e, 'L003')
 
             # set the sample number
@@ -273,7 +273,7 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
         # process variant record
         while record != '' and not record.startswith('##') and not record.startswith('#CHROM'):
@@ -395,7 +395,7 @@ def build_allele_frequency(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, out
             xlib.Message.print('verbose', f'\rProcessed records ... {input_record_counter:8d} - Total variants ... {total_variant_counter:8d}')
 
             # read the next record of the input VCF file
-            (record, key, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
+            (record, _, data_dict) = xlib.read_vcf_file(vcf_file_id, sample_number)
 
     xlib.Message.print('verbose', '\n')
 

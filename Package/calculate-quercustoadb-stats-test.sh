@@ -45,7 +45,8 @@ cd $NGSHELPER_DIR
 /usr/bin/time \
     $PYTHON $PYTHON_OPTIONS calculate-quercustoadb-stats.py \
         --db=$DATA_DIR/quercusTOA.db \
-        --stats=$OUTPUT_DIR/quercusTOA-stats.csv \
+        --stats=$OUTPUT_DIR/quercusTOA-stats.ini \
+        --noannot=$OUTPUT_DIR/quercusTOA-noannot.csv \
         --verbose=Y  \
         --trace=N
 if [ $? -ne 0 ]; then echo 'Script ended with errors.'; exit 1; fi

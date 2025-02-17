@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -4001,7 +4001,7 @@ def get_tair10_ortholog_seq_id(conn, cluster_id):
 # Statistics of gymnoTOA database
 #-------------------------------------------------------------------------------
 
-def get_quercustoa_db_stats(conn):
+def get_gymnotoa_db_stats(conn):
     '''
     Get the statistics of gymnoTOA database.
     '''
@@ -4131,7 +4131,7 @@ def get_quercustoa_db_stats(conn):
     for row in rows:
         tair10_cluster_id_set.add(row[0])
 
-    # calculate the
+    # calculate the clusters number without annotations
     union_cluster_id_set = interproscan_cluster_id_set | emapper_cluster_id_set | tair10_cluster_id_set
     clusternum_with_annotations = len(union_cluster_id_set)
     clusternum_without_annotations = clusternum_total - clusternum_with_annotations
@@ -4274,14 +4274,35 @@ def get_quercustoa_db_stats(conn):
     for row in rows:
         tair10_cluster_id_set.add(row[0])
 
-    # calculate the
+    # calculate the clusters number without annotations
     union_cluster_id_set = interproscan_cluster_id_set | emapper_cluster_id_set | tair10_cluster_id_set
     clusternum_with_annotations = len(union_cluster_id_set)
     clusternum_without_annotations = clusternum_total - clusternum_with_annotations
 
+    # get the cluster identifications with annotations
+    union_cluster_id_txt = ', '.join(f"'{str(cluster_id)}'" for cluster_id in union_cluster_id_set)
+
+    # initialize the dictionary
+    ids_without_annotations_list = []
+
+    # select rows with identifications without annotations from the table "mmseqs2_relationships"
+    sentence = f'''
+                SELECT cluster_id, seq_id
+                    FROM mmseqs2_relationships
+                    WHERE cluster_id not in ({union_cluster_id_txt})
+                    ORDER BY cluster_id, seq_id;
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # add row data to the dictionary
+    for row in rows:
+        ids_without_annotations_list.append([row[0], row[1]])
 
     # return the ortholog sequence identification
-    return seqnum_quercus, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations
+    return seqnum_quercus, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations, ids_without_annotations_list
 
 #-------------------------------------------------------------------------------
 # General classes

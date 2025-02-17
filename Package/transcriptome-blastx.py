@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -406,7 +406,7 @@ def check_options(options):
             elif options.node_number > 1 and options.machine_type == 'local':
                 xlib.Message.print('error', f'*** The node number is {options.node_number} but it must be 1 where the machine type is local.')
                 OK = False
-        except Exception as e:
+        except Exception:
             xlib.Message.print('error', f'*** The node number value {options.node_number} is not an integer greater or equal to 1.')
             OK = False
 
@@ -419,7 +419,7 @@ def check_options(options):
             if options.blastx_thread_number < 1:
                 xlib.Message.print('error', f'*** The threads number value {options.blastx_thread_number} is not an integer greater or equal to 1.')
                 OK = False
-        except Exception as e:
+        except Exception:
             xlib.Message.print('error', f'*** The threads number value {options.blastx_thread_number} is not an integer greater or equal to 1.')
             OK = False
 
@@ -452,7 +452,7 @@ def check_options(options):
     else:
         try:
             options.e_value = float(options.e_value)
-        except Exception as e:
+        except Exception:
             xlib.Message.print('error', f'*** {options.e_value} is not a float number. E-value must be a float number.')
             OK = False
 
@@ -465,7 +465,7 @@ def check_options(options):
             if options.max_target_seqs < 1:
                 xlib.Message.print('error', f'*** The maximum number of aligned sequences to keep {options.max_target_seqs} is not an integer greater or equal to 1.')
                 OK = False
-        except Exception as e:
+        except Exception:
             xlib.Message.print('error', f'*** The maximum number of aligned sequences to keep {options.max_target_seqs} is not an integer greater or equal to 1.')
             OK = False
 
@@ -478,7 +478,7 @@ def check_options(options):
             if options.max_hsps < 1:
                 xlib.Message.print('error', f'*** The maximum number of HSPs per subject sequence to save for each query {options.max_hsps} is not an integer greater or equal to 1.')
                 OK = False
-        except Exception as e:
+        except Exception:
             xlib.Message.print('error', f'*** The maximum number of HSPs per subject sequence to save for each query {options.max_hsps} is not an integer greater or equal to 1.')
             OK = False
 
@@ -491,7 +491,7 @@ def check_options(options):
             if options.qcov_hsp_perc < 0.0 or options.qcov_hsp_perc > 100.0:
                 xlib.Message.print('error', f'*** The query coverage per HSPs {options.qcov_hsp_perc} is not a float between 0.0 and 100.0.')
                 OK = False
-        except Exception as e:
+        except Exception:
             xlib.Message.print('error', f'*** The query coverage per HSPs {options.qcov_hsp_perc} is not a float between 0.0 and 100.0.')
             OK = False
 
@@ -503,7 +503,7 @@ def check_options(options):
         try:
             if not os.path.exists(options.output_directory):
                 os.makedirs(options.output_directory)
-        except Exception as e:
+        except Exception:
             xlib.Message.print('error', f'*** The directory {options.output_directory} is not valid.')
             OK = False
 
@@ -745,6 +745,7 @@ def check_infrastructure_software():
     OK = True
 
     #check blastx
+    command = ''
     if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
         command = 'blastx -h >/dev/null 2>&1'
     elif sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):

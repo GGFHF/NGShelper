@@ -2,8 +2,7 @@
 
 rem ----------------------------------------------------------------------------
 
-rem This script executes a test of the program calculate-gymnotoadb-stats.py
-rem in a Windows environment.
+rem This script runs the program get-transcripts-geneid.py in a Windows environment.
 rem
 rem This software has been developed by:
 rem
@@ -17,13 +16,7 @@ rem Licence: GNU General Public Licence Version 3.
 
 rem ----------------------------------------------------------------------------
 
-rem Control parameters
-
-if not "%*" == "" (set ERROR=1 & goto END)
-
-rem ----------------------------------------------------------------------------
-
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
@@ -31,28 +24,20 @@ set ERROR=0
 
 set PYTHON=python.exe
 set PYTHON_OPTIONS=
+set ARGV=
 set PYTHONPATH=.
 
 set NGSHELPER_DIR=%NGSHELPER%
-set DATA_DIR=%NGSHELPER%\data
-set OUTPUT_DIR=%NGSHELPER%\output
-
-if not exist %OUTPUT_DIR% (mkdir %OUTPUT_DIR%)
 
 set INITIAL_DIR=%cd%
 cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program calculate-quercustoadb-stats.py
+rem Run the program get-transcripts-geneid.py
 
-%PYTHON% %PYTHON_OPTIONS% calculate-quercustoadb-stats.py ^
-    --db=%DATA_DIR%\quercusTOA.db ^
-    --stats=%OUTPUT_DIR%\quercusTOA-stats.ini ^
-    --noannot=%OUTPUT_DIR%\quercusTOA-noannot.csv ^
-    --verbose=Y ^
-    --trace=N
-if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
+%PYTHON% %PYTHON_OPTIONS% get-transcripts-geneid.py %* %ARGV%
+if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------
 
@@ -65,12 +50,6 @@ if %ERROR% equ 0 (
 )
 
 if %ERROR% equ 1 (
-    echo *** ERROR: This script does not have input parameters.
-    rem -- pause
-    rem -- exit %RC%
-)
-
-if %ERROR% equ 2 (
     echo *** ERROR: The program ended with return code %RC%.
     rem -- pause
     rem -- exit %RC%

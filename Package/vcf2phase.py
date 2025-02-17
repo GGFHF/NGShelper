@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -64,7 +64,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--vcf', dest='vcf_file', help='Path of the VCF file (mandatory).')
     parser.add_argument('--variants', dest='variant_file', help='Path of the variant file with record format "seq_id;position;gene_fragment" (mandatory).')
     parser.add_argument('--samples', dest='sample_file', help='Path of the sample file with record format "sample_id;species_id;mother_id" (mandatory).')
@@ -161,7 +161,7 @@ def check_args(args):
     if args.tsi_list is None or args.tsi_list == 'NONE':
         args.tsi_list = []
     else:
-        args.tsi_list = xlib.split_literal_to_string_list(args.tsi_list)
+        args.tsi_list = xlib.split_literal_to_text_list(args.tsi_list)
 
     # if there are errors, exit with exception
     if not OK:
@@ -255,7 +255,7 @@ def convert_vcf_to_phase_input(vcf_file, variant_dict, sample_file, sp1_id, sp2_
                 species_id_list.append(species_id)
 
             # check if the sample species list is empty
-            if species_id_list == []:
+            if not species_id_list:
                 raise xlib.ProgramException('', 'L003')
 
             # set the sample number
@@ -465,7 +465,7 @@ def convert_vcf_to_phase_input(vcf_file, variant_dict, sample_file, sp1_id, sp2_
                         try:
                             allele_left = f'{allele_code_matrix[j].index(gtseq_left_matrix[j][i]) + 1}'
                             if seq_id in tsi_list: xlib.Message.print('trace', f'allele_left: {allele_left}')
-                        except:
+                        except Exception:
                             allele_left = '60'
                     if seq_id in tsi_list: xlib.Message.print('trace', f'allele_left: {allele_left}')
                     sample_variant_gt_left_list.append(allele_left)
@@ -481,7 +481,7 @@ def convert_vcf_to_phase_input(vcf_file, variant_dict, sample_file, sp1_id, sp2_
                         try:
                             allele_right = f'{allele_code_matrix[j].index(gtseq_right_matrix[j][i]) + 1}'
                             if seq_id in tsi_list: xlib.Message.print('trace', f'allele_right: {allele_right}')
-                        except:
+                        except Exception:
                             allele_right = '60'
                     if seq_id in tsi_list: xlib.Message.print('trace', f'allele_right: {allele_right}')
                     sample_variant_gt_right_list.append(allele_right)

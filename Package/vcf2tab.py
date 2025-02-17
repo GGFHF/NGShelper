@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ def check_args(args):
     if args.tvi_list is None or args.tvi_list == 'NONE':
         args.tvi_list = []
     else:
-        args.tvi_list = xlib.split_literal_to_string_list(args.tvi_list)
+        args.tvi_list = xlib.split_literal_to_text_list(args.tvi_list)
 
     # if there are errors, exit with exception
     if not OK:

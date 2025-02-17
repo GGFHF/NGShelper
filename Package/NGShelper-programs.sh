@@ -108,6 +108,10 @@ echo
 echo
 echo "**********************************************************************"
 echo
+/home/fmm/Documents/Trabajo/ProyectosVScode/NGShelper/get-transcripts-geneid.py --help
+echo
+echo "**********************************************************************"
+echo
 /home/fmm/Documents/Trabajo/ProyectosVScode/NGShelper/impute-adults.py --help
 echo
 echo "**********************************************************************"
@@ -290,11 +294,11 @@ echo
 echo
 echo "**********************************************************************"
 echo
-/home/fmm/Documents/Trabajo/ProyectosVScode/NGShelper/vcf2mach.py --help
+/home/fmm/Documents/Trabajo/ProyectosVScode/NGShelper/vcf2fastphase.py --help
 echo
 echo "**********************************************************************"
 echo
-/home/fmm/Documents/Trabajo/ProyectosVScode/NGShelper/vcf2fastphase.py --help
+/home/fmm/Documents/Trabajo/ProyectosVScode/NGShelper/vcf2mach.py --help
 echo
 echo "**********************************************************************"
 echo

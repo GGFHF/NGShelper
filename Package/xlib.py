@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#pylint: disable=too-many-lines
-#pylint: disable=line-too-long
-#pylint: disable=invalid-name
-#pylint: disable=multiple-statements
-#pylint: disable=wrong-import-position
+# pylint: disable=broad-except
+# pylint: disable=invalid-name
+# pylint: disable=line-too-long
+# pylint: disable=multiple-statements
+# pylint: disable=too-many-lines
 
 #-------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.83'
+    return '0.84'
 
 #-------------------------------------------------------------------------------
 
@@ -88,11 +88,11 @@ def check_startswith(literal, text_list, case_sensitive=False):
     if not case_sensitive:
         try:
             literal = literal.upper()
-        except:
+        except Exception:
             pass
         try:
             w_list = [x.upper() for x in text_list]
-        except:
+        except Exception:
             pass
     else:
         w_list = text_list
@@ -120,11 +120,11 @@ def check_code(literal, code_list, case_sensitive=False):
     if not case_sensitive:
         try:
             literal = literal.upper()
-        except:
+        except Exception:
             pass
         try:
             w_list = [x.upper() for x in code_list]
-        except:
+        except Exception:
             pass
     else:
         w_list = code_list
@@ -150,7 +150,7 @@ def check_int(literal, minimum=(-sys.maxsize - 1), maximum=sys.maxsize):
         int(literal)
         int(minimum)
         int(maximum)
-    except:
+    except Exception:
         OK = False
     else:
         if int(literal) < int(minimum) or int(literal) > int(maximum):
@@ -176,7 +176,7 @@ def check_float(literal, minimum=float(-sys.maxsize - 1), maximum=float(sys.maxs
         float(maximum)
         float(mne)
         float(mxe)
-    except:
+    except Exception:
         OK = False
     else:
         if float(literal) < (float(minimum) + float(mne)) or float(literal) > (float(maximum) - float(mxe)):
@@ -189,46 +189,46 @@ def check_float(literal, minimum=float(-sys.maxsize - 1), maximum=float(sys.maxs
 
 def split_literal_to_integer_list(literal):
     '''
-    Split a string literal in a integer value list which are separated by comma.
+    Split a text literal with values are separated by comma in a integer list.
     '''
 
-    # initialize the string values list and the interger values list
-    strings_list = []
-    integers_list = []
+    # initialize the text list and interger list
+    text_list = []
+    integer_list = []
 
-    # split the string literal in a string values list
-    strings_list = split_literal_to_string_list(literal)
+    # split the text literal in a text list
+    text_list = split_literal_to_text_list(literal)
 
-    # convert each value from string to integer
-    for i in range(len(strings_list)):
+    # convert each item from text to integer
+    for text in text_list:
         try:
-            integers_list.append(int(strings_list[i]))
-        except:
-            integers_list = []
+            integer_list.append(int(text))
+        except Exception:
+            integer_list = []
             break
 
     # return the integer values list
-    return integers_list
+    return integer_list
 
 #-------------------------------------------------------------------------------
 
 def split_literal_to_float_list(literal):
     '''
-    Split a string literal in a float value list which are separated by comma.
+    Split a text literal with values are separated by comma in a float list.
     '''
 
-    # initialize the string values list and the float values list
-    strings_list = []
+    # initialize the text list and the float list
+    text_list = []
     float_list = []
 
-    # split the string literal in a string values list
-    strings_list = split_literal_to_string_list(literal)
+    # split the text literal in a text list
+    text_list = split_literal_to_text_list(literal)
 
-    # convert each value from string to float
-    for i in range(len(strings_list)):
+    # convert each value from text to float
+    for text in text_list:
         try:
-            float_list.append(float(strings_list[i]))
-        except:
+            float_list.append(float(text))
+        except Exception:
             float_list = []
             break
 
@@ -237,23 +237,24 @@ def split_literal_to_float_list(literal):
 
 #-------------------------------------------------------------------------------
 
-def split_literal_to_string_list(literal):
+def split_literal_to_text_list(literal):
     '''
-    Split a string literal in a string value list which are separated by comma.
+    Split a text literal with values are separated by comma in a text list.
     '''
 
-    # initialize the string values list
-    string_list = []
+    # initialize the new text list
+    new_text_list = []
 
-    # split the string literal in a string values list
-    string_list = literal.split(',')
+    # split the text literal in a text list
+    text_list = literal.split(',')
 
     # remove the leading and trailing whitespaces in each value
-    for i in range(len(string_list)):
-        string_list[i] = string_list[i].strip()
+    # and add text item to the new text list
+    for item in text_list:
+        new_text_list.append(item.strip())
 
-    # return the string values list
-    return string_list
+    # return the text list
+    return new_text_list
 
 #-------------------------------------------------------------------------------
 
@@ -366,8 +367,8 @@ def get_nucleotide_list_symbol(nucleotide_list):
     nucleotide_dict = get_nucleotide_dict()
 
     # set element list in uppercase
-    for i in range(len(nucleotide_list)):
-        nucleotide_list[i] = nucleotide_list[i].upper()
+    for i, nucleotide in nucleotide_list:
+        nucleotide_list[i] = nucleotide.upper()
 
     # find the nucleotide code
     for code in nucleotide_dict.keys():
@@ -507,8 +508,8 @@ def read_vcf_file(vcf_file_id, sample_number, check_sample_number=True):
 
         # check if the number of sample data
         if check_sample_number and len(record_data_list) - 9 != sample_number:
-            print('sample_number: {}'.format(sample_number))
-            print('len(record_data_list) - 9: {}'.format(len(record_data_list) - 9))
+            print(f'sample_number: {sample_number}')
+            print(f'len(record_data_list) - 9: {len(record_data_list) - 9}')
             raise ProgramException('L006', record_data_list[0], record_data_list[1])
 
         # extract data from the record
@@ -562,12 +563,12 @@ def get_sample_data(sample_file, sp1_id, sp2_id, hybrid_id):
         try:
             sample_file_id = gzip.open(sample_file, mode='rt', encoding='iso-8859-1')
         except Exception as e:
-            raise ProgramException(e, 'F002', sample_file)
+            raise ProgramException(e, 'F002', sample_file) from e
     else:
         try:
             sample_file_id = open(sample_file, mode='r', encoding='iso-8859-1')
         except Exception as e:
-            raise ProgramException(e, 'F001', sample_file)
+            raise ProgramException(e, 'F001', sample_file) from e
 
     # initialize counters
     record_counter = 0
@@ -595,7 +596,7 @@ def get_sample_data(sample_file, sp1_id, sp2_id, hybrid_id):
                 species_id = mo.group(2).strip()
                 mother_id = mo.group(3).strip()
             except Exception as e:
-                raise ProgramException(e, 'D001', record.strip('\n'), sample_file)
+                raise ProgramException(e, 'D001', record.strip('\n'), sample_file) from e
 
             # check "mother_id"
             if mother_id.upper() == 'NONE':
@@ -655,12 +656,12 @@ def get_id_data(id_file):
         try:
             id_file_id = gzip.open(id_file, mode='rt', encoding='iso-8859-1')
         except Exception as e:
-            raise ProgramException(e, 'F002', id_file)
+            raise ProgramException(e, 'F002', id_file) from e
     else:
         try:
             id_file_id = open(id_file, mode='r', encoding='iso-8859-1')
         except Exception as e:
-            raise ProgramException(e, 'F001', id_file)
+            raise ProgramException(e, 'F001', id_file) from e
 
     # read the first record
     record = id_file_id.readline()
@@ -685,7 +686,7 @@ def get_id_data(id_file):
     id_file_id.close()
 
     # sort the identification list
-    if id_list != []:
+    if id_list:
         id_list.sort()
 
     # return the list and dictonary of identifications
@@ -736,10 +737,10 @@ def get_taxonomy_dict(type, value):
     # inquire the taxonomy data to the server
     try:
         r = requests.get(f'{taxonomy_server}/{type}/{value}')
-    except requests.exceptions.ConnectionError:
-        raise ProgramException('', 'W002', taxonomy_server)
+    except requests.exceptions.ConnectionError as e:
+        raise ProgramException('', 'W002', taxonomy_server) from e
     except Exception as e:
-        raise ProgramException(e, 'W001', taxonomy_server)
+        raise ProgramException(e, 'W001', taxonomy_server) from e
 
     # build the taxonomy dictionary
     if r.status_code == requests.codes.ok: #pylint: disable=no-member
@@ -2084,6 +2085,9 @@ class Message():
 
     @staticmethod
     def set_verbose_status(status):
+        '''
+        Set the verbose status.
+        '''
 
         Message.verbose_status = status
 
@@ -2091,6 +2095,9 @@ class Message():
 
     @staticmethod
     def set_trace_status(status):
+        '''
+        Set the trace status.
+        '''
 
         Message.trace_status = status
 
@@ -2098,6 +2105,9 @@ class Message():
 
     @staticmethod
     def print(message_type, message_text):
+        '''
+        Print a message depending to its type.
+        '''
 
         if message_type == 'info':
             print(message_text, file=sys.stdout)

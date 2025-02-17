@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--phase-indir', dest='phase_input_dir', help='Path of the PHASE input file directory (mandatory).')
     parser.add_argument('--phase-outdir', dest='phase_output_dir', help='Path of the PHASE output file directory (mandatory).')
     parser.add_argument('--samples', dest='sample_file', help='Path of the sample file in the following record format: "sample_id;species_id;mother_id" (mandatory).')

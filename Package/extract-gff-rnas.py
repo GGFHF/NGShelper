@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--gff', dest='gff_file', help='Path of the GFF file (mandatory).')
     parser.add_argument('--format', dest='gff_format', help='The format of the transcript GFF file: GFF3; default: GFF3.')
     parser.add_argument('--genome', dest='genome_file', help='Path of the FASTA genome file (mandatory)')
@@ -136,7 +136,7 @@ def check_args(args):
     if args.tvi_list is None or args.tvi_list == 'NONE':
         args.tvi_list = []
     else:
-        args.tvi_list = xlib.split_literal_to_string_list(args.tvi_list)
+        args.tvi_list = xlib.split_literal_to_text_list(args.tvi_list)
 
     # if there are errors, exit with exception
     if not OK:

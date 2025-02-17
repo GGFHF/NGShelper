@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--fasta', dest='fasta_file', help='Path of FASTA file (mandatory)')
     parser.add_argument('--id', dest='id_file', help='Path of the sequence identification file in plane text (mandatory)')
     parser.add_argument('--type', dest='id_type', help=f'Type of the identification: {get_id_type_code_list()}; default: {xlib.Const.DEFAULT_ID_TYPE}.')
@@ -308,7 +308,7 @@ def get_id_data(id_file):
     id_file_id.close()
 
     # sort the identification list
-    if id_list != []:
+    if id_list:
         id_list.sort()
 
     # return the list and dictonary of identifications

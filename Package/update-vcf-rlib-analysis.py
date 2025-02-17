@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -135,7 +135,7 @@ def check_args(args):
     if args.tsi_list is None or args.tsi_list == 'NONE':
         args.tsi_list = []
     else:
-        args.tsi_list = xlib.split_literal_to_string_list(args.tsi_list)
+        args.tsi_list = xlib.split_literal_to_text_list(args.tsi_list)
 
     # if there are errors, exit with exception
     if not OK:

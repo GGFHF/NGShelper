@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -29,6 +29,8 @@ import gzip
 import os
 import sys
 
+from Bio import Entrez, SeqIO
+
 import xlib
 import xsqlite
 
@@ -51,7 +53,7 @@ def main():
     conn = xsqlite.connect_database(args.sqlite_database)
 
     # calculate statistics of the quercusTOA SQLite database
-    calculate_quercustoadb_stats(conn, args.stats_file)
+    calculate_quercustoadb_stats(conn, args.stats_file, args.noannot_file)
 
     # close connection to SQLite database
     conn.close()
@@ -70,7 +72,8 @@ def build_parser():
     parser = argparse.ArgumentParser(usage=usage)
     parser._optionals.title = 'Arguments'    #pylint: disable=protected-access
     parser.add_argument('--db', dest='sqlite_database', help='Path of the quercusTOA SQLite database (mandatory).')
-    parser.add_argument('--stats', dest='stats_file', help='Path of statistics file (mandatory).')
+    parser.add_argument('--stats', dest='stats_file', help='Path of the statistics file (mandatory).')
+    parser.add_argument('--noannot', dest='noannot_file', help='Path of the file with sequences without annotations or NONE; default: NONE.')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')
     parser.add_argument('--trace', dest='trace', help=f'Additional info useful to the developer team: {xlib.get_trace_code_list_text()}; default: {xlib.Const.DEFAULT_TRACE}.')
 
@@ -97,6 +100,10 @@ def check_args(args):
         xlib.Message.print('error', '*** The statistics file is not indicated in the input arguments.')
         OK = False
 
+    # check "noannot_file"
+    if args.noannot_file is None or args.noannot_file.upper() == 'NONE':
+        args.noannot_file = 'NONE'
+
     # check "verbose"
     if args.verbose is None:
         args.verbose = xlib.Const.DEFAULT_VERBOSE
@@ -121,7 +128,7 @@ def check_args(args):
 
 #-------------------------------------------------------------------------------
 
-def calculate_quercustoadb_stats(conn, stats_file):
+def calculate_quercustoadb_stats(conn, stats_file, noannot_file):
     '''
     Calculate statistics of the quercusTOA SQLite database.
     '''
@@ -138,9 +145,10 @@ def calculate_quercustoadb_stats(conn, stats_file):
         except Exception as e:
             raise xlib.ProgramException(e, 'F003', stats_file)
 
-    (seqnum_quercus, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations) = xsqlite.get_quercustoa_db_stats(conn)
+    # get the statistics of the quercusTOA database
+    (seqnum_quercus, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations, ids_without_annotations_list) = xsqlite.get_quercustoa_db_stats(conn)
 
-    # write records
+    # write records in the statistics file
     stats_file_id.write( '[statistics]\n')
     stats_file_id.write(f'seqnum_quercus = {seqnum_quercus}\n')
     stats_file_id.write(f'clusternum_total = {clusternum_total}\n')
@@ -149,8 +157,51 @@ def calculate_quercustoadb_stats(conn, stats_file):
     stats_file_id.write(f'clusternum_tair10_ortologs = {clusternum_tair10_ortologs}\n')
     stats_file_id.write(f'clusternum_without_annotations = {clusternum_without_annotations}\n')
 
-    # close the statistics file
+    # close statistics file
     stats_file_id.close()
+
+    # write sequences without annotations if necessary
+    if noannot_file != 'NONE':
+
+        # configure Entrez
+        Entrez.email = "user@kkkkkkkk.net"
+
+        # open the file with sequences without annotations
+        if noannot_file.endswith('.gz'):
+            try:
+                noannot_file_id = gzip.open(noannot_file, mode='wt', encoding='iso-8859-1', newline='\n')
+            except Exception as e:
+                raise xlib.ProgramException(e, 'F004', noannot_file)
+        else:
+            try:
+                noannot_file_id = open(noannot_file, mode='w', encoding='iso-8859-1', newline='\n')
+            except Exception as e:
+                raise xlib.ProgramException(e, 'F003', noannot_file)
+
+        # write head in the file with sequences without annotations
+        noannot_file_id.write('cluster_id;seq_id;description;aminoacids#\n')
+
+        # write records in the file with sequences without annotations
+        for id_without_annotations in ids_without_annotations_list:
+
+            # set cluster_id and seq_id
+            cluster_id = id_without_annotations[0]
+            seq_id = id_without_annotations[1]
+
+            # consult the protein database
+            handle = Entrez.efetch(db='protein', id=seq_id, rettype='gb', retmode='text')
+            record = SeqIO.read(handle, 'genbank')
+            handle.close()
+
+            # get data
+            description = record.description
+            num_amino_acids = len(record.seq)
+
+            # write record
+            noannot_file_id.write(f'{cluster_id};{seq_id};{description};{num_amino_acids}\n')
+
+        # close  the file with sequences without annotations
+        noannot_file_id.close()
 
 #-------------------------------------------------------------------------------
 

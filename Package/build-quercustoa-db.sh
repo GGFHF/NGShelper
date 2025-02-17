@@ -22,45 +22,46 @@
 
 # Software installation.
 
-# Miniconda3
+# Miniforge3
 # ==========
 
 #    $ cd /ngscloud2/apps
-#    $ wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-#    $ [rm -fr Miniconda3]
-#    $ chmod u+x Miniconda3-latest-Linux-x86_64.sh
-#    $ ./Miniconda3-latest-Linux-x86_64.sh -b -p Miniconda3
-#    $ rm Miniconda3-latest-Linux-x86_64.sh
+#    $ wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+#    $ [rm -fr Miniforge3]
+#    $ chmod u+x Miniforge3-Linux-x86_64.sh
+#    $ ./Miniforge3-Linux-x86_64.sh -b -p Miniforge3
+#    $ rm Miniforge3-Linux-x86_64.sh
 
-#    $ Miniconda3/condabin/conda init bash   (reinicializar la consola)
+#    $ Miniforge3/condabin/conda init bash   (reinicializar la consola)
 
-#    $ conda config --add channels defaults
+#    $ export MAMBA_ROOT_PREFIX=/ngscloud2/apps/Miniforge3
+
 #    $ conda config --add channels bioconda
 #    $ conda config --add channels conda-forge
 #    $ conda config --set channel_priority strict
 
-#    $ conda update --yes --name base --all
+#    $ mamba update --yes --name base --all
 
-#    $ conda install --yes --name base mamba
-
-#    $ mamba install --yes --name base openjdk=11
-#    $ mamba install --yes --name base numpy
-#    $ mamba install --yes --name base scipy
-#    $ mamba install --yes --name base sympy
-#    $ mamba install --yes --name base pandas
-#    $ mamba install --yes --name base pandasql
-#    $ mamba install --yes --name base matplotlib
-#    $ mamba install --yes --name base seaborn
-#    $ mamba install --yes --name base plotnine
 #    $ mamba install --yes --name base biopython
-#    $ mamba install --yes --name base minisom
-#    $ mamba install --yes --name base scikit-learn
-#    $ mamba install --yes --name base requests
-#    $ mamba install --yes --name base paramiko
 #    $ mamba install --yes --name base boto3
 #    $ mamba install --yes --name base gffutils
-#    $ mamba install --yes --name base psutil
 #    $ mamba install --yes --name base joblib
+#    $ mamba install --yes --name base matplotlib
+#    $ mamba install --yes --name base minisom
+#    $ mamba install --yes --name base numpy
+#    $ mamba install --yes --name base openjdk
+#    $ mamba install --yes --name base pandas
+#    $ mamba install --yes --name base pandasql
+#    $ mamba install --yes --name base paramiko
+#    $ mamba install --yes --name base plotyy
+#    $ mamba install --yes --name base plotnine
+#    $ mamba install --yes --name base psutil
+#    $ mamba install --yes --name base requests
+#    $ mamba install --yes --name base scikit-learn
+#    $ mamba install --yes --name base scipy
+#    $ mamba install --yes --name base sqlite
+#    $ mamba install --yes --name base seaborn
+#    $ mamba install --yes --name base sympy
 
 # NGShelper
 # =========
@@ -93,8 +94,9 @@
 
 #    $ [conda env remove --yes --name eggnog-mapper]
 #    $ mamba create --yes --name eggnog-mapper eggnog-mapper
-#    $ mkdir /ngscloud2/apps/Miniconda3/envs/eggnog-mapper/lib/python3.12/site-packages/data/
+#    $ mkdir /ngscloud2/apps/Miniforge3/envs/eggnog-mapper/lib/python3.11/site-packages/data/ (depending on eggnog-mapper Python version)
 #    $ conda activate eggnog-mapper
+#    $ mamba install --yes setuptools
 #    $ download_eggnog_data.py -f -y -P -M
 #    $ conda deactivate
 
@@ -131,8 +133,8 @@
 # InterProScan
 # ============
 #
-#    $ [OLD_VERSION=5.70-102.0]
-#    $ NEW_VERSION=5.71-102.0
+#    $ [OLD_VERSION=5.71-102.0]
+#    $ NEW_VERSION=5.72-103.0
 #    $ sudo apt install libgomp1 (if Ubuntu 20.04) 
 #    $ cd /ngscloud2/apps
 #    $ wget http://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/$NEW_VERSION/interproscan-$NEW_VERSION-64-bit.tar.gz
@@ -175,7 +177,7 @@ if [ "$ENVIRONMENT" = "$ENV_AWS" ]; then
     INTERPROSCAN_DIR=/ngscloud2/apps/InterProScan
     OUTPUT_DIR=/ngscloud2/quercustoa
 
-    FASTA_FILE=$CLADE-protein-sequences.fasta
+    PROTEIN_FASTA_FILE=$CLADE-protein-sequences.fasta
 
     THREADS=16
 
@@ -188,7 +190,7 @@ elif [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
     INTERPROSCAN_DIR=$APPS/InterProScan
     OUTPUT_DIR=$QUERCUSTOA/output
 
-    FASTA_FILE=$CLADE-protein-sequences-seq1000.fasta
+    PROTEIN_FASTA_FILE=$CLADE-protein-sequences-seq1000.fasta
 
     THREADS=4
 
@@ -204,7 +206,7 @@ OUTPUT_PREFIX=$TEMP_DIR/$CLADE-mmseqs2
 CLUSTER_DIR=$TEMP_DIR/clusters
 DB_FILE=$DB_NAME.db
 DB_PATH=$DB_DIR/$DB_FILE
-FASTA_PATH=$TEMP_DIR/$FASTA_FILE
+PROTEIN_FASTA_PATH=$TEMP_DIR/$PROTEIN_FASTA_FILE
 ALLSEQS_FILE=$CLADE-mmseqs2_all_seqs.fasta
 ALLSEQS_PATH=$TEMP_DIR/$ALLSEQS_FILE
 RELATIONSHIP_FILE=$CLADE-relationships.csv
@@ -227,15 +229,173 @@ EMAPPER_ANNOTATIONS_PATH=$TEMP_DIR/$CONSEQS_PREFIX-annotations-emapper.tsv
 ANNOTATIONS_FILE=$CONSEQS_PREFIX-seqs-annotations.csv
 STATS_FILE=$DB_NAME-stats.ini
 STATS_PATH=$DB_DIR/$STATS_FILE
+NOANNOT_FILE=$DB_NAME-noannot.csv
+# -- NOANNOT_PATH=$TEMP_DIR/$NOANNOT_FILE
+NOANNOT_PATH=NONE
+
+# NCBI Genome
+# Quercus agrifolia
+GENOME_QUERCUS_ALBA_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/029/955/455/GCA_029955455.1_dhQueAgri1.0.hap1/GCA_029955455.1_dhQueAgri1.0.hap1_genomic.fna.gz
+GENOME_QUERCUS_ALBA_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_ALBA_GENOME_URL")
+GENOME_QUERCUS_ALBA_GFF_URL=
+GENOME_QUERCUS_ALBA_GFF_PATH=
+GENOME_QUERCUS_ALBA_PROTEIN_URL=
+GENOME_QUERCUS_ALBA_PROTEIN_PATH=
+# Quercus alba
+GENOME_QUERCUS_ALBA_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/036/321/655/GCA_036321655.1_ASM3632165v1/GCA_036321655.1_ASM3632165v1_genomic.fna.gz
+GENOME_QUERCUS_ALBA_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_ALBA_GENOME_URL")
+GENOME_QUERCUS_ALBA_GFF_URL=
+GENOME_QUERCUS_ALBA_GFF_PATH=
+GENOME_QUERCUS_ALBA_PROTEIN_URL=
+GENOME_QUERCUS_ALBA_PROTEIN_PATH=
+# Quercus dentata
+GENOME_QUERCUS_DENTATA_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/028/216/015/GCA_028216015.1_ASM2821601v1/GCA_028216015.1_ASM2821601v1_genomic.fna.gz
+GENOME_QUERCUS_DENTATA_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_DENTATA_GENOME_URL")
+GENOME_QUERCUS_DENTATA_GFF_URL=
+GENOME_QUERCUS_DENTATA_GFF_PATH=
+GENOME_QUERCUS_DENTATA_PROTEIN_URL=
+GENOME_QUERCUS_DENTATA_PROTEIN_PATH=
+# Quercus gilva
+GENOME_QUERCUS_GILVA_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/023/621/385/GCA_023621385.1_ASM2362138v1/GCA_023621385.1_ASM2362138v1_genomic.fna.gz
+GENOME_QUERCUS_GILVA_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_GILVA_GENOME_URL")
+GENOME_QUERCUS_GILVA_GFF_URL=
+GENOME_QUERCUS_GILVA_GFF_PATH=
+GENOME_QUERCUS_GILVA_PROTEIN_URL=
+GENOME_QUERCUS_GILVA_PROTEIN_PATH=
+# Quercus glauca
+GENOME_QUERCUS_GLAUCA_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/023/736/055/GCA_023736055.1_g3h1/GCA_023736055.1_g3h1_genomic.fna.gz
+GENOME_QUERCUS_GLAUCA_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_GLAUCA_GENOME_URL")
+GENOME_QUERCUS_GLAUCA_GFF_URL=
+GENOME_QUERCUS_GLAUCA_GFF_PATH=
+GENOME_QUERCUS_GLAUCA_PROTEIN_URL=
+GENOME_QUERCUS_GLAUCA_PROTEIN_PATH=
+# Quercus ilex
+GENOME_QUERCUS_ILEX_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/964/341/355/GCA_964341355.1_dhQueIlex1.hap2.1/GCA_964341355.1_dhQueIlex1.hap2.1_genomic.fna.gz
+GENOME_QUERCUS_ILEX_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_ILEX_GENOME_URL")
+GENOME_QUERCUS_ILEX_GFF_URL=
+GENOME_QUERCUS_ILEX_GFF_PATH=
+GENOME_QUERCUS_ILEX_PROTEIN_URL=
+GENOME_QUERCUS_ILEX_PROTEIN_PATH=
+# Quercus lobata
+GENOME_QUERCUS_LOBATA_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/633/185/GCF_001633185.2_ValleyOak3.2/GCF_001633185.2_ValleyOak3.2_genomic.fna.gz
+GENOME_QUERCUS_LOBATA_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_LOBATA_GENOME_URL")
+GENOME_QUERCUS_LOBATA_GFF_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/633/185/GCF_001633185.2_ValleyOak3.2/GCF_001633185.2_ValleyOak3.2_genomic.gff.gz
+GENOME_QUERCUS_LOBATA_GFF_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_LOBATA_GFF_URL")
+GENOME_QUERCUS_LOBATA_PROTEIN_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/633/185/GCF_001633185.2_ValleyOak3.2/GCF_001633185.2_ValleyOak3.2_protein.faa.gz
+GENOME_QUERCUS_LOBATA_PROTEIN_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_LOBATA_PROTEIN_URL")
+# Quercus mongolica
+GENOME_QUERCUS_MONGOLICA_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/011/696/235/GCA_011696235.1_ASM1169623v1/GCA_011696235.1_ASM1169623v1_genomic.fna.gz
+GENOME_QUERCUS_MONGOLICA_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_MONGOLICA_GENOME_URL")
+GENOME_QUERCUS_MONGOLICA_GFF_URL=
+GENOME_QUERCUS_MONGOLICA_GFF_PATH=
+GENOME_QUERCUS_MONGOLICA_PROTEIN_URL=
+GENOME_QUERCUS_MONGOLICA_PROTEIN_PATH=
+# Quercus petraea
+GENOME_QUERCUS_PETRAEA_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/964/102/825/GCA_964102825.1_dhQuePetr1.hap1.1/GCA_964102825.1_dhQuePetr1.hap1.1_genomic.fna.gz
+GENOME_QUERCUS_PETRAEA_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_PETRAEA_GENOME_URL")
+GENOME_QUERCUS_PETRAEA_GFF_URL=
+GENOME_QUERCUS_PETRAEA_GFF_PATH=
+GENOME_QUERCUS_PETRAEA_PROTEIN_URL=
+GENOME_QUERCUS_PETRAEA_PROTEIN_PATH=
+# Quercus robur
+GENOME_QUERCUS_ROBUR_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/932/294/415/GCF_932294415.1_dhQueRobu3.1/GCF_932294415.1_dhQueRobu3.1_genomic.fna.gz
+GENOME_QUERCUS_ROBUR_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_ROBUR_GENOME_URL")
+GENOME_QUERCUS_ROBUR_GFF_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/932/294/415/GCF_932294415.1_dhQueRobu3.1/GCF_932294415.1_dhQueRobu3.1_genomic.gff.gz
+GENOME_QUERCUS_ROBUR_GFF_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_ROBUR_GFF_URL")
+GENOME_QUERCUS_ROBUR_PROTEIN_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/932/294/415/GCF_932294415.1_dhQueRobu3.1/GCF_932294415.1_dhQueRobu3.1_protein.faa.gz
+GENOME_QUERCUS_ROBUR_PROTEIN_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_ROBUR_PROTEIN_URL")
+# Quercus rubra
+GENOME_QUERCUS_RUBRA_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/035/136/125/GCA_035136125.1_Qrubra_687_v2.0/GCA_035136125.1_Qrubra_687_v2.0_genomic.fna.gz
+GENOME_QUERCUS_RUBRA_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_RUBRA_GENOME_URL")
+GENOME_QUERCUS_RUBRA_GFF_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/035/136/125/GCA_035136125.1_Qrubra_687_v2.0/GCA_035136125.1_Qrubra_687_v2.0_genomic.gff.gz
+GENOME_QUERCUS_RUBRA_GFF_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_RUBRA_GFF_URL")
+GENOME_QUERCUS_RUBRA_PROTEIN_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/035/136/125/GCA_035136125.1_Qrubra_687_v2.0/GCA_035136125.1_Qrubra_687_v2.0_protein.faa.gz
+GENOME_QUERCUS_RUBRA_PROTEIN_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_RUBRA_PROTEIN_URL")
+# Quercus suber
+GENOME_QUERCUS_SUBER_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/906/115/GCF_002906115.3_Cork_oak_2.0/GCF_002906115.3_Cork_oak_2.0_genomic.fna.gz
+GENOME_QUERCUS_SUBER_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_SUBER_GENOME_URL")
+GENOME_QUERCUS_SUBER_GFF_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/906/115/GCF_002906115.3_Cork_oak_2.0/GCF_002906115.3_Cork_oak_2.0_genomic.gff.gz
+GENOME_QUERCUS_SUBER_GFF_PATH=$TEMP_DIR/$(basename "$rGENOME_QUERCUS_SUBER_GFF_URL")
+GENOME_QUERCUS_SUBER_PROTEIN_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/002/906/115/GCF_002906115.3_Cork_oak_2.0/GCF_002906115.3_Cork_oak_2.0_protein.faa.gz
+GENOME_QUERCUS_SUBER_PROTEIN_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_SUBER_PROTEIN_URL")
+# Quercus variabilis
+GENOME_QUERCUS_VARIABILIS_GENOME_URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/030/445/155/GCA_030445155.1_ASM3044515v1/GCA_030445155.1_ASM3044515v1_genomic.fna.gz
+GENOME_QUERCUS_VARIABILIS_GENOME_PATH=$TEMP_DIR/$(basename "$GENOME_QUERCUS_VARIABILIS_GENOME_URL")
+GENOME_QUERCUS_VARIABILIS_GFF_URL=
+GENOME_QUERCUS_VARIABILIS_GFF_PATH=
+GENOME_QUERCUS_VARIABILIS_PROTEIN_URL=
+GENOME_QUERCUS_VARIABILIS_PROTEIN_PATH=
+
+# CNCB - NGDC
+# Quercus acutissima
+NGDC_QUERCUS_ACUTISSIMA_GENOME_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_acutissima_Quercus_a_v1.0_GWHBGBO00000000/GWHBGBO00000000.genome.fasta.gz
+NGDC_QUERCUS_ACUTISSIMA_GENOME_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_ACUTISSIMA_GENOME_URL")
+NGDC_QUERCUS_ACUTISSIMAA_GFF_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_acutissima_Quercus_a_v1.0_GWHBGBO00000000/GWHBGBO00000000.gff.gz
+NGDC_QUERCUS_ACUTISSIMA_GFF_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_ACUTISSIMAA_GFF_URL")
+NGDC_QUERCUS_ACUTISSIMA_PROTEIN_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_acutissima_Quercus_a_v1.0_GWHBGBO00000000/GWHBGBO00000000.Protein.faa.gz
+NGDC_QUERCUS_ACUTISSIMA_PROTEIN_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_ACUTISSIMA_PROTEIN_URL")
+# Quercus dentata
+NGDC_QUERCUS_DENTATA_GENOME_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_dentata_NA_GWHBRAD00000000/GWHBRAD00000000.genome.fasta.gz
+NGDC_QUERCUS_DENTATA_GENOME_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_DENTATA_GENOME_URL")
+NGDC_QUERCUS_DENTATA_GFF_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_dentata_NA_GWHBRAD00000000/GWHBRAD00000000.gff.gz
+NGDC_QUERCUS_DENTATA_GFF_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_DENTATA_GFF_URL")
+NGDC_QUERCUS_DENTATA_PROTEIN_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_dentata_NA_GWHBRAD00000000/GWHBRAD00000000.Protein.faa.gz
+NGDC_QUERCUS_DENTATA_PROTEIN_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_DENTATA_PROTEIN_URL")
+# Quercus glauca
+NGDC_QUERCUS_GLAUCA_GENOME_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_glauca_chr_GWHDTWU00000000/GWHDTWU00000000.genome.fasta.gz
+NGDC_QUERCUS_GLAUCA_GENOME_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_GLAUCA_GENOME_URL")
+NGDC_QUERCUS_GLAUCA_GFF_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_glauca_chr_GWHDTWU00000000/GWHDTWU00000000.gff.gz
+NGDC_QUERCUS_GLAUCA_GFF_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_GLAUCA_GFF_URL")
+NGDC_QUERCUS_GLAUCA_PROTEIN_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_glauca_chr_GWHDTWU00000000/GWHDTWU00000000.Protein.faa.gz
+NGDC_QUERCUS_GLAUCA_PROTEIN_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_GLAUCA_PROTEIN_URL")
+# Quercus longispica
+NGDC_QUERCUS_LONGISPICA_GENOME_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_longispica_LKM1_GWHESEV00000000/GWHESEV00000000.genome.fasta.gz
+NGDC_QUERCUS_LONGISPICA_GENOME_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_LONGISPICA_GENOME_URL")
+NGDC_QUERCUS_LONGISPICA_GFF_URL=
+NGDC_QUERCUS_LONGISPICA_GFF_PATH=
+NGDC_QUERCUS_LONGISPICA_PROTEIN_URL=
+NGDC_QUERCUS_LONGISPICA_PROTEIN_PATH=
+# Quercus rex
+NGDC_QUERCUS_REX_GENOME_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_rex_Quercus_rex_GWHCBIV00000000/GWHCBIV00000000.genome.fasta.gz
+NGDC_QUERCUS_REX_GENOME_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_REX_GENOME_URL")
+NGDC_QUERCUS_REX_GFF_URL=
+NGDC_QUERCUS_REX_GFF_PATH=
+NGDC_QUERCUS_REX_PROTEIN_URL=
+NGDC_QUERCUS_REX_PROTEIN_PATH=
+# Quercus sichourensis
+NGDC_QUERCUS_SICHOURENSIS_GENOME_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_sichourensis_Quercus_sichourensis_GWHCBIW00000000/GWHCBIW00000000.genome.fasta.gz
+NGDC_QUERCUS_SICHOURENSIS_GENOME_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_SICHOURENSIS_GENOME_URL")
+NGDC_QUERCUS_SICHOURENSIS_GFF_URL=
+NGDC_QUERCUS_SICHOURENSIS_GFF_PATH=
+NGDC_QUERCUS_SICHOURENSIS_PROTEIN_URL=
+NGDC_QUERCUS_SICHOURENSIS_PROTEIN_PATH=
+# Quercus variabilis
+NGDC_QUERCUS_VARIABILIS_GENOME_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_variabilis_QuvarV2_GWHBQTN00000000/GWHBQTN00000000.genome.fasta.gz
+NGDC_QUERCUS_VARIABILIS_GENOME_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_VARIABILIS_GENOME_URL")
+NGDC_QUERCUS_VARIABILIS_GFF_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_variabilis_QuvarV2_GWHBQTN00000000/GWHBQTN00000000.gff.gz
+NGDC_QUERCUS_VARIABILIS_GFF_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_VARIABILIS_GFF_URL")
+NGDC_QUERCUS_VARIABILIS_PROTEIN_URL=https://download.cncb.ac.cn/gwh/Plants/Quercus_variabilis_QuvarV2_GWHBQTN00000000/GWHBQTN00000000.Protein.faa.gz
+NGDC_QUERCUS_VARIABILIS_PROTEIN_PATH=$TEMP_DIR/$(basename "$NGDC_QUERCUS_VARIABILIS_PROTEIN_URL")
+
+# Reference genome
+REFERENCE_GENOME_URL=$GENOME_QUERCUS_LOBATA_GENOME_URL
+REFERENCE_GENOME_PATH=$GENOME_QUERCUS_LOBATA_GENOME_PATH
+REFERENCE_GFF_URL=$GENOME_QUERCUS_LOBATA_GFF_URL
+REFERENCE_GFF_PATH=$GENOME_QUERCUS_LOBATA_GFF_PATH
+
+# Protein source
+PROTEIN_SOURCE_1='NCBI-PROTEINS-DATABASE'
+PROTEIN_SOURCE_2='GENOMIC-PROTEINS'
+PROTEIN_SOURCE=$PROTEIN_SOURCE_2
 
 # NCBI Taxonomy
-TAXONOMY_TAXDMP_FTP=ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdmp.zip
+TAXONOMY_TAXDMP_URL=ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdmp.zip
 TAXONOMY_TAXDMP_PATH=$TEMP_DIR/taxdmp.zip
 TAXONOMY_TAXONNAMES_PATH=$TEMP_DIR/names.dmp
 
 # BUSCO Embryophyta dataset
 BUSCO_DATASET=embryophyta_odb10
-BUSCO_DATASET_FTP=https://busco-data.ezlab.org/v5/data/lineages/embryophyta_odb10.2024-01-08.tar.gz
+BUSCO_DATASET_URL=https://busco-data.ezlab.org/v5/data/lineages/embryophyta_odb10.2024-01-08.tar.gz
 BUSCO_DATASET_PATH=$TEMP_DIR/$BUSCO_DATASET.tar.gz
 BUSCO_DATASET_DIR=$TEMP_DIR/$BUSCO_DATASET
 BUSCO_ASSESSMENT_PATTERN=busco-assessment
@@ -256,22 +416,22 @@ TAIR10_CONSEQS_ALIGNMENT_FILE=$CONSEQS_PREFIX-tair10-alignments.csv
 TAIR10_CONSEQS_ALIGNMENT_PATH=$TEMP_DIR/$TAIR10_CONSEQS_ALIGNMENT_FILE
 
 # Gene Ontology
-GO_ONTOLOGY_FTP=http://purl.obolibrary.org/obo/go.obo
+GO_ONTOLOGY_URL=http://purl.obolibrary.org/obo/go.obo
 GO_ONTOLOGY_FILE=$TEMP_DIR/go.obo
 
 # CANTATA data
 CANTATA_ARABIDOPSIS_THALIANA_FASTA_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Arabidopsis_thaliana_lncRNAs.fasta
-CANTATA_ARABIDOPSIS_THALIANA_FASTA_FILE=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.fasta
+CANTATA_ARABIDOPSIS_THALIANA_FASTA_PATH=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.fasta
 CANTATA_ARABIDOPSIS_THALIANA_GTF_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Arabidopsis_thaliana_lncRNAs.gtf
-CANTATA_ARABIDOPSIS_THALIANA_GTF_FILE=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.gtf
+CANTATA_ARABIDOPSIS_THALIANA_GTF_PATH=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.gtf
 CANTATA_QUERCUS_LOBATA_FASTA_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Quercus_lobata_lncRNAs.fasta
-CANTATA_QUERCUS_LOBATA_FASTA_FILE=$TEMP_DIR/Quercus-lobata-lncrnas.fasta
+CANTATA_QUERCUS_LOBATA_FASTA_PATH=$TEMP_DIR/Quercus-lobata-lncrnas.fasta
 CANTATA_QUERCUS_LOBATA_GTF_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Quercus_lobata_lncRNAs.gtf
-CANTATA_QUERCUS_LOBATA_GTF_FILE=$TEMP_DIR/Quercus-lobata-lncrnas.gtf
+CANTATA_QUERCUS_LOBATA_GTF_PATH=$TEMP_DIR/Quercus-lobata-lncrnas.gtf
 CANTATA_QUERCUS_SUBER_FASTA_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Quercus_suber_lncRNAs.fasta
-CANTATA_QUERCUS_SUBER_FASTA_FILE=$TEMP_DIR/Quercus-suber-lncrnas.fasta
+CANTATA_QUERCUS_SUBER_FASTA_PATH=$TEMP_DIR/Quercus-suber-lncrnas.fasta
 CANTATA_QUERCUS_SUBER_GTF_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Quercus_suber_lncRNAs.gtf
-CANTATA_QUERCUS_SUBER_GTF_FILE=$TEMP_DIR/Quercus-suber-lncrnas.gtf
+CANTATA_QUERCUS_SUBER_GTF_PATH=$TEMP_DIR/Quercus-suber-lncrnas.gtf
 LNCRNAS_PREFIX=lncRNA
 LNCRNAS_FILE=$LNCRNAS_PREFIX-seqs.fasta
 LNCRNAS_PATH=$TEMP_DIR/$LNCRNAS_FILE
@@ -302,7 +462,9 @@ EMAPPER_DMND_ITERATE=yes
 EMAPPER_START_SENS=3
 EMAPPER_SENS_STEPS=3
 EMAPPER_FINAL_SENS=7
-EMAPPER_EVALUE=0.001
+# -- EMAPPER_PIDENT=30.0
+EMAPPER_EVALUE=0.00001
+# -- EMAPPER_QUERY_COVER=30.0
 
 PATH=$NGSHELPER_DIR:$MMSEQS2_DIR:$INTERPROSCAN_DIR:$PATH
 
@@ -359,7 +521,215 @@ function create_database
 
 #-------------------------------------------------------------------------------
 
-function download_ncbi_taxonomy_data
+function download_reference_genome
+{
+
+    echo "$SEP"
+    echo 'Downloading and decompressing reference genome FASTA ...'
+    /usr/bin/time \
+        wget \
+            --quiet \
+            --output-document $REFERENCE_GENOME_PATH \
+            $REFERENCE_GENOME_URL
+    RC=$?
+    if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+    gzip -d $REFERENCE_GENOME_PATH
+    RC=$?
+    if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+    echo 'File is downloaded and decompressed.'
+
+    echo "$SEP"
+    echo 'Downloading and decompressing reference genome GFF3 ...'
+    /usr/bin/time \
+        wget \
+            --quiet \
+            --output-document $REFERENCE_GFF_PATH \
+            $REFERENCE_GFF_URL
+    RC=$?
+    if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+    gzip -d $REFERENCE_GFF_PATH
+    RC=$?
+    if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+    echo 'File is downloaded and decompressed.'
+
+}
+
+#-------------------------------------------------------------------------------
+
+function download_protein_sequences
+{
+
+    if [ "$PROTEIN_SOURCE" = "$PROTEIN_SOURCE_1" ]; then
+
+        echo "$SEP"
+        echo "Downloading $CLADE protein sequences from NCBI protein database ..."
+        if [ "$ENVIRONMENT" = "$ENV_AWS" ]; then
+            source activate entrez-direct
+            /usr/bin/time \
+                esearch -db protein -query "$CLADE [Organism]" | efetch -format fasta >$PROTEIN_FASTA_PATH
+            RC=$?
+            if [ $RC -ne 0 ]; then manage_error esearch $RC; fi
+            conda deactivate
+        elif [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
+            cp /home/fmm/Documents/Trabajo/ProyectosVScode/quercusTOA/data/$PROTEIN_FASTA_FILE $TEMP_DIR
+        else
+            echo 'Environment error'; exit 3
+        fi
+        echo 'Sequences are downloaded.'
+
+    elif [ "$PROTEIN_SOURCE" = "$PROTEIN_SOURCE_2" ]; then
+
+        echo "$SEP"
+        echo 'Downloading and decompressing Quercus lobata protein FASTA ...'
+        /usr/bin/time \
+            wget \
+                --quiet \
+                --output-document $GENOME_QUERCUS_LOBATA_PROTEIN_PATH \
+                $GENOME_QUERCUS_LOBATA_PROTEIN_URL
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+        gzip -d $GENOME_QUERCUS_LOBATA_PROTEIN_PATH
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+        echo 'File is downloaded and decompressed.'
+
+        echo "$SEP"
+        echo 'Downloading and decompressing Quercus robur protein FASTA ...'
+        /usr/bin/time \
+            wget \
+                --quiet \
+                --output-document $GENOME_QUERCUS_ROBUR_PROTEIN_PATH \
+                $GENOME_QUERCUS_ROBUR_PROTEIN_URL
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+        gzip -d $GENOME_QUERCUS_ROBUR_PROTEIN_PATH
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+        echo 'File is downloaded and decompressed.'
+
+        echo "$SEP"
+        echo 'Downloading and decompressing Quercus rubra protein FASTA ...'
+        /usr/bin/time \
+            wget \
+                --quiet \
+                --output-document $GENOME_QUERCUS_RUBRA_PROTEIN_PATH \
+                $GENOME_QUERCUS_RUBRA_PROTEIN_URL
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+        gzip -d $GENOME_QUERCUS_RUBRA_PROTEIN_PATH
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+        echo 'File is downloaded and decompressed.'
+
+        echo "$SEP"
+        echo 'Downloading and decompressing Quercus suber protein FASTA ...'
+        /usr/bin/time \
+            wget \
+                --quiet \
+                --output-document $GENOME_QUERCUS_SUBER_PROTEIN_PATH \
+                $GENOME_QUERCUS_SUBER_PROTEIN_URL
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+        gzip -d $GENOME_QUERCUS_SUBER_PROTEIN_PATH
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+        echo 'File is downloaded and decompressed.'
+
+        # echo "$SEP"
+        # echo 'Downloading and decompressing Quercus acutissima protein FASTA ...'
+        # /usr/bin/time \
+        #     wget \
+        #         --quiet \
+        #         --output-document $NGDC_QUERCUS_ACUTISSIMA_PROTEIN_PATH \
+        #         $NGDC_QUERCUS_ACUTISSIMA_PROTEIN_URL
+        # RC=$?
+        # if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+        # gzip -d $NGDC_QUERCUS_ACUTISSIMA_PROTEIN_PATH
+        # RC=$?
+        # if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+        # echo 'File is downloaded and decompressed.'
+
+        # echo "$SEP"
+        # echo 'Downloading and decompressing Quercus dentata protein FASTA ...'
+        # /usr/bin/time \
+        #     wget \
+        #         --quiet \
+        #         --output-document $NGDC_QUERCUS_DENTATA_PROTEIN_PATH \
+        #         $NGDC_QUERCUS_DENTATA_PROTEIN_URL
+        # RC=$?
+        # if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+        # gzip -d $NGDC_QUERCUS_DENTATA_PROTEIN_PATH
+        # RC=$?
+        # if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+        # echo 'File is downloaded and decompressed.'
+
+        # echo "$SEP"
+        # echo 'Downloading and decompressing Quercus glauca protein FASTA ...'
+        # /usr/bin/time \
+        #     wget \
+        #         --quiet \
+        #         --output-document $NGDC_QUERCUS_GLAUCA_PROTEIN_PATH \
+        #         $NGDC_QUERCUS_GLAUCA_PROTEIN_URL
+        # RC=$?
+        # if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+        # gzip -d $NGDC_QUERCUS_GLAUCA_PROTEIN_PATH
+        # RC=$?
+        # if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+        # echo 'File is downloaded and decompressed.'
+
+        # echo "$SEP"
+        # echo 'Downloading and decompressing Quercus variabilis protein FASTA ...'
+        # /usr/bin/time \
+        #     wget \
+        #         --quiet \
+        #         --output-document $NGDC_QUERCUS_VARIABILIS_PROTEIN_PATH \
+        #         $NGDC_QUERCUS_VARIABILIS_PROTEIN_URL
+        # RC=$?
+        # if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+        # gzip -d $NGDC_QUERCUS_VARIABILIS_PROTEIN_PATH
+        # RC=$?
+        # if [ $RC -ne 0 ]; then manage_error tar $RC; fi
+        # echo 'File is downloaded and decompressed.'
+
+        # echo "$SEP"
+        # echo 'Concating the protein FASTAs ...'
+        # /usr/bin/time \
+        #     cat \
+        #         "${GENOME_QUERCUS_LOBATA_PROTEIN_PATH%.*}" \
+        #         "${GENOME_QUERCUS_ROBUR_PROTEIN_PATH%.*}" \
+        #         "${GENOME_QUERCUS_RUBRA_PROTEIN_PATH%.*}" \
+        #         "${GENOME_QUERCUS_SUBER_PROTEIN_PATH%.*}" \
+        #         "${NGDC_QUERCUS_ACUTISSIMA_PROTEIN_PATH%.*}" \
+        #         "${NGDC_QUERCUS_DENTATA_PROTEIN_PATH%.*}" \
+        #         "${NGDC_QUERCUS_GLAUCA_PROTEIN_PATH%.*}" \
+        #         "${NGDC_QUERCUS_VARIABILIS_PROTEIN_PATH%.*}" \
+        #         > $PROTEIN_FASTA_PATH
+        # RC=$?
+        # if [ $RC -ne 0 ]; then manage_error cat $RC; fi
+        # echo 'Files are concated.'
+
+        echo "$SEP"
+        echo 'Concating the protein FASTAs ...'
+        /usr/bin/time \
+            cat \
+                "${GENOME_QUERCUS_LOBATA_PROTEIN_PATH%.*}" \
+                "${GENOME_QUERCUS_ROBUR_PROTEIN_PATH%.*}" \
+                "${GENOME_QUERCUS_RUBRA_PROTEIN_PATH%.*}" \
+                "${GENOME_QUERCUS_SUBER_PROTEIN_PATH%.*}" \
+                > $PROTEIN_FASTA_PATH
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error cat $RC; fi
+        echo 'Files are concated.'
+
+    else
+        echo 'Protein source error'; exit 3
+    fi
+
+}
+
+#-------------------------------------------------------------------------------
+
+function download_taxonomy_data
 {
 
     echo "$SEP"
@@ -368,7 +738,7 @@ function download_ncbi_taxonomy_data
         wget \
             --quiet \
             --output-document $TAXONOMY_TAXDMP_PATH \
-            $TAXONOMY_TAXDMP_FTP
+            $TAXONOMY_TAXDMP_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
     unzip -o -d $TEMP_DIR $TAXONOMY_TAXDMP_PATH
@@ -380,38 +750,17 @@ function download_ncbi_taxonomy_data
 
 #-------------------------------------------------------------------------------
 
-function download_ncbi_protein_sequences
-{
-
-    echo "$SEP"
-    echo "Downloading $CLADE protein sequences from NCBI taxonomy database ..."
-    if [ "$ENVIRONMENT" = "$ENV_AWS" ]; then
-        source activate entrez-direct
-        /usr/bin/time \
-            esearch -db protein -query "$CLADE [Organism]" | efetch -format fasta >$FASTA_PATH
-        RC=$?
-        if [ $RC -ne 0 ]; then manage_error esearch $RC; fi
-        conda deactivate
-    elif [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
-        cp /home/fmm/Documents/Trabajo/ProyectosVScode/quercusTOA/data/$FASTA_FILE $TEMP_DIR
-    else
-        echo 'Environment error'; exit 3
-    fi
-    echo 'Sequences are downloaded.'
-
-}
-
-#-------------------------------------------------------------------------------
-
 function cluster_sequences
 {
+
+    source activate mmseqs2
 
     echo "$SEP"
     echo 'Clustering sequences ...'
     /usr/bin/time \
         mmseqs \
             easy-cluster \
-            $FASTA_PATH \
+            $PROTEIN_FASTA_PATH \
             $OUTPUT_PREFIX \
             tmp \
             --threads $THREADS \
@@ -423,6 +772,8 @@ function cluster_sequences
     RC=$?
     if [ $RC -ne 0 ]; then manage_error mmseqs $RC; fi
     echo 'Sequences are clustered.'
+
+    conda deactivate
 
 }
 
@@ -596,7 +947,7 @@ function download_busco_dataset
         wget \
             --quiet \
             --output-document $BUSCO_DATASET_PATH \
-            $BUSCO_DATASET_FTP
+            $BUSCO_DATASET_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
     tar -xzvf $BUSCO_DATASET_PATH --directory=$TEMP_DIR
@@ -741,29 +1092,57 @@ function run_eggnog_mapper_analysis
     echo 'Running eggNOG-mapper analysis ...'
     if [ "$EMAPPER_SEARCH_OPTION" = "$DIAMOND" ]; then
         /usr/bin/time \
+        /usr/bin/time \
+            # -- emapper.py \
+            # --     --cpu $THREADS \
+            # --     -i $CONSEQS_PATH \
+            # --     --itype $EMAPPER_ITYPE \
+            # --     -m $DIAMOND \
+            # --     --dmnd_algo $EMAPPER_DMND_ALGO \
+            # --     --sensmode $EMAPPER_SENSMODE \
+            # --     --dmnd_iterate $EMAPPER_DMND_ITERATE \
+            # --     --pident $EMAPPER_PIDENT \
+            # --     --evalue $EMAPPER_EVALUE \
+            # --     --query_cover $EMAPPER_QUERY_COVER \
+            # --     --output_dir $TEMP_DIR \
+            # --     --output $CONSEQS_PREFIX
             emapper.py \
+                --cpu $THREADS \
+                -i $CONSEQS_PATH \
+                --itype $EMAPPER_ITYPE \
+                -m $DIAMOND \
+                --dmnd_algo $EMAPPER_DMND_ALGO \
+                --sensmode $EMAPPER_SENSMODE \
+                --dmnd_iterate $EMAPPER_DMND_ITERATE \
+                --evalue $EMAPPER_EVALUE \
+                --output_dir $TEMP_DIR \
+                --output $CONSEQS_PREFIX
+            RC=$?
+        if [ $RC -ne 0 ]; then manage_error emapper.py $RC; fi
+    elif [ "$EMAPPER_SEARCH_OPTION" = "$MMSEQS" ]; then
+        /usr/bin/time \
+        # -- emapper.py \
+        # --     --cpu $THREADS \
+        # --     -i $CONSEQS_PATH \
+        # --     --itype $EMAPPER_ITYPE \
+        # --     -m $MMSEQS \
+        # --     --start_sens $EMAPPER_START_SENS \
+        # --     --sens_steps $EMAPPER_SENS_STEPS \
+        # --     --final_sens $EMAPPER_FINAL_SENS \
+        # --     --pident $EMAPPER_PIDENT \
+        # --     --evalue $EMAPPER_EVALUE \
+        # --     --query_cover $EMAPPER_QUERY_COVER \
+        # --     --output_dir $TEMP_DIR \
+        # --     --output $CONSEQS_PREFIX
+        emapper.py \
             --cpu $THREADS \
             -i $CONSEQS_PATH \
             --itype $EMAPPER_ITYPE \
-            -m $DIAMOND \
-            --dmnd_algo $EMAPPER_DMND_ALGO \
-            --sensmode $EMAPPER_SENSMODE \
-            --dmnd_iterate $EMAPPER_DMND_ITERATE \
+            -m $MMSEQS \
+            --start_sens $EMAPPER_START_SENS \
+            --sens_steps $EMAPPER_SENS_STEPS \
+            --final_sens $EMAPPER_FINAL_SENS \
             --evalue $EMAPPER_EVALUE \
-            --output_dir $TEMP_DIR \
-            --output $CONSEQS_PREFIX
-        RC=$?
-        if [ $RC -ne 0 ]; then manage_error emapper.py $RC; fi
-    elif [ "$EMAPPER_SEARCH_OPTION" = "$MMSEQS" ]; then
-        emapper.py \
-           --cpu $THREADS \
-           -i $CONSEQS_PATH \
-           --itype $EMAPPER_ITYPE \
-           -m $MMSEQS \
-           --start_sens $EMAPPER_START_SENS \
-           --sens_steps $EMAPPER_SENS_STEPS \
-           --final_sens $EMAPPER_FINAL_SENS \
-           --evalue $EMAPPER_EVALUE \
             --output_dir $TEMP_DIR \
             --output $CONSEQS_PREFIX
         RC=$?
@@ -901,7 +1280,7 @@ function download_gene_ontology
         wget \
             --quiet \
             --output-document $GO_ONTOLOGY_FILE \
-            $GO_ONTOLOGY_FTP
+            $GO_ONTOLOGY_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
     echo 'File is downloaded.'
@@ -937,7 +1316,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_ARABIDOPSIS_THALIANA_FASTA_FILE \
+            --output-document $CANTATA_ARABIDOPSIS_THALIANA_FASTA_PATH \
             $CANTATA_ARABIDOPSIS_THALIANA_FASTA_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -948,7 +1327,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_ARABIDOPSIS_THALIANA_GTF_FILE \
+            --output-document $CANTATA_ARABIDOPSIS_THALIANA_GTF_PATH \
             $CANTATA_ARABIDOPSIS_THALIANA_GTF_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -959,7 +1338,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_QUERCUS_LOBATA_FASTA_FILE \
+            --output-document $CANTATA_QUERCUS_LOBATA_FASTA_PATH \
             $CANTATA_QUERCUS_LOBATA_FASTA_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -970,7 +1349,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_QUERCUS_LOBATA_GTF_FILE \
+            --output-document $CANTATA_QUERCUS_LOBATA_GTF_PATH \
             $CANTATA_QUERCUS_LOBATA_GTF_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -981,7 +1360,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_QUERCUS_SUBER_FASTA_FILE \
+            --output-document $CANTATA_QUERCUS_SUBER_FASTA_PATH \
             $CANTATA_QUERCUS_SUBER_FASTA_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -992,26 +1371,19 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_QUERCUS_SUBER_GTF_FILE \
+            --output-document $CANTATA_QUERCUS_SUBER_GTF_PATH \
             $CANTATA_QUERCUS_SUBER_GTF_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
     echo 'File is downloaded.'
 
-}
-
-#-------------------------------------------------------------------------------
-
-function concat_lncrna_sequences
-{
-
     echo "$SEP"
-    echo 'Concating the lncRNA FASTAS ...'
+    echo 'Concating the lncRNA FASTAs ...'
     /usr/bin/time \
         cat \
-            $CANTATA_ARABIDOPSIS_THALIANA_FASTA_FILE \
-            $CANTATA_QUERCUS_LOBATA_FASTA_FILE \
-            $CANTATA_QUERCUS_SUBER_FASTA_FILE \
+            $CANTATA_ARABIDOPSIS_THALIANA_FASTA_PATH \
+            $CANTATA_QUERCUS_LOBATA_FASTA_PATH \
+            $CANTATA_QUERCUS_SUBER_FASTA_PATH \
             > $LNCRNAS_PATH
     RC=$?
     if [ $RC -ne 0 ]; then manage_error cat $RC; fi
@@ -1054,6 +1426,7 @@ function calculate_quercustoa_db_stats
         calculate-quercustoadb-stats.py \
             --db=$DB_PATH \
             --stats=$STATS_PATH \
+            --noannot=$NOANNOT_PATH \
             --verbose=N \
             --trace=N
     RC=$?
@@ -1132,8 +1505,9 @@ function manage_error
 init
 create_directories
 create_database
-download_ncbi_taxonomy_data
-download_ncbi_protein_sequences
+download_reference_genome
+download_protein_sequences
+download_taxonomy_data
 cluster_sequences
 split_clusters
 load_cluster_sequence_relationships
@@ -1156,7 +1530,6 @@ load_tair10_orthologs
 download_gene_ontology
 load_gene_ontology
 download_lncrna_sequences
-concat_lncrna_sequences
 build_lncrna_blast_db
 calculate_quercustoa_db_stats
 compress_quercustoa_db

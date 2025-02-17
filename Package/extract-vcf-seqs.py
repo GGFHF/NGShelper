@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--vcf', dest='vcf_file', help='Path of input VCF file (mandatory).')
     parser.add_argument('--id', dest='id_file', help='Path of the sequence identification file in plane text (mandatory)')
     parser.add_argument('--extract', dest='extract_file', help='Path of extracted VCF file (mandatory)')
@@ -131,7 +131,7 @@ def extract_sequences(vcf_file, id_file, extract_file):
     '''
 
     # get the identification data
-    (seq_id_list, seq_id_dict) = xlib.get_id_data(id_file)
+    (seq_id_list, _) = xlib.get_id_data(id_file)
 
     # open the VCF file
     if vcf_file.endswith('.gz'):

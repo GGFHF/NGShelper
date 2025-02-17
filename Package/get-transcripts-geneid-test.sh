@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------------
 
-# This script performs a test of the program  a impute-md-naive.py 
+# This script performs a test of the program get-transcripts-geneid.py
 # in a Linux environment.
 #
 # This software has been developed by:
@@ -40,14 +40,13 @@ cd $NGSHELPER_DIR
 
 #-------------------------------------------------------------------------------
 
-# Run the program impute-md-naive.py
+# Run the program get-transcripts-geneid.py
 
 /usr/bin/time \
-    $PYTHON $PYTHON_OPTIONS impute-md-naive.py \
-        --threads=4 \
-        --input_vcf=$DATA_DIR/variants-nonko.vcf \
-        --output_vcf=$OUTPUT_DIR/variants-nonko-imputed.vcf \
-        --impdata=$OUTPUT_DIR/imputation_data.csv \
+    $PYTHON $PYTHON_OPTIONS get-transcripts-geneid.py \
+        --gff=$DATA_DIR/target.gff3 \
+        --format=GFF3 \
+        --out=$OUTPUT_DIR/transcripts-geneid.csv \
         --verbose=Y \
         --trace=N \
         --tvi=NONE

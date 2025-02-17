@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--vcf', dest='input_vcf_file', help='Path of input VCF file (mandatory).')
     parser.add_argument('--samples', dest='sample_file', help='Path of the sample file in the following record format: "sample_id;species_id;mother_id" (mandatory).')
     parser.add_argument('--sp1_id', dest='sp1_id', help='Identification of the first species (mandatory)')
@@ -119,7 +119,7 @@ def check_args(args):
     if args.variant_list is None or args.variant_list == 'NONE':
         args.variant_list = []
     else:
-        args.variant_list = xlib.split_literal_to_string_list(args.variant_list)
+        args.variant_list = xlib.split_literal_to_text_list(args.variant_list)
 
     # check "output_dir"
     if args.output_dir is None:
@@ -242,7 +242,7 @@ def print_variants(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, output_dir,
                     if len(mother_id) > mother_id_max_len: mother_id_max_len = len(mother_id)
 
                 # check if the sample species list is empty
-                if species_id_list == []:
+                if not species_id_list:
                     raise xlib.ProgramException('', 'L003')
 
                 # set the sample number
@@ -311,9 +311,9 @@ def print_variants(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, output_dir,
 
                     # set the output_file for saving the current variant data
                     if vcf_file.endswith('.gz'):
-                        file_name, file_extension = os.path.splitext(os.path.basename(vcf_file[:-3]))
+                        file_name, _ = os.path.splitext(os.path.basename(vcf_file[:-3]))
                     else:
-                        file_name, file_extension = os.path.splitext(os.path.basename(vcf_file))
+                        file_name, _ = os.path.splitext(os.path.basename(vcf_file))
                     output_file = f'{output_dir}/{file_name}-{variant_id}.txt'
 
                     # open the output file

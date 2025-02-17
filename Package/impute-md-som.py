@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -31,7 +31,6 @@ import sys
 import threading
 
 from threading import Semaphore
-semaphore = Semaphore(1)
 
 import minisom
 
@@ -57,7 +56,7 @@ def main():
     conn = xsqlite.connect_database(args.sqlite_database, check_same_thread=False)
 
     # impute genotypes with missing data in a VCF file using Self-Organizing Maps
-    impute_md_som(conn, args.threads_num, args.input_vcf_file, args.output_vcf_file, args.minimum_r2, args.r_estimator, args.snps_num, args.xdim, args.ydim, args.sigma, args.learning_rate, args.num_iteration, args.genotype_imputation_method, args.tvi_list)
+    impute_md_som(conn, args.threads_num, args.input_vcf_file, args.output_vcf_file, args.imputation_data_file, args.minimum_r2, args.r_estimator, args.snps_num, args.xdim, args.ydim, args.sigma, args.learning_rate, args.num_iteration, args.genotype_imputation_method, args.tvi_list)
 
 #-------------------------------------------------------------------------------
 
@@ -71,11 +70,12 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'    #pylint: disable=protected-access
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--threads', dest='threads_num', help='Number of threads (mandatory).')
     parser.add_argument('--db', dest='sqlite_database', help='Path of the SQLite database (mandatory).')
-    parser.add_argument('--vcf', dest='input_vcf_file', help='Path of the input VCF file (mandatory).')
-    parser.add_argument('--out', dest='output_vcf_file', help='Path of the output VCF file with missing data imputed (mandatory).')
+    parser.add_argument('--input_vcf', dest='input_vcf_file', help='Path of the input VCF file (mandatory).')
+    parser.add_argument('--output_vcf', dest='output_vcf_file', help='Path of the output VCF file with missing data imputed (mandatory).')
+    parser.add_argument('--impdata', dest='imputation_data_file', help='Path of the output file with imputation data (mandatory).')
     parser.add_argument('--xdim', dest='xdim', help='X dimension of the SOM (mandatory).')
     parser.add_argument('--ydim', dest='ydim', help='Y dimension of the SOM (mandatory).')
     parser.add_argument('--sigma', dest='sigma', help='Spread of the neighborhood function (mandatory).')
@@ -128,6 +128,11 @@ def check_args(args):
     # check "output_vcf_file"
     if args.output_vcf_file is None:
         xlib.Message.print('error', '*** The output VCF file with missing data imputed is not indicated in the input arguments.')
+        OK = False
+
+    # check "imputation_data_file"
+    if args.imputation_data_file is None:
+        xlib.Message.print('error', '*** The output file with imputation data is not indicated in the input arguments.')
         OK = False
 
     # check "xdim"
@@ -238,7 +243,7 @@ def check_args(args):
     if args.tvi_list is None or args.tvi_list == 'NONE':
         args.tvi_list = []
     else:
-        args.tvi_list = xlib.split_literal_to_string_list(args.tvi_list)
+        args.tvi_list = xlib.split_literal_to_text_list(args.tvi_list)
 
     # if there are errors, exit with exception
     if not OK:
@@ -246,15 +251,15 @@ def check_args(args):
 
 #-------------------------------------------------------------------------------
 
-def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2, r_estimator, snps_num, xdim, ydim, sigma, learning_rate, num_iteration, genotype_imputation_method, tvi_list):
+def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, imputation_data_file, minimum_r2, r_estimator, snps_num, xdim, ydim, sigma, learning_rate, num_iteration, genotype_imputation_method, tvi_list):
     '''
     Impute genotypes with missing data in a VCF file using Self-Organizing Maps.
     '''
 
     xlib.Message.print('verbose', 'Processing the imputation in the VCF file ...\n')
-    xlib.Message.print('verbose', f'input_vcf_file: {input_vcf_file}\n')
-    xlib.Message.print('verbose', f'minimum_r2: {minimum_r2} - snps_num: {snps_num}\n')
-    xlib.Message.print('verbose', f'xdim: {xdim} - ydim: {ydim} - sigma: {sigma} - learning_rate: {learning_rate} - num_iteration: {num_iteration}\n')
+    xlib.Message.print('verbose', f'input_vcf_file: {input_vcf_file}')
+    xlib.Message.print('verbose', f'minimum_r2: {minimum_r2} - snps_num: {snps_num}')
+    xlib.Message.print('verbose', f'xdim: {xdim} - ydim: {ydim} - sigma: {sigma} - learning_rate: {learning_rate} - num_iteration: {num_iteration}')
 
     # get the number of CPUs in the system
     cpus_num = os.cpu_count()
@@ -270,8 +275,10 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
             max_threads_num = cpus_num
         xlib.Message.print('verbose', f'CPUs in the system: {cpus_num}.  The process will use {max_threads_num} threads.\n')
 
+    # create the semaphore to control databases accesses
+    semaphore = Semaphore(1)
+
     # initialize the sample lists, sample number and label dict
-    # -- sample_name_list = []
     sample_id_list = []
     sample_label_list = []
     sample_number = 0
@@ -280,7 +287,7 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
     # get the kinship dictionary
     kinship_dict = xsqlite.get_vcf_kinship_dict(conn)
 
-    # get the list of snp identification with  missing data from table "vcf_linkage_disequilibrium_snp_id_1_list"
+    # get the list of snp identification with  missing data
     snp_id_1_list = sorted(xsqlite.get_vcf_linkage_disequilibrium_snp_id_1_list(conn))
 
     # open the input VCF file
@@ -295,7 +302,7 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
         except Exception as e:
             raise xlib.ProgramException(e, 'F001', input_vcf_file)
 
-    # open the imputed VCF file
+    # open the output VCF file with missing data imputed
     if output_vcf_file.endswith('.gz'):
         try:
             output_vcf_file_id = gzip.open(output_vcf_file, mode='wt', encoding='iso-8859-1', newline='\n')
@@ -306,6 +313,18 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
             output_vcf_file_id = open(output_vcf_file, mode='w', encoding='iso-8859-1', newline='\n')
         except Exception as e:
             raise xlib.ProgramException(e, 'F003', output_vcf_file)
+
+    # open the output file with imputation data
+    if imputation_data_file.endswith('.gz'):
+        try:
+            imputation_data_file_id = gzip.open(imputation_data_file, mode='wt', encoding='iso-8859-1', newline='\n')
+        except Exception as e:
+            raise xlib.ProgramException(e, 'F004', imputation_data_file)
+    else:
+        try:
+            imputation_data_file_id = open(imputation_data_file, mode='w', encoding='iso-8859-1', newline='\n')
+        except Exception as e:
+            raise xlib.ProgramException(e, 'F003', imputation_data_file)
 
     # initialize counters
     input_record_counter = 0
@@ -321,7 +340,7 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
         # process metadata records
         while record != '' and record.startswith('##'):
 
-            # add 1 to the read sequence counter
+            # add 1 to the input record counter
             input_record_counter += 1
 
             # write the metadata record
@@ -336,7 +355,7 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
         # process the column description record
         if record.startswith('#CHROM'):
 
-            # add 1 to the read sequence counter
+            # add 1 to the input record counter
             input_record_counter += 1
 
             # get the record data list
@@ -344,7 +363,6 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
 
             # build sample lists and sample dictionary
             for i in range(9, len(record_data_list)):
-                # -- sample_name_list.append(os.path.basename(record_data_list[i]))
                 sample_id_list.append(i - 9)
                 sample_label_list.append(f'{i - 9:04d}')
                 label_dict[f'{i - 9:04d}'] = i - 9
@@ -374,7 +392,7 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
             # create a group of max_threads_num variant records
             while record != '' and not record.startswith('##') and not record.startswith('#CHROM') and w_threads_num < max_threads_num:
 
-                # add 1 to the read sequence counter
+                # add 1 to the input record counter
                 input_record_counter += 1
 
                 # add 1 to the total variant counter
@@ -394,7 +412,7 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
             result_list = []
             for thread_id in range(w_threads_num):
                 result_list.append({})
-                threads_list.append(threading.Thread(target=process_variant, args=[thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, ydim, sigma, learning_rate, num_iteration, genotype_imputation_method, tvi_list, kinship_dict, snp_id_1_list, sample_label_list, label_dict, sample_number, data_dict_list[thread_id], result_list]))
+                threads_list.append(threading.Thread(target=process_variant, args=[thread_id, conn, semaphore, minimum_r2, r_estimator, snps_num, xdim, ydim, sigma, learning_rate, num_iteration, genotype_imputation_method, tvi_list, kinship_dict, snp_id_1_list, sample_label_list, label_dict, sample_number, data_dict_list[thread_id], result_list]))
                 threads_list[thread_id].start()
 
             # wait until all threads terminate
@@ -404,13 +422,16 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
             # process results of threads
             for thread_id in range(w_threads_num):
 
-                # -- print(f'\nthread_id: {thread_id} - result_list[{thread_id}]: {result_list[thread_id]}')
-
                 # write the variant record
                 output_vcf_file_id.write(result_list[thread_id]['output_vcf_record'])
 
-                # add 1 to imputed variant counter if the variant is imputed
+                # if the variant is imputed
                 if result_list[thread_id]['is_variant_imputed']:
+
+                    # write the record in the output file with imputation data
+                    imputation_data_file_id.write(result_list[thread_id]['imputation_data_record'])
+
+                    # add 1 to imputed variant counter if the variant is imputed
                     imputed_variant_counter += 1
 
                 # print the counters
@@ -418,13 +439,18 @@ def impute_md_som(conn, threads_num, input_vcf_file, output_vcf_file, minimum_r2
 
     xlib.Message.print('verbose', '\n')
 
+    xlib.Message.print('info', f'Processed records: {input_record_counter:8d}')
+    xlib.Message.print('info', f'Total variants   : {total_variant_counter:8d}')
+    xlib.Message.print('info', f'Imputed variants : {imputed_variant_counter:8d}')
+
     # close files
     input_vcf_file_id.close()
     output_vcf_file_id.close()
+    imputation_data_file_id.close()
 
 #-------------------------------------------------------------------------------
 
-def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, ydim, sigma, learning_rate, num_iteration, genotype_imputation_method, tvi_list, kinship_dict, snp_id_1_list, sample_label_list, label_dict, sample_number, data_dict, result_list):
+def process_variant(thread_id, conn, semaphore, minimum_r2, r_estimator, snps_num, xdim, ydim, sigma, learning_rate, num_iteration, genotype_imputation_method, tvi_list, kinship_dict, snp_id_1_list, sample_label_list, label_dict, sample_number, data_dict, result_list):
     '''
     Process a variant and impute its genotypes with missing data using a Self-Organizing Map if necessary.
     '''
@@ -444,8 +470,7 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
         'CG': 'S',
         'CT': 'Y',
         'GT': 'K',
-        'NN': 'N'
-        }
+        'NN': 'N'}
     symbol2alleles_dict = {
         'A': 'AA',
         'C': 'CC',
@@ -457,14 +482,15 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
         'S': 'CG',
         'Y': 'CT',
         'K': 'GT',
-        'N': 'NN'
-        }
+        'N': 'NN'}
 
     # set the symbol list
     symbol_list = sorted(symbol2alleles_dict.keys())
 
-    # add set the variant identification
-    variant_id = f'{data_dict["chrom"]}-{data_dict["pos"]}'
+    # get the sequence identification, position and variant identification
+    seq_id = data_dict['chrom']
+    pos = data_dict['pos']
+    variant_id = f'{seq_id}-{pos}'
 
     # get the reference allele and alternative alleles (field ALT)
     reference_allele = data_dict['ref']
@@ -482,7 +508,7 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
     try:
         gt_position = format_subfield_list.index('GT')
     except Exception as e:
-        raise xlib.ProgramException(e, 'L007', 'GT', data_dict['chrom'], data_dict['pos'])
+        raise xlib.ProgramException(e, 'L002', 'GT', data_dict['chrom'], data_dict['pos'])
 
     # build the list of sample genotypes of a variant
     sample_data_list = []
@@ -502,7 +528,7 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
             sep = '|'
             sep_pos = sample_gt_list[i].find(sep)
         if sep_pos == -1:
-            raise xlib.ProgramException('', 'L008', 'GT', data_dict['chrom'], data_dict['pos'])
+            raise xlib.ProgramException('', 'L003', 'GT', data_dict['chrom'], data_dict['pos'])
         sample_sep_list.append(sep)
         sample_gt_left_list.append(sample_gt_list[i][:sep_pos])
         sample_gt_right_list.append(sample_gt_list[i][sep_pos+1:])
@@ -512,7 +538,7 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
 
         if variant_id in tvi_list: xlib.Message.print('trace', f'thread_id: {thread_id} - variant_id: {variant_id} - There is missing data')
 
-        # get the linkage disequilibrium dictionary
+        # get the linkage disequilibrium list
         semaphore.acquire()
         ld_list = xsqlite.get_vcf_linkage_disequilibrium_list(conn, variant_id)
         semaphore.release()
@@ -554,6 +580,7 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
             pseudobinary_sample_gt_list_2 = xlib.split_literal_to_integer_list(snp_data_dict_2['sample_gt_list'])
 
             for i in range(sample_number):
+                allele_list = []
                 # 0b00 -> 0
                 if pseudobinary_sample_gt_list_2[i] == 0:
                     allele_list = [ref_2, ref_2]
@@ -610,6 +637,8 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
             # 0b11 -> 3
             elif pseudobinary_sample_gt_list_1[i] == 3:
                 counter_1_1 += 1
+        sample_gt_left_mf = -1
+        sample_gt_right_mf = -1
         if counter_0_0 > 0 or counter_0_1 > 0 or counter_1_1 > 0:
             if counter_0_0  == max(counter_0_0, counter_0_1, counter_1_1):
                 sample_gt_left_mf = 0
@@ -644,22 +673,25 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
             # build the training data corresponding to samples without missing data from the input data
             training_data_list = input_data_list.copy()
             training_label_list = sample_label_list.copy()
-            for i in sorted(sample_withmd_list, reverse=True):
-                training_data_list.pop(i)
-                training_label_list.pop(i)
+            for sample_withmd in sorted(sample_withmd_list, reverse=True):
+                training_data_list.pop(sample_withmd)
+                training_label_list.pop(sample_withmd)
 
             # build the test data corresponding to samples with missing data from the input data
             test_data_list = []
             test_label_list = []
-            for i in sample_withmd_list:
-                test_data_list.append(input_data_list[i])
-                test_label_list.append(sample_label_list[i])
+            for sample_withmd in sample_withmd_list:
+                test_data_list.append(input_data_list[sample_withmd])
+                test_label_list.append(sample_label_list[sample_withmd])
 
-            # create a new SOM 5x5 instance and train the SOM algorith
+            # create a new SOM x * y instance and train the SOM algorith
             som_shape_tup = (xdim, ydim)
             som = minisom.MiniSom(x=som_shape_tup[0], y=som_shape_tup[1], input_len=len(input_data_list[0]),
                                 sigma=sigma, learning_rate=learning_rate, decay_function=minisom.asymptotic_decay,
                                 neighborhood_function='gaussian', topology='rectangular', activation_distance='euclidean', random_seed=None)
+            # -- som = minisom.MiniSom(x=som_shape_tup[0], y=som_shape_tup[1], input_len=len(input_data_list[0]),
+            # --                     sigma=sigma, learning_rate=learning_rate, decay_function='asymptotic_decay',
+            # --                     neighborhood_function='gaussian', topology='rectangular', activation_distance='euclidean', random_seed=None)
 
             # initialize the weights to span the first two principal components
             som.pca_weights_init(data=training_data_list)
@@ -691,15 +723,15 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
                         mark = '<---'
                     else:
                         mark = ''
-                    if variant_id in tvi_list: xlib.Message.print('trace', f'thread_id: {thread_id} - variant_id: {variant_id} -         label_id: {label_id} - seq: {seq} {mark}')
+                    if variant_id in tvi_list: xlib.Message.print('trace', f'thread_id: {thread_id} - variant_id: {variant_id} - label_id: {label_id} - seq: {seq} {mark}')
 
             # get the coordinates of the winning neuron for the sample with missing data
             winning_neuron_coordinates_list = []
-            for i in sample_withmd_list:
-                winning_neuron_coordinates_tup = som.winner(input_data_list[i])
+            for sample_withmd in sample_withmd_list:
+                winning_neuron_coordinates_tup = som.winner(input_data_list[sample_withmd])
                 winning_neuron_coordinates_list.append(winning_neuron_coordinates_tup)
-                seq = symbolic_genotype_list[i]
-                if variant_id in tvi_list: xlib.Message.print('trace', f'thread_id: {thread_id} - variant_id: {variant_id} - label_id: {sample_label_list[i]} - seq: {seq} - winning_neuron_coordinates_tup:{winning_neuron_coordinates_tup}')
+                seq = symbolic_genotype_list[sample_withmd]
+                if variant_id in tvi_list: xlib.Message.print('trace', f'thread_id: {thread_id} - variant_id: {variant_id} - label_id: {sample_label_list[sample_withmd]} - seq: {seq} - winning_neuron_coordinates_tup:{winning_neuron_coordinates_tup}')
 
             # update the genotypes with missing data in the data of sequence records
             for i in range(len(sample_withmd_list)):    # pylint: disable=consider-using-enumerate
@@ -729,14 +761,14 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
                         if variant_id in tvi_list: xlib.Message.print('trace', f'thread_id: {thread_id} - variant_id: {variant_id} - sample_withmd_list[{i}]: {sample_withmd_list[i]} - counter_0_0: {counter_0_0} - counter_0_1: {counter_0_1} - counter_1_1: {counter_1_1}')
                         if counter_0_0 > 0 or counter_0_1 > 0 or counter_1_1 > 0:
                             if counter_0_0  == max(counter_0_0, counter_0_1, counter_1_1):
-                                sample_gt_left_list[sample_withmd_list[i]] = 0
-                                sample_gt_right_list[sample_withmd_list[i]] = 0
+                                sample_gt_left_list[sample_withmd_list[i]] = '0'
+                                sample_gt_right_list[sample_withmd_list[i]] = '0'
                             elif counter_0_1  == max(counter_0_0, counter_0_1, counter_1_1):
-                                sample_gt_left_list[sample_withmd_list[i]] = 0
-                                sample_gt_right_list[sample_withmd_list[i]] = 1
+                                sample_gt_left_list[sample_withmd_list[i]] = '0'
+                                sample_gt_right_list[sample_withmd_list[i]] = '1'
                             elif counter_1_1  == max(counter_0_0, counter_0_1, counter_1_1):
-                                sample_gt_left_list[sample_withmd_list[i]] = 1
-                                sample_gt_right_list[sample_withmd_list[i]] = 1
+                                sample_gt_left_list[sample_withmd_list[i]] = '1'
+                                sample_gt_right_list[sample_withmd_list[i]] = '1'
                     # method CK: the genotype of the closest kinship individual
                     elif genotype_imputation_method == 'CK':
                         related_sample_id_list = [int(x) for x in related_label_list]
@@ -746,7 +778,7 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
                         if variant_id in tvi_list: xlib.Message.print('trace', f'thread_id: {thread_id} - variant_id: {variant_id} - sample_withmd_list[{i}]: {sample_withmd_list[i]} - most_related_sample_id: {most_related_sample_id}')
                 if variant_id in tvi_list: xlib.Message.print('trace', f'thread_id: {thread_id} - variant_id: {variant_id} -     sample_gt_left_list[{sample_withmd_list[i]}]: {sample_gt_left_list[sample_withmd_list[i]]} - sample_gt_right_list[{sample_withmd_list[i]}]: {sample_gt_right_list[sample_withmd_list[i]]}')
 
-            # add 1 to the imputed variant counter
+            # set the impute variant indicator
             is_variant_imputed = True
 
         # build the genotype text after imputation
@@ -775,8 +807,23 @@ def process_variant(thread_id, conn, minimum_r2, r_estimator, snps_num, xdim, yd
     sample_list_text = '\t'.join(sample_list)
     output_vcf_record = f'{data_dict["chrom"]}\t{data_dict["pos"]}\t{data_dict["id"]}\t{data_dict["ref"]}\t{data_dict["alt"]}\t{data_dict["qual"]}\t{data_dict["filter"]}\t{data_dict["info"]}\t{data_dict["format"]}\t{sample_list_text}\n'
 
+    # save imputation data
+    # record format: seq_id;pos;reference_allele;alternative_alleles;sample_withmd_list_text;symbolic_sample_gt_list_text
+    if is_variant_imputed:
+        sample_withmd_list_text = '_'.join([str(x) for x in sample_withmd_list])
+        symbolic_sample_gt_list = []
+        for i in range(sample_number):
+            symbolic_sample_gt_left = reference_allele if sample_gt_left_list[i] == '0' else alternative_allele_list[0]
+            symbolic_sample_gt_right = reference_allele if sample_gt_right_list[i] == '0' else alternative_allele_list[0]
+            symbolic_sample_gt = ''.join(sorted([symbolic_sample_gt_left, symbolic_sample_gt_right]))
+            symbolic_sample_gt_list.append(alleles2symbol_dict[symbolic_sample_gt])
+        symbolic_sample_gt_list_text = ''.join(symbolic_sample_gt_list)
+        imputation_data_record = f'{seq_id};{pos};{reference_allele};{alternative_alleles};{sample_withmd_list_text};{symbolic_sample_gt_list_text}\n'
+    else:
+        imputation_data_record = ''
+
     # update the result list
-    result_list[thread_id] = {'output_vcf_record': output_vcf_record, 'is_variant_imputed': is_variant_imputed}
+    result_list[thread_id] = {'output_vcf_record': output_vcf_record, 'imputation_data_record': imputation_data_record, 'is_variant_imputed': is_variant_imputed}
 
 #-------------------------------------------------------------------------------
 
@@ -844,7 +891,7 @@ def get_snp_dict_dict(snps_file):
             # load SNP data into the dictionary
             snp_dict[variant_id] = {'ref': reference_allele, 'alt': alternative_allele, 'gt': binary_sample_gt_list, 'md': sample_withmd_list}
 
-            # print counters
+            # print counter
             xlib.Message.print('verbose', f'\rLD file: {record_counter} processed records')
 
         # read the next record
@@ -852,7 +899,7 @@ def get_snp_dict_dict(snps_file):
 
     xlib.Message.print('verbose', '\n')
 
-    # close alignments file
+    # close the SNPs file
     snps_file_id.close()
 
     # return the SNP dictionary
@@ -900,6 +947,7 @@ def get_most_related_sample_id(kinship_dict, r_estimator, sample_wmd_id, related
 
     # get the sample identication with the highest kinship value
     for related_sample_id in related_sample_id_list:
+        r = -999
         if sample_wmd_id < related_sample_id:
             if r_estimator == 'rbeta':
                 r = kinship_dict[sample_wmd_id][related_sample_id]['rbeta']

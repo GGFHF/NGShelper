@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--threads', dest='threads_num', help='Number of threads (mandatory).')
     parser.add_argument('--action', dest='filtering_action', help=f'Filtering acction: {xlib.get_vcf_filtering_action_code_list_text()}; default: {xlib.Const.DEFAULT_VCF_FILTERING_ACTION}.')
     parser.add_argument('--vcf', dest='input_vcf_file', help='Path of the input VCF file (mandatory).')
@@ -137,7 +137,7 @@ def check_args(args):
     if args.tvi_list is None or args.tvi_list == 'NONE':
         args.tvi_list = []
     else:
-        args.tvi_list = xlib.split_literal_to_string_list(args.tvi_list)
+        args.tvi_list = xlib.split_literal_to_text_list(args.tvi_list)
 
     # if there are errors, exit with exception
     if not OK:
@@ -303,7 +303,7 @@ def filter_vcf(threads_num, filtering_action, input_vcf_file, output_vcf_file, t
                         output_vcf_file_id.write(result_list[thread_id]['output_vcf_record'])
                     else:
                         filtered_variant_counter += 1
-                except:
+                except Exception:
                     print(f'result_list: {result_list}')
                     sys.exit(1)
 

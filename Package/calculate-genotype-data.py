@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    #pylint: disable=protected-access
     parser.add_argument('--threads', dest='threads_num', help='Number of threads (mandatory).')
     parser.add_argument('--db', dest='sqlite_database', help='Path of the SQLite database (mandatory).')
     parser.add_argument('--vcf', dest='vcf_file', help='Path of the input VCF file (mandatory).')
@@ -141,7 +141,7 @@ def check_args(args):
     if args.tvi_list is None or args.tvi_list == 'NONE':
         args.tvi_list = []
     else:
-        args.tvi_list = xlib.split_literal_to_string_list(args.tvi_list)
+        args.tvi_list = xlib.split_literal_to_text_list(args.tvi_list)
 
     # if there are errors, exit with exception
     if not OK:
@@ -268,7 +268,7 @@ def calculate_genotype_data(conn, threads_num, vcf_file, tvi_list):
             sample_number = len(sample_list)
             xlib.Message.print('trace', f'sample_number: {sample_number}')
 
-            # set 0 the counter values in the kinship dictionary
+            # set 0 in the values of the kinship dictionary
             for i in range(sample_number):
                 for j in range(i + 1, sample_number):
                     kinship_dict[i][j]['rbeta_summation'] = 0
@@ -440,8 +440,15 @@ def calculate_genotype_data(conn, threads_num, vcf_file, tvi_list):
     for i in range(sample_number):
         for j in range(i + 1, sample_number):
             rbeta = (kinship_dict[i][j]['rbeta_summation'] - ms) / (1 - ms)
-            rw = kinship_dict[i][j]['rw_numerator_summation'] / kinship_dict[i][j]['rw_denominator_summation']
-            ru = kinship_dict[i][j]['ru_summation'] / kinship_dict[i][j]['ru_l']
+            try:
+                rw = kinship_dict[i][j]['rw_numerator_summation'] / kinship_dict[i][j]['rw_denominator_summation']
+                ru = kinship_dict[i][j]['ru_summation'] / kinship_dict[i][j]['ru_l']
+            except ZeroDivisionError as e:
+                xlib.Message.print('trace', '*** WARNING: ZeroDivisionError calculating kinship data')
+                xlib.Message.print('trace', f'between samples {sample_list[i]} & {sample_list[j]}')
+                xlib.Message.print('trace', 'due to all variants have missing data in at least one of the two samples.')
+                rw = -999
+                ru = -999
             kinship_row_dict = {}
             kinship_row_dict['individual_i'] = i
             kinship_row_dict['individual_j'] = j
@@ -471,7 +478,7 @@ def calculate_genotype_data(conn, threads_num, vcf_file, tvi_list):
     snps_counter = 0
     snps_total = len(snp_id_list_1)
 
-    # create ...
+    # create the semaphore to control database accesses
     semaphore = Semaphore(1)
 
     # calculate the linkage disequilibrium between each pair of SNPs
@@ -497,7 +504,7 @@ def calculate_genotype_data(conn, threads_num, vcf_file, tvi_list):
         # create and start threads
         threads_list = []
         for thread_id in range(w_threads_num):
-            threads_list.append(threading.Thread(target=calculate_snp_linkage_disequilibrium, args=[semaphore, conn, sample_number, group_snp_id_list_1[thread_id], snp_id_list_2]))
+            threads_list.append(threading.Thread(target=calculate_snp_linkage_disequilibrium, args=[conn, semaphore, sample_number, group_snp_id_list_1[thread_id], snp_id_list_2]))
             threads_list[thread_id].start()
 
         # wait until all threads terminate
@@ -530,7 +537,7 @@ def calculate_genotype_data(conn, threads_num, vcf_file, tvi_list):
 
 #-------------------------------------------------------------------------------
 
-def calculate_snp_linkage_disequilibrium(semaphore, conn, sample_number, snp_id_1, snp_id_list_2):
+def calculate_snp_linkage_disequilibrium(conn, semaphore, sample_number, snp_id_1, snp_id_list_2):
     '''
     Calculate the linkage disequilibrium of a SNP.
     '''
@@ -555,10 +562,10 @@ def calculate_snp_linkage_disequilibrium(semaphore, conn, sample_number, snp_id_
         snp_data_dict_2 = xsqlite.get_snp_data_dict(conn, snp_id_2)
         semaphore.release()
 
-        # get the the list of sample genotypes using psuedo binary numbers
+        # get the the list of sample genotypes using pseudo binary numbers
         pseudobinary_sample_gt_list_2 = xlib.split_literal_to_integer_list(snp_data_dict_2['sample_gt_list'])
 
-        # calculate the observed genotype counts and allele frecuencies
+        # calculate the observed genotype counts and allele frequencies
         #
         #  ri: reference allele of SNPi; ai: alternative allele of SNPi; ni: count of observed genotype pair i
         #         r2-r2 r2-a2 a2-a2
@@ -567,7 +574,7 @@ def calculate_snp_linkage_disequilibrium(semaphore, conn, sample_number, snp_id_
         #  r1-a1 |  n4    n5    n6
         #  a1-a1 |  n7    n8    n9
         #
-        # rfi: reference allele frequency of SNP i; afi: alternative allele frecuency of SNP i
+        # rfi: reference allele frequency of SNP i; afi: alternative allele frequency of SNP i
         #
         # (samples with missing data '0b111' are not considered!!!)
         n = n1 = n2 = n3 = n4 = n5 = n6 = n7 = n8 = n9 = 0
@@ -624,10 +631,6 @@ def calculate_snp_linkage_disequilibrium(semaphore, conn, sample_number, snp_id_
                 n9 += 1
                 af1 += 2
                 af2 += 2
-        rf1 = rf1 / (n * 2)
-        af1 = af1 / (n * 2)
-        rf2 = rf2 / (n * 2)
-        af2 = af2 / (n * 2)
 
         # calculate the unbiased estimator for the covariance of alleles co-occurring on a haplotype
         # (Ragsdale, Gravel - 2020 - Unbiased Estimation of Linkage Disequilibrium from Unphased Data)
@@ -635,6 +638,10 @@ def calculate_snp_linkage_disequilibrium(semaphore, conn, sample_number, snp_id_
 
         # calculate the squared correlation
         try:
+            rf1 = rf1 / (n * 2)
+            af1 = af1 / (n * 2)
+            rf2 = rf2 / (n * 2)
+            af2 = af2 / (n * 2)
             r2 = (dhat ** 2) / (rf1 * af1 * rf2 * af2)
         except ZeroDivisionError:
             r2 = -999

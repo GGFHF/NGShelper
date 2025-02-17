@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -138,7 +138,7 @@ def calculate_gymnotoadb_stats(conn, stats_file):
         except Exception as e:
             raise xlib.ProgramException(e, 'F003', stats_file)
 
-    (seqnum_acrogymnospermae, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations) = xsqlite.get_quercustoa_db_stats(conn)
+    (seqnum_acrogymnospermae, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations) = xsqlite.get_gymnotoa_db_stats(conn)
 
     # write records
     stats_file_id.write( '[statistics]\n')

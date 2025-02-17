@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--vcf', dest='vcf_file', help='Path of the VCF file (mandatory).')
     parser.add_argument('--samples', dest='sample_file', help='Path of the sample file in the following record format: "sample_id;species_id;mother_id" (mandatory).')
     parser.add_argument('--sp1_id', dest='sp1_id', help='Identification of the first species (mandatory)')
@@ -171,7 +171,7 @@ def check_args(args):
     if args.tvi_list is None or args.tvi_list == 'NONE':
         args.tvi_list = []
     else:
-        args.tvi_list = xlib.split_literal_to_string_list(args.tvi_list)
+        args.tvi_list = xlib.split_literal_to_text_list(args.tvi_list)
 
     # if there are errors, exit with exception
     if not OK:
@@ -258,7 +258,7 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
                 sample_info_list.append([record_data_list[i], numeric_species_id])
 
             # check if the sample information list is empty
-            if sample_info_list == []:
+            if not sample_info_list:
                 raise xlib.ProgramException('', 'L003')
 
             # set the sample number
@@ -349,7 +349,7 @@ def convert_vcf_to_structure(vcf_file, sample_file, sp1_id, sp2_id, hybrid_id, i
                 if gt_left_matrix[i][j] == imputed_md_id or gt_right_matrix[i][j] == imputed_md_id:
                     excluded_variant_index_list.append(i)
                     break
-        xlib.Message.print('trace', 'excluded_variant_index_list: {}'.format(excluded_variant_index_list))
+        xlib.Message.print('trace', f'excluded_variant_index_list: {excluded_variant_index_list}')
 
         # remove data of variants with any imputed missing data
         excluded_variant_index_list.reverse()

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -118,7 +118,7 @@ def check_args(args):
         try:
             if not os.path.exists(os.path.dirname(args.output_file)):
                 os.makedirs(os.path.dirname(args.output_file))
-        except Exception as e:
+        except Exception:
             xlib.Message.print('error', f'*** The directory {os.path.dirname(args.output_file)} of the file {args.output_file} is not valid.')
             OK = False
 

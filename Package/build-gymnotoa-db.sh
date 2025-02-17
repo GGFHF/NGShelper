@@ -22,45 +22,46 @@
 
 # Software installation.
 
-# Miniconda3
+# Miniforge3
 # ==========
 
 #    $ cd /ngscloud2/apps
-#    $ wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-#    $ [rm -fr Miniconda3]
-#    $ chmod u+x Miniconda3-latest-Linux-x86_64.sh
-#    $ ./Miniconda3-latest-Linux-x86_64.sh -b -p Miniconda3
-#    $ rm Miniconda3-latest-Linux-x86_64.sh
+#    $ wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
+#    $ [rm -fr Miniforge3]
+#    $ chmod u+x Miniforge3-Linux-x86_64.sh
+#    $ ./Miniforge3-Linux-x86_64.sh -b -p Miniforge3
+#    $ rm Miniforge3-Linux-x86_64.sh
 
-#    $ Miniconda3/condabin/conda init bash   (reinicializar la consola)
+#    $ Miniforge3/condabin/conda init bash   (reinicializar la consola)
 
-#    $ conda config --add channels defaults
 #    $ conda config --add channels bioconda
 #    $ conda config --add channels conda-forge
 #    $ conda config --set channel_priority strict
 
-#    $ conda update --yes --name base --all
+#    $ export MAMBA_ROOT_PREFIX=/ngscloud2/apps/Miniforge3
 
-#    $ conda install --yes --name base mamba
+#    $ mamba update --yes --name base --all
 
-#    $ mamba install --yes --name base openjdk=11
-#    $ mamba install --yes --name base numpy
-#    $ mamba install --yes --name base scipy
-#    $ mamba install --yes --name base sympy
-#    $ mamba install --yes --name base pandas
-#    $ mamba install --yes --name base pandasql
-#    $ mamba install --yes --name base matplotlib
-#    $ mamba install --yes --name base seaborn
-#    $ mamba install --yes --name base plotnine
 #    $ mamba install --yes --name base biopython
-#    $ mamba install --yes --name base minisom
-#    $ mamba install --yes --name base scikit-learn
-#    $ mamba install --yes --name base requests
-#    $ mamba install --yes --name base paramiko
 #    $ mamba install --yes --name base boto3
 #    $ mamba install --yes --name base gffutils
-#    $ mamba install --yes --name base psutil
 #    $ mamba install --yes --name base joblib
+#    $ mamba install --yes --name base matplotlib
+#    $ mamba install --yes --name base minisom
+#    $ mamba install --yes --name base numpy
+#    $ mamba install --yes --name base openjdk
+#    $ mamba install --yes --name base pandas
+#    $ mamba install --yes --name base pandasql
+#    $ mamba install --yes --name base paramiko
+#    $ mamba install --yes --name base plotyy
+#    $ mamba install --yes --name base plotnine
+#    $ mamba install --yes --name base psutil
+#    $ mamba install --yes --name base requests
+#    $ mamba install --yes --name base scikit-learn
+#    $ mamba install --yes --name base scipy
+#    $ mamba install --yes --name base sqlite
+#    $ mamba install --yes --name base seaborn
+#    $ mamba install --yes --name base sympy
 
 # NGShelper
 # =========
@@ -93,8 +94,9 @@
 
 #    $ [conda env remove --yes --name eggnog-mapper]
 #    $ mamba create --yes --name eggnog-mapper eggnog-mapper
-#    $ mkdir /ngscloud2/apps/Miniconda3/envs/eggnog-mapper/lib/python3.12/site-packages/data/
+#    $ mkdir /ngscloud2/apps/Miniforge3/envs/eggnog-mapper/lib/python3.11/site-packages/data/ (depending on eggnog-mapper Python version)
 #    $ conda activate eggnog-mapper
+#    $ mamba install --yes setuptools
 #    $ download_eggnog_data.py -f -y -P -M
 #    $ conda deactivate
 
@@ -261,17 +263,17 @@ GO_ONTOLOGY_FILE=$TEMP_DIR/go.obo
 
 # CANTATA data
 CANTATA_ARABIDOPSIS_THALIANA_FASTA_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Arabidopsis_thaliana_lncRNAs.fasta
-CANTATA_ARABIDOPSIS_THALIANA_FASTA_FILE=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.fasta
+CANTATA_ARABIDOPSIS_THALIANA_FASTA_PATH=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.fasta
 CANTATA_ARABIDOPSIS_THALIANA_GTF_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Arabidopsis_thaliana_lncRNAs.gtf
-CANTATA_ARABIDOPSIS_THALIANA_GTF_FILE=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.gtf
+CANTATA_ARABIDOPSIS_THALIANA_GTF_PATH=$TEMP_DIR/Arabidopsis-thaliana-lncrnas.gtf
 CANTATA_POPULUS_TRICHOCARPA_FASTA_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Populus_trichocarpa_lncRNAs.fasta
-CANTATA_POPULUS_TRICHOCARPA_FASTA_FILE=$TEMP_DIR/Populus-trichocarpa-lncrnas.fasta
+CANTATA_POPULUS_TRICHOCARPA_FASTA_PATH=$TEMP_DIR/Populus-trichocarpa-lncrnas.fasta
 CANTATA_POPULUS_TRICHOCARPA_GTF_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Populus_trichocarpa_lncRNAs.gtf
-CANTATA_POPULUS_TRICHOCARPA_GTF_FILE=$TEMP_DIR/Populus-trichocarpa-lncrnas.gtf
+CANTATA_POPULUS_TRICHOCARPA_GTF_PATH=$TEMP_DIR/Populus-trichocarpa-lncrnas.gtf
 CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Selaginella_moellendorffii_lncRNAs.fasta
-CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_FILE=$TEMP_DIR/Selaginella-moellendorffii-lncrnas.fasta
+CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_PATH=$TEMP_DIR/Selaginella-moellendorffii-lncrnas.fasta
 CANTATA_SELAGINELLA_MOELLENDORFFII_GTF_URL=http://yeti.amu.edu.pl/CANTATA/DOWNLOADS/Selaginella_moellendorffii_lncRNAs.gtf
-CANTATA_SELAGINELLA_MOELLENDORFFII_GTF_FILE=$TEMP_DIR/Selaginella-moellendorffii-lncrnas.gtf
+CANTATA_SELAGINELLA_MOELLENDORFFII_GTF_PATH=$TEMP_DIR/Selaginella-moellendorffii-lncrnas.gtf
 LNCRNAS_PREFIX=lncRNA
 LNCRNAS_FILE=$LNCRNAS_PREFIX-seqs.fasta
 LNCRNAS_PATH=$TEMP_DIR/$LNCRNAS_FILE
@@ -302,7 +304,9 @@ EMAPPER_DMND_ITERATE=yes
 EMAPPER_START_SENS=3
 EMAPPER_SENS_STEPS=3
 EMAPPER_FINAL_SENS=7
-EMAPPER_EVALUE=0.001
+# -- EMAPPER_PIDENT=30.0
+EMAPPER_EVALUE=0.00001
+# -- EMAPPER_QUERY_COVER=30.0
 
 PATH=$NGSHELPER_DIR:$MMSEQS2_DIR:$INTERPROSCAN_DIR:$PATH
 
@@ -406,6 +410,8 @@ function download_ncbi_protein_sequences
 function cluster_sequences
 {
 
+    source activate mmseqs2
+
     echo "$SEP"
     echo 'Clustering sequences ...'
     /usr/bin/time \
@@ -423,6 +429,8 @@ function cluster_sequences
     RC=$?
     if [ $RC -ne 0 ]; then manage_error mmseqs $RC; fi
     echo 'Sequences are clustered.'
+
+    conda deactivate
 
 }
 
@@ -741,29 +749,56 @@ function run_eggnog_mapper_analysis
     echo 'Running eggNOG-mapper analysis ...'
     if [ "$EMAPPER_SEARCH_OPTION" = "$DIAMOND" ]; then
         /usr/bin/time \
+            # -- emapper.py \
+            # --     --cpu $THREADS \
+            # --     -i $CONSEQS_PATH \
+            # --     --itype $EMAPPER_ITYPE \
+            # --     -m $DIAMOND \
+            # --     --dmnd_algo $EMAPPER_DMND_ALGO \
+            # --     --sensmode $EMAPPER_SENSMODE \
+            # --     --dmnd_iterate $EMAPPER_DMND_ITERATE \
+            # --     --pident $EMAPPER_PIDENT \
+            # --     --evalue $EMAPPER_EVALUE \
+            # --     --query_cover $EMAPPER_QUERY_COVER \
+            # --     --output_dir $TEMP_DIR \
+            # --     --output $CONSEQS_PREFIX
             emapper.py \
-            --cpu $THREADS \
-            -i $CONSEQS_PATH \
-            --itype $EMAPPER_ITYPE \
-            -m $DIAMOND \
-            --dmnd_algo $EMAPPER_DMND_ALGO \
-            --sensmode $EMAPPER_SENSMODE \
-            --dmnd_iterate $EMAPPER_DMND_ITERATE \
-            --evalue $EMAPPER_EVALUE \
-            --output_dir $TEMP_DIR \
-            --output $CONSEQS_PREFIX
+                --cpu $THREADS \
+                -i $CONSEQS_PATH \
+                --itype $EMAPPER_ITYPE \
+                -m $DIAMOND \
+                --dmnd_algo $EMAPPER_DMND_ALGO \
+                --sensmode $EMAPPER_SENSMODE \
+                --dmnd_iterate $EMAPPER_DMND_ITERATE \
+                --evalue $EMAPPER_EVALUE \
+                --output_dir $TEMP_DIR \
+                --output $CONSEQS_PREFIX
         RC=$?
         if [ $RC -ne 0 ]; then manage_error emapper.py $RC; fi
     elif [ "$EMAPPER_SEARCH_OPTION" = "$MMSEQS" ]; then
+        /usr/bin/time \
+        # -- emapper.py \
+        # --     --cpu $THREADS \
+        # --     -i $CONSEQS_PATH \
+        # --     --itype $EMAPPER_ITYPE \
+        # --     -m $MMSEQS \
+        # --     --start_sens $EMAPPER_START_SENS \
+        # --     --sens_steps $EMAPPER_SENS_STEPS \
+        # --     --final_sens $EMAPPER_FINAL_SENS \
+        # --     --pident $EMAPPER_PIDENT \
+        # --     --evalue $EMAPPER_EVALUE \
+        # --     --query_cover $EMAPPER_QUERY_COVER \
+        # --     --output_dir $TEMP_DIR \
+        # --     --output $CONSEQS_PREFIX
         emapper.py \
-           --cpu $THREADS \
-           -i $CONSEQS_PATH \
-           --itype $EMAPPER_ITYPE \
-           -m $MMSEQS \
-           --start_sens $EMAPPER_START_SENS \
-           --sens_steps $EMAPPER_SENS_STEPS \
-           --final_sens $EMAPPER_FINAL_SENS \
-           --evalue $EMAPPER_EVALUE \
+            --cpu $THREADS \
+            -i $CONSEQS_PATH \
+            --itype $EMAPPER_ITYPE \
+            -m $MMSEQS \
+            --start_sens $EMAPPER_START_SENS \
+            --sens_steps $EMAPPER_SENS_STEPS \
+            --final_sens $EMAPPER_FINAL_SENS \
+            --evalue $EMAPPER_EVALUE \
             --output_dir $TEMP_DIR \
             --output $CONSEQS_PREFIX
         RC=$?
@@ -937,7 +972,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_ARABIDOPSIS_THALIANA_FASTA_FILE \
+            --output-document $CANTATA_ARABIDOPSIS_THALIANA_FASTA_PATH \
             $CANTATA_ARABIDOPSIS_THALIANA_FASTA_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -948,7 +983,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_ARABIDOPSIS_THALIANA_GTF_FILE \
+            --output-document $CANTATA_ARABIDOPSIS_THALIANA_GTF_PATH \
             $CANTATA_ARABIDOPSIS_THALIANA_GTF_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -959,7 +994,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_POPULUS_TRICHOCARPA_FASTA_FILE \
+            --output-document $CANTATA_POPULUS_TRICHOCARPA_FASTA_PATH \
             $CANTATA_POPULUS_TRICHOCARPA_FASTA_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -970,7 +1005,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_POPULUS_TRICHOCARPA_GTF_FILE \
+            --output-document $CANTATA_POPULUS_TRICHOCARPA_GTF_PATH \
             $CANTATA_POPULUS_TRICHOCARPA_GTF_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -981,7 +1016,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_FILE \
+            --output-document $CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_PATH \
             $CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -992,7 +1027,7 @@ function download_lncrna_sequences
     /usr/bin/time \
         wget \
             --quiet \
-            --output-document $CANTATA_SELAGINELLA_MOELLENDORFFII_GTF_FILE \
+            --output-document $CANTATA_SELAGINELLA_MOELLENDORFFII_GTF_PATH \
             $CANTATA_SELAGINELLA_MOELLENDORFFII_GTF_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
@@ -1009,9 +1044,9 @@ function concat_lncrna_sequences
     echo 'Concating the lncRNA FASTAS ...'
     /usr/bin/time \
         cat \
-            $CANTATA_ARABIDOPSIS_THALIANA_FASTA_FILE \
-            $CANTATA_POPULUS_TRICHOCARPA_FASTA_FILE \
-            $CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_FILE \
+            $CANTATA_ARABIDOPSIS_THALIANA_FASTA_PATH \
+            $CANTATA_POPULUS_TRICHOCARPA_FASTA_PATH \
+            $CANTATA_SELAGINELLA_MOELLENDORFFII_FASTA_PATH \
             > $LNCRNAS_PATH
     RC=$?
     if [ $RC -ne 0 ]; then manage_error cat $RC; fi

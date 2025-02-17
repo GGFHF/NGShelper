@@ -2,7 +2,7 @@
 
 rem ----------------------------------------------------------------------------
 
-rem This script executes a test of the program calculate-gymnotoadb-stats.py
+rem This script performs a test of the program get-transcripts-geneid.py
 rem in a Windows environment.
 rem
 rem This software has been developed by:
@@ -23,7 +23,7 @@ if not "%*" == "" (set ERROR=1 & goto END)
 
 rem ----------------------------------------------------------------------------
 
-rem Set run environment
+rem Set environment
 
 setlocal EnableDelayedExpansion
 
@@ -44,14 +44,15 @@ cd %NGSHELPER_DIR%
 
 rem ----------------------------------------------------------------------------
 
-rem Execute the program calculate-quercustoadb-stats.py
+rem Run the program get-transcripts-geneid.py
 
-%PYTHON% %PYTHON_OPTIONS% calculate-quercustoadb-stats.py ^
-    --db=%DATA_DIR%\quercusTOA.db ^
-    --stats=%OUTPUT_DIR%\quercusTOA-stats.ini ^
-    --noannot=%OUTPUT_DIR%\quercusTOA-noannot.csv ^
+%PYTHON% %PYTHON_OPTIONS% get-transcripts-geneid.py ^
+    --gff=%DATA_DIR%\target.gff3 ^
+    --format=GFF3 ^
+    --out=%OUTPUT_DIR%/transcripts-geneid.csv ^
     --verbose=Y ^
-    --trace=N
+    --trace=N ^
+    --tvi=NONE
 if %ERRORLEVEL% neq 0 (set RC=%ERRORLEVEL% & set ERROR=2 & goto END)
 
 rem ----------------------------------------------------------------------------

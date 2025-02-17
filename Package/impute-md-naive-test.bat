@@ -48,8 +48,9 @@ rem Run the program impute-md-naive.py
 
 %PYTHON% %PYTHON_OPTIONS% impute-md-naive.py ^
     --threads=1 ^
-    --vcf=%DATA_DIR%\variants-nonko.vcf ^
-    --out=%OUTPUT_DIR%\variants-nonko-imputed.vcf ^
+    --input_vcf=%DATA_DIR%\variants-nonko.vcf ^
+    --output_vcf=%OUTPUT_DIR%\variants-nonko-imputed.vcf ^
+    --impdata=%$%OUTPUT_DIR%\imputation_data.csv ^
     --verbose=Y ^
     --trace=N ^
     --tvi=NONE

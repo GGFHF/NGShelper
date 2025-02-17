@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--phasedir', dest='phase_dir', help='Path of the directoty of the PHASE application installation (mandatory).')
     parser.add_argument('--processes', dest='processes_number', help=f'Number of process to be launched; default: {xlib.Const.DEFAULT_PROCESSES_NUMBER}.')
     parser.add_argument('--indir', dest='input_dir', help='Path of the directoty where the PHASE application input files are located (mandatory).')
@@ -340,8 +340,8 @@ def build_phase_process_script(process_number, phase_dir, input_dir, input_files
             script_file_id.write( '        echo "Processing file $IN_FILE ..."\n')
             script_file_id.write( '        BASENAME=`basename $IN_FILE`\n')
             script_file_id.write( '        /usr/bin/time \\\n')
-            script_file_id.write(f'            PHASE \\\n')
-            script_file_id.write(f'                -d1 \\\n')
+            script_file_id.write( '            PHASE \\\n')
+            script_file_id.write( '                -d1 \\\n')
             if other_parameters != 'NONE':
                 script_file_id.write(f'                {other_parameters} \\\n')
             script_file_id.write( '                $IN_FILE \\\n')

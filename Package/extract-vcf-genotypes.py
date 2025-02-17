@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--vcf', dest='input_vcf_file', help='Path of input VCF file (mandatory).')
     parser.add_argument('--imd_id', dest='imputed_md_id', help=f'Identification of the alternative allele for imputed missing data; default {xlib.Const.DEFAULT_IMPUTED_MD_ID}')
     parser.add_argument('--out', dest='output_genotype_file', help='Path of genotype data file (mandatory).')
@@ -123,7 +123,7 @@ def check_args(args):
     if args.tvi_list is None or args.tvi_list == 'NONE':
         args.tvi_list = []
     else:
-        args.tvi_list = xlib.split_literal_to_string_list(args.tvi_list)
+        args.tvi_list = xlib.split_literal_to_text_list(args.tvi_list)
 
     # if there are errors, exit with exception
     if not OK:
@@ -237,7 +237,7 @@ def extract_vcf_genotypes(input_vcf_file, imputed_md_id, output_genotype_file, t
             alternative_allele_list = data_dict['alt'].split(',')
             try:
                 alternative_allele_list.remove(xlib.get_md_symbol())
-            except:
+            except Exception:
                 pass
 
             # set the maximum allele number
@@ -376,7 +376,7 @@ def extract_vcf_genotypes(input_vcf_file, imputed_md_id, output_genotype_file, t
                 maximum_variant_list.append('99/99')
     maximum_variant_list.append('.')
     if variant_id in tvi_list: xlib.Message.print('trace', f'maximum_variant_list: {maximum_variant_list}')
-    output_genotype_file_id.write('seq_id;position;ref;alt;{0}\n'.format(';'.join(maximum_variant_list)))
+    output_genotype_file_id.write(f'seq_id;position;ref;alt;{';'.join(maximum_variant_list)}\n')
 
     # read the first record of the temporal genotype data file
     (record, _, data_dict) = read_temporal_genotype_data_file_record(tmp_genotype_file, tmp_genotype_file_id, input_record_counter)

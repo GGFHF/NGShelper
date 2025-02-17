@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -132,7 +132,7 @@ def check_args(args):
     if args.tsi_list is None or args.tsi_list == 'NONE':
         args.tsi_list = []
     else:
-        args.tsi_list = xlib.split_literal_to_string_list(args.tsi_list)
+        args.tsi_list = xlib.split_literal_to_text_list(args.tsi_list)
 
     # if there are errors, exit with exception
     if not OK:
@@ -319,7 +319,7 @@ def update_vcf_with_fastphase_analysis(input_vcf_file, output_vcf_file, analysis
                         else:
                             try:
                                 impute_sample_gt_left = str(alternative_allele_list.index(impute_sample_gt_left_text) + 1)
-                            except:
+                            except Exception:
                                 impute_sample_gt_left = '*'
                         # get right
                         impute_sample_gt_right_numeric = genotypes_per_sample_dict[sample_id]['second_genotype_list'][variants_per_seq_counter]
@@ -329,7 +329,7 @@ def update_vcf_with_fastphase_analysis(input_vcf_file, output_vcf_file, analysis
                         else:
                             try:
                                 impute_sample_gt_right = str(alternative_allele_list.index(impute_sample_gt_right_text) + 1)
-                            except:
+                            except Exception:
                                 impute_sample_gt_right = '*'
                         # oder
                         impute_sample_gt_list = sorted([impute_sample_gt_left, impute_sample_gt_right])

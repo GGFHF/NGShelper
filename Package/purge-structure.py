@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--structure', dest='input_structure_file', help='Path of the Structure input file (mandatory).')
     parser.add_argument('--format', dest='structure_input_format', help=f'Structure input format (mandatory): {xlib.get_structure_input_format_code_list_text()}.')
     parser.add_argument('--operation', dest='purge_operation', help=f'Purge operation (mandatory): {xlib.get_structure_purge_code_list_text()}.')
@@ -244,7 +244,7 @@ def purge_structure_input_format_2(input_structure_file, purge_operation, value,
                 if data_matrix[j][i] == value:
                     excluded_col_index_list.append(i)
                     break
-        xlib.Message.print('trace', 'excluded_col_index_list: {}'.format(excluded_col_index_list))
+        xlib.Message.print('trace', f'excluded_col_index_list: {excluded_col_index_list}')
 
         # delete columns containing the determined value
         excluded_col_index_list.reverse()

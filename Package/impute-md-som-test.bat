@@ -51,7 +51,7 @@ rem Run the program impute-md-som.py
     --db=%DATA_DIR%\ddRADseqTools2.db ^
     --input_vcf=%DATA_DIR%\variants-nonko.vcf ^
     --output_vcf=%OUTPUT_DIR%\variants-nonko-imputed.vcf ^
-    --impdata=$OUTPUT_DIR/imputation_data.csv ^
+    --impdata=%$%OUTPUT_DIR%\imputation_data.csv ^
     --xdim=3 ^
     --ydim=3 ^
     --sigma=0.5 ^

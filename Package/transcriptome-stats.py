@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=broad-except
 # pylint: disable=invalid-name
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
-# pylint: disable=wrong-import-position
 
 #-------------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ def build_parser():
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
-    parser._optionals.title = 'Arguments'
+    parser._optionals.title = 'Arguments'    # pylint: disable=protected-access
     parser.add_argument('--transcriptome', dest='transcriptome_file', help='Path of a transcriptome file in FASTA format (mandatory)')
     parser.add_argument('--output', dest='output_directory', help='Path of a directory where the results will be saved (mandatory)')
     parser.add_argument('--verbose', dest='verbose', help=f'Additional job status info during the run: {xlib.get_verbose_code_list_text()}; default: {xlib.Const.DEFAULT_VERBOSE}.')
@@ -97,7 +97,7 @@ def check_args(args):
         try:
             if not os.path.exists(args.output_directory):
                 os.makedirs(args.output_directory)
-        except Exception as e:
+        except Exception:
             xlib.Message.print('error', f'*** The directory {args.output_directory} is not valid.')
             OK = False
 
