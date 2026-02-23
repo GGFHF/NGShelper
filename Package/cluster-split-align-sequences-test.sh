@@ -42,10 +42,10 @@ if [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
 
 elif [ "$ENVIRONMENT" = "$ENV_AWS" ]; then
 
-    source /ngscloud2/apps/Miniconda3/envs/mmseqs2/util/bash-completion.sh
+    source /ngscloud2/apps/Miniforge3/envs/mmseqs2/util/bash-completion.sh
 
     NGSHELPER_DIR=/ngscloud2/apps/NGShelper
-    MMSEQS2_DIR=/ngscloud2/apps/Miniconda3/envs/mmseqs2/bin
+    MMSEQS2_DIR=/ngscloud2/apps/Miniforge3/envs/mmseqs2/bin
     DATA_DIR=/ngscloud2/gymnotoa/data-test
     TEST_DIR=/ngscloud2/gymnotoa/output-test
 
@@ -63,8 +63,8 @@ OUTPUT_PREFIX=$OUTPUT_DIR/`echo "$(n=${FASTA_FILE##*/}; echo ${n%.*})"`
 CLUSTER_DIR=$OUTPUT_DIR/clusters
 FASTA_PATH=$DATA_DIR/$FASTA_FILE
 ALLSEQS_PATH=$OUTPUT_DIR/$ALLSEQS_FILE
-RELATIONSHIP_FILE=`echo "$(n=${FASTA_FILE##*/}; echo ${n%.*})"`-relationships.csv
-RELATIONSHIP_PATH=$OUTPUT_DIR/$RELATIONSHIP_FILE
+CLUSTER_FILE=`echo "$(n=${FASTA_FILE##*/}; echo ${n%.*})"`-clusters.csv
+CLUSTER_PATH=$OUTPUT_DIR/$CLUSTER_FILE
 IDENTITIES_FILE=`echo "$(n=${FASTA_FILE##*/}; echo ${n%.*})"`-identities.csv
 IDENTITIES_PATH=$OUTPUT_DIR/$IDENTITIES_FILE
 CONSEQS_FILE=`echo "$(n=${FASTA_FILE##*/}; echo ${n%.*})"`-consensus-seqs.fasta
@@ -121,14 +121,14 @@ function split_clusters
     echo "$SEP"
     echo "Spliting clusters ..."
     /usr/bin/time \
-        split-mmseqs2-clusters.py \
+        split-mmseqs2-protein-clusters.py \
             --allseqs=$ALLSEQS_PATH \
-            --relationships=$RELATIONSHIP_PATH \
+            --clusters=$CLUSTER_PATH \
             --outdir=$CLUSTER_DIR \
             --verbose=N \
             --trace=N
     RC=$?
-    if [ $RC -ne 0 ]; then manage_error split-mmseqs2-clusters.py $RC; fi
+    if [ $RC -ne 0 ]; then manage_error split-mmseqs2-protein-clusters.py $RC; fi
 
 }
 

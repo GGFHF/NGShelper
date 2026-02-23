@@ -25,7 +25,7 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 # Set environment
 
-BLASTPLUS_DIR=$APPS/Miniconda3/envs/blast/bin
+BLASTPLUS_DIR=$APPS/Miniforge3/envs/blast/bin
 NGSHELPER_DIR=$NGSHELPER
 
 export PATH=$BLASTPLUS_DIR:$NGSHELPER_DIR:$PATH

@@ -5,6 +5,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
+# pylint: disable=unnecessary-pass
 
 #-------------------------------------------------------------------------------
 

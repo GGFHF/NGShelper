@@ -5,6 +5,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
+# pylint: disable=unnecessary-pass
 
 #-------------------------------------------------------------------------------
 
@@ -27,7 +28,6 @@ Licence: GNU General Public Licence Version 3.
 import argparse
 import gzip
 import os
-import re
 import sys
 
 import xlib
@@ -172,7 +172,7 @@ def get_transcripts_geneid(gff_file, gff_format, transcripts_geneid_file, tvi_li
     gene_ids_counter = 0
 
     # read the first record of input GFF file
-    record = gff_file_id.readline()
+    (record, _, data_dict) = xlib.read_gff_file(gff_file_id)
 
     # while there are records in the input GFF file
     while record != '':
@@ -183,34 +183,22 @@ def get_transcripts_geneid(gff_file, gff_format, transcripts_geneid_file, tvi_li
         # process data records
         if not record.startswith('#'):
 
-            # extract data
-            # record format: seq_id <field_sep> source <field_sep> type <field_sep> start <field_sep> end <field_sep> score <field_sep> strand <field_sep> phase <field_sep> attributes <record_sep>
-            field_sep = '\t'
-            record_sep = '\n'
-            data_list = re.split(field_sep, record.replace(record_sep,''))
-            try:
-                seq_id = data_list[0].strip()
-                type = data_list[2].strip()
-                attributes = data_list[8].strip()
-            except Exception as e:
-                raise xlib.ProgramException(e, 'F009', os.path.basename(gff_file), record_counter)
-
             # only the type "gene"is considerer
-            if type == 'gene':
+            if data_dict['seq_type'] == 'gene':
 
                 # add 1 to the gene identifications counter
                 gene_ids_counter += 1
 
                 # get "gene_id" data from "attributes"
                 gene_id = xlib.get_na()
-                literal = 'gene_id='
-                pos_1 = attributes.find(literal)
+                literal = 'gene='
+                pos_1 = data_dict['attributes'].find(literal)
                 if pos_1 > -1:
-                    pos_2 = attributes.find(';', pos_1 + len(literal) + 1)
-                    gene_id = attributes[pos_1 + len(literal):pos_2]
+                    pos_2 = data_dict['attributes'].find(';', pos_1 + len(literal) + 1)
+                    gene_id = data_dict['attributes'][pos_1 + len(literal):pos_2]
 
                 # write the gene identification in the file with transcripts gene identifications
-                transcripts_geneid_file_id.write(f'{seq_id};{gene_id}\n')
+                transcripts_geneid_file_id.write(f'{data_dict['seq_id']};{gene_id}\n')
 
         # print record counter
         xlib.Message.print('verbose', f'\rGFF file records: {record_counter:8d} - Genes identifications: {gene_ids_counter:8d}')

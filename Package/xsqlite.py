@@ -5,6 +5,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
+# pylint: disable=unnecessary-pass
 
 #-------------------------------------------------------------------------------
 
@@ -67,6 +68,21 @@ def rebuild_database(conn):
 
     # return the control variable
     return OK
+
+#-------------------------------------------------------------------------------
+
+def attach_database(conn, database_id, database_path):
+    '''
+    Attach a database.
+    '''
+
+    sentence = f'''
+                ATTACH DATABASE '{database_path}' AS {database_id};
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
 
 #-------------------------------------------------------------------------------
 # table "gene_info"
@@ -158,7 +174,7 @@ def insert_gene_info_row(conn, row_dict):
 
 def check_gene_info(conn):
     '''
-    Check if table "gene_info exists and if there are rows.
+    Check if table "gene_info" exists and if there are rows.
     '''
 
     # check if table "gene_info" exists
@@ -1320,7 +1336,7 @@ def get_go_ontology_dict(conn, go_id_list):
         sentence = f'''
                     SELECT DISTINCT go_id, go_name, namespace
                         FROM go_ontology
-                        WHERE go_id in ({xlib.join_string_list_to_string(go_id_list)});
+                        WHERE go_id in ({xlib.join_text_list_to_literal(go_id_list)});
                     '''
     try:
         rows = conn.execute(sentence)
@@ -1469,7 +1485,7 @@ def get_genomic_feature_dict(conn, transcript_seq_id, transcript_start, transcri
     sentence = f'''
                 SELECT seq_id, start, end, type, gene
                     FROM genomic_features
-                    WHERE seq_id = "{transcript_seq_id}"
+                    WHERE seq_id = '{transcript_seq_id}'
                       AND start <= {transcript_start}
                       AND end >= {transcript_end};
                 '''
@@ -1968,7 +1984,7 @@ def insert_vcf_variants_row(conn, row_dict):
 
 def check_vcf_variants(conn):
     '''
-    Check if table "vcf_variants exists and if there are rows.
+    Check if table "vcf_variants" exists and if there are rows.
     '''
 
     # check if table "vcf_variants" exists
@@ -3273,7 +3289,7 @@ def get_interproscan_annotation_dict(conn, cluster_id):
     sentence = f'''
                 SELECT cluster_id, interpro_goterms, panther_goterms, x_goterms, metacyc_pathways, reactome_pathways, x_pathways
                     FROM interproscan_annotations
-                    WHERE cluster_id = "{cluster_id}";
+                    WHERE cluster_id = '{cluster_id}';
                 '''
     try:
         rows = conn.execute(sentence)
@@ -3309,8 +3325,8 @@ def get_metacyc_pathways_per_cluster_dict(conn, species_name):
                     SELECT cluster_id, metacyc_pathways
                         FROM interproscan_annotations
                         WHERE cluster_id in (SELECT DISTINCT cluster_id
-                                                FROM mmseqs2_relationships
-                                                where species like "%{species_name}%");
+                                                FROM mmseqs2_protein_clusters
+                                                where species like '%{species_name}%');
                     '''
     try:
         rows = conn.execute(sentence)
@@ -3470,7 +3486,7 @@ def get_emapper_annotation_dict(conn, cluster_id):
     sentence = f'''
                 SELECT cluster_id, ortholog_seq_id, ortholog_species, eggnog_ogs, cog_category, description, goterms, ec, kegg_kos, kegg_pathways, kegg_modules, kegg_reactions, kegg_rclasses, brite, kegg_tc, cazy, pfams
                     FROM emapper_annotations
-                    WHERE cluster_id = "{cluster_id}";
+                    WHERE cluster_id = '{cluster_id}';
                 '''
     try:
         rows = conn.execute(sentence)
@@ -3506,8 +3522,8 @@ def get_kegg_kos_per_cluster_dict(conn, species_name):
                     SELECT cluster_id, kegg_kos
                         FROM emapper_annotations
                         WHERE cluster_id in (SELECT DISTINCT cluster_id
-                                                FROM mmseqs2_relationships
-                                                where species like "%{species_name}%");
+                                                FROM mmseqs2_protein_clusters
+                                                where species like '%{species_name}%');
                     '''
     try:
         rows = conn.execute(sentence)
@@ -3542,8 +3558,8 @@ def get_kegg_pathways_per_cluster_dict(conn, species_name):
                     SELECT cluster_id, kegg_pathways
                         FROM emapper_annotations
                         WHERE cluster_id in (SELECT DISTINCT cluster_id
-                                                FROM mmseqs2_relationships
-                                                where species like "%{species_name}%");
+                                                FROM mmseqs2_protein_clusters
+                                                where species like '%{species_name}%');
                     '''
     try:
         rows = conn.execute(sentence)
@@ -3558,16 +3574,16 @@ def get_kegg_pathways_per_cluster_dict(conn, species_name):
     return pathways_per_cluster_dict
 
 #-------------------------------------------------------------------------------
-# table "mmseqs2_relationships"
+# table "mmseqs2_protein_clusters"
 #-------------------------------------------------------------------------------
 
-def drop_mmseqs2_relationships(conn):
+def drop_mmseqs2_protein_clusters(conn):
     '''
-    Drop the table "mmseqs2_relationships" (if it exists)
+    Drop the table "mmseqs2_protein_clusters" (if it exists)
     '''
 
     sentence = '''
-               DROP TABLE IF EXISTS mmseqs2_relationships;
+               DROP TABLE IF EXISTS mmseqs2_protein_clusters;
                '''
     try:
         conn.execute(sentence)
@@ -3576,13 +3592,13 @@ def drop_mmseqs2_relationships(conn):
 
 #-------------------------------------------------------------------------------
 
-def create_mmseqs2_relationships(conn):
+def create_mmseqs2_protein_clusters(conn):
     '''
-    Create table "mmseqs2_relationships".
+    Create table "mmseqs2_protein_clusters".
     '''
 
     sentence = '''
-               CREATE TABLE mmseqs2_relationships (
+               CREATE TABLE mmseqs2_protein_clusters (
                    cluster_id  TEXT NOT NULL,
                    seq_id      TEXT NOT NULL,
                    description TEXT NOT NULL,
@@ -3595,14 +3611,14 @@ def create_mmseqs2_relationships(conn):
 
 #-------------------------------------------------------------------------------
 
-def create_mmseqs2_relationships_index_1(conn):
+def create_mmseqs2_protein_clusters_index_1(conn):
     '''
-    Create the index "mmseqs2_relationships_index_1" (if it does not exist) with the column "cluster_id" on the table "mmseqs2_relationships".
+    Create the index "mmseqs2_protein_clusters_index_1" (if it does not exist) with the column "cluster_id" on the table "mmseqs2_protein_clusters".
     '''
 
     sentence = '''
-               CREATE INDEX mmseqs2_relationships_index_1
-                   ON mmseqs2_relationships (cluster_id);
+               CREATE INDEX mmseqs2_protein_clusters_index_1
+                   ON mmseqs2_protein_clusters (cluster_id);
                '''
     try:
         conn.execute(sentence)
@@ -3611,14 +3627,14 @@ def create_mmseqs2_relationships_index_1(conn):
 
 #-------------------------------------------------------------------------------
 
-def create_mmseqs2_relationships_index_2(conn):
+def create_mmseqs2_protein_clusters_index_2(conn):
     '''
-    Create the index "mmseqs2_relationships_index_2" (if it does not exist) with the column "seq_id" on the table "mmseqs2_relationships".
+    Create the index "mmseqs2_protein_clusters_index_2" (if it does not exist) with the column "seq_id" on the table "mmseqs2_protein_clusters".
     '''
 
     sentence = '''
-               CREATE UNIQUE INDEX mmseqs2_relationships_index_2
-                   ON mmseqs2_relationships (seq_id);
+               CREATE UNIQUE INDEX mmseqs2_protein_clusters_index_2
+                   ON mmseqs2_protein_clusters (seq_id);
                '''
     try:
         conn.execute(sentence)
@@ -3627,13 +3643,13 @@ def create_mmseqs2_relationships_index_2(conn):
 
 #-------------------------------------------------------------------------------
 
-def insert_mmseqs2_relationships_row(conn, row_dict):
+def insert_mmseqs2_protein_clusters_row(conn, row_dict):
     '''
-    Insert a row into table "mmseqs2_relationships".
+    Insert a row into table "mmseqs2_protein_clusters".
     '''
 
     sentence = f'''
-                INSERT INTO mmseqs2_relationships
+                INSERT INTO mmseqs2_protein_clusters
                     (cluster_id, seq_id, description, species)
                     VALUES ('{row_dict["cluster_id"]}', '{row_dict["seq_id"]}', '{row_dict["description"]}', '{row_dict["species"]}');
                 '''
@@ -3644,18 +3660,18 @@ def insert_mmseqs2_relationships_row(conn, row_dict):
 
 #-------------------------------------------------------------------------------
 
-def check_mmseqs2_relationships(conn):
+def check_mmseqs2_protein_clusters(conn):
     '''
-    Check if table "mmseqs2_relationships" exists and if there are rows.
+    Check if table "mmseqs2_protein_clusters" exists and if there are rows.
     '''
 
-    # check if table "mmseqs2_relationships" exists
+    # check if table "mmseqs2_protein_clusters" exists
     sentence = '''
                SELECT EXISTS
                    (SELECT 1
                        FROM sqlite_master
                        WHERE type = 'table'
-                         AND tbl_name = 'mmseqs2_relationships'
+                         AND tbl_name = 'mmseqs2_protein_clusters'
                        LIMIT 1);
                '''
     try:
@@ -3668,14 +3684,14 @@ def check_mmseqs2_relationships(conn):
         control = int(row[0])
         break
 
-    # check if there are rows when the table "mmseqs2_relationships" exists
+    # check if there are rows when the table "mmseqs2_protein_clusters" exists
     if control == 1:
 
         # select the row number
         sentence = '''
                    SELECT EXISTS
                        (SELECT 1
-                           FROM mmseqs2_relationships
+                           FROM mmseqs2_protein_clusters
                            LIMIT 1);
                    '''
         try:
@@ -3693,20 +3709,20 @@ def check_mmseqs2_relationships(conn):
 
 #-------------------------------------------------------------------------------
 
-def get_mmseqs2_relationship_dict(conn, cluster_id):
+def get_mmseqs2_protein_clusters_dict(conn, cluster_id):
     '''
-    Get rows data from the table "mmseqs2_relationships" corresponding to
+    Get rows data from the table "mmseqs2_protein_clusters" corresponding to
     a cluster identification.
     '''
 
     # initialize the dictionary
     relationships_dict = {}
 
-    # select rows from the table "mmseqs2_relationships"
+    # select rows from the table "mmseqs2_protein_clusters"
     sentence = f'''
                 SELECT cluster_id, seq_id, description, species
-                    FROM mmseqs2_relationships
-                    WHERE cluster_id = "{cluster_id}";
+                    FROM mmseqs2_protein_clusters
+                    WHERE cluster_id = '{cluster_id}';
                 '''
     try:
         rows = conn.execute(sentence)
@@ -3723,9 +3739,38 @@ def get_mmseqs2_relationship_dict(conn, cluster_id):
 
 #-------------------------------------------------------------------------------
 
+def get_mmseqs2_protein_cluster_seqs_dict(conn):
+    '''
+    Get a dictionary with the cluster identification of every sequence identification 
+    data from the table "mmseqs2_protein_clusters".
+    '''
+
+    # initialize the dictionary
+    seq_dict = {}
+
+    # select rows from the table "mmseqs2_protein_clusters"
+    sentence = '''
+               SELECT cluster_id, seq_id, description, species
+                   FROM mmseqs2_protein_clusters;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # add row data to the dictionary
+    for row in rows:
+        # seq_dict[row[1]] = row[0]
+        seq_dict[row[1]] = {'cluster_id': row[0], 'seq_id': row[1], 'description': row[2], 'species': row[3]}
+
+    # return the dictionary
+    return seq_dict
+
+#-------------------------------------------------------------------------------
+
 def get_mmseqs2_seq_mf_data(conn, cluster_id):
     '''
-    Get the most frequent description and species from the table "mmseqs2_relationships"
+    Get the most frequent description and species from the table "mmseqs2_protein_clusters"
     corresponding to a cluster identification.
     '''
 
@@ -3735,11 +3780,11 @@ def get_mmseqs2_seq_mf_data(conn, cluster_id):
     # initialize the dictionary
     species_dict = {}
 
-    # select rows from the table "mmseqs2_relationships"
+    # select rows from the table "mmseqs2_protein_clusters"
     sentence = f'''
                 SELECT description, species
-                    FROM mmseqs2_relationships
-                    WHERE cluster_id = "{cluster_id}";
+                    FROM mmseqs2_protein_clusters
+                    WHERE cluster_id = '{cluster_id}';
                 '''
     try:
         rows = conn.execute(sentence)
@@ -3778,16 +3823,16 @@ def get_mmseqs2_seq_mf_data(conn, cluster_id):
 
 def get_mmseqs2_species_list(conn):
     '''
-    Get the distinct species names in the table "mmseqs2_relationships".
+    Get the distinct species names in the table "mmseqs2_protein_clusters".
     '''
 
     # initialize the species names list
     species_names_list = []
 
-    # select rows from the table "mmseqs2_relationships"
+    # select rows from the table "mmseqs2_protein_clusters"
     sentence = '''
                SELECT DISTINCT species
-                   FROM mmseqs2_relationships
+                   FROM mmseqs2_protein_clusters
                    ORDER by 1;
                '''
     try:
@@ -3819,7 +3864,7 @@ def get_goterms_per_cluster_dict(conn, species_name):
         sentence = '''
                    WITH cluster_identifications AS (
                        SELECT DISTINCT cluster_id
-                       FROM mmseqs2_relationships
+                       FROM mmseqs2_protein_clusters
                    )
                    SELECT a.cluster_id, COALESCE(b.interpro_goterms, '-'), COALESCE(b.panther_goterms, '-'), COALESCE(c.goterms, '-')
                    FROM cluster_identifications a
@@ -3831,8 +3876,8 @@ def get_goterms_per_cluster_dict(conn, species_name):
         sentence = f'''
                     WITH cluster_identifications AS (
                         SELECT DISTINCT cluster_id
-                        FROM mmseqs2_relationships
-                        WHERE species LIKE "%{species_name}%"
+                        FROM mmseqs2_protein_clusters
+                        WHERE species LIKE '%{species_name}%'
                     )
                     SELECT a.cluster_id, COALESCE(b.interpro_goterms, '-'), COALESCE(b.panther_goterms, '-'), COALESCE(c.goterms, '-')
                     FROM cluster_identifications a
@@ -3851,6 +3896,151 @@ def get_goterms_per_cluster_dict(conn, species_name):
 
     # return the dictionary
     return goterms_per_cluster_dict
+
+#-------------------------------------------------------------------------------
+# table "tair10_info"
+#-------------------------------------------------------------------------------
+
+def drop_tair10_info(conn):
+    '''
+    Drop the table "tair10_info" (if it exists)
+    '''
+
+    sentence = '''
+               DROP TABLE IF EXISTS tair10_info;
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_tair10_info(conn):
+    '''
+    Create table "tair10_info".
+    '''
+
+    sentence = '''
+               CREATE TABLE tair10_info (
+                   tair10_peptide_id   TEXT NOT NULL,
+                   description TEXT NOT NULL);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_tair10_info_index(conn):
+    '''
+    Create the index "tair10_info_index" (if it does not exist) with the column "tair10_peptide_id" on the table "tair10_info".
+    '''
+
+    sentence = '''
+               CREATE UNIQUE INDEX tair10_info_index
+                   ON tair10_info (tair10_peptide_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def insert_tair10_info_row(conn, row_dict):
+    '''
+    Insert a row into table "tair10_info".
+    '''
+
+    sentence = f'''
+                INSERT INTO tair10_info
+                    (tair10_peptide_id, description)
+                    VALUES ('{row_dict["tair10_peptide_id"]}', '{row_dict["description"]}');
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def check_tair10_info(conn):
+    '''
+    Check if table "tair10_info" exists and if there are rows.
+    '''
+
+    # check if table "tair10_info" exists
+    sentence = '''
+               SELECT EXISTS
+                   (SELECT 1
+                       FROM sqlite_master
+                       WHERE type = 'table'
+                         AND tbl_name = 'tair10_info'
+                       LIMIT 1);
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the row number
+    for row in rows:
+        control = int(row[0])
+        break
+
+    # check if there are rows when the table "tair10_info" exists
+    if control == 1:
+
+        # select the row number
+        sentence = '''
+                   SELECT EXISTS
+                       (SELECT 1
+                           FROM tair10_info
+                           LIMIT 1);
+                   '''
+        try:
+            rows = conn.execute(sentence)
+        except Exception as e:
+            raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+        # get the row number
+        for row in rows:
+            control = int(row[0])
+            break
+
+    # return the row number
+    return control
+
+#-------------------------------------------------------------------------------
+
+def get_tair10_peptide_description(conn, tair10_peptide_id):
+    '''
+    Get the description of a TAIR 10 peptide identification.
+    '''
+
+    # initialize description
+    description = '-'
+
+    # query
+    sentence = f'''
+                SELECT description
+                    FROM tair10_info
+                    where tair10_peptide_id = '{tair10_peptide_id}';
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the description
+    for row in rows:
+        description = row[0]
+        break
+
+    # return the description
+    return description
 
 #-------------------------------------------------------------------------------
 # table "tair10_orthologs"
@@ -3998,177 +4188,1507 @@ def get_tair10_ortholog_seq_id(conn, cluster_id):
     return ortholog_seq_id
 
 #-------------------------------------------------------------------------------
-# Statistics of gymnoTOA database
+# table "species_gene_seqs"
 #-------------------------------------------------------------------------------
 
-def get_gymnotoa_db_stats(conn):
+def drop_species_gene_seqs(conn):
     '''
-    Get the statistics of gymnoTOA database.
+    Drop the table "species_gene_seqs" (if it exists)
     '''
 
-    # count the sequences number of Acrogymnospermae
     sentence = '''
-               SELECT COUNT(*)
-                   FROM mmseqs2_relationships;
+               DROP TABLE IF EXISTS species_gene_seqs;
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_species_gene_seqs(conn):
+    '''
+    Create table "species_gene_seqs".
+    '''
+
+    sentence = '''
+               CREATE TABLE species_gene_seqs (
+                   gene_id       TEXT NOT NULL,
+                   species_id    TEXT NOT NULL,
+                   seq           TEXT NOT NULL);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_species_gene_seqs_index(conn):
+    '''
+    Create the index "species_gene_seqs_index" (if it does not exist) with the column "gene_id"
+    on the table "species_gene_seqs".
+    '''
+
+    sentence = '''
+               CREATE INDEX species_gene_seqs_index
+                   ON species_gene_seqs (gene_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def insert_species_gene_seqs_row(conn, row_dict):
+    '''
+    Insert a row into table "species_gene_seqs".
+    '''
+
+    sentence = f'''
+                INSERT INTO species_gene_seqs
+                    (gene_id, species_id, seq)
+                    VALUES ('{row_dict["gene_id"]}', '{row_dict["species_id"]}', '{row_dict["seq"]}');
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def delete_species_gene_seqs_rows(conn, species_id):
+    '''
+    Delete rows from table "species_gene_seqs" corresponding to a species_id.
+    '''
+
+    sentence = f'''
+                DELETE
+                    FROM species_gene_seqs
+                    WHERE species_id = '{species_id}';
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def check_species_gene_seqs(conn):
+    '''
+    Check if table "species_gene_seqs" exists and if there are rows.
+    '''
+
+    # check if table "species_gene_seqs" exists
+    sentence = '''
+               SELECT EXISTS
+                   (SELECT 1
+                       FROM sqlite_master
+                       WHERE type = 'table'
+                         AND tbl_name = 'species_gene_seqs'
+                       LIMIT 1);
                '''
     try:
         rows = conn.execute(sentence)
     except Exception as e:
         raise xlib.ProgramException(e, 'B002', sentence, conn)
 
-    # set the sequences number of Acrogymnospermae
-    seqnum_acrogymnospermae = 0
+    # get the row number
     for row in rows:
-        seqnum_acrogymnospermae = int(row[0])
+        control = int(row[0])
+        break
+
+    # check if there are rows when the table "species_gene_seqs" exists
+    if control == 1:
+
+        # select the row number
+        sentence = '''
+                   SELECT EXISTS
+                       (SELECT 1
+                           FROM species_gene_seqs
+                           LIMIT 1);
+                   '''
+        try:
+            rows = conn.execute(sentence)
+        except Exception as e:
+            raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+        # get the row number
+        for row in rows:
+            control = int(row[0])
+            break
+
+    # return the row number
+    return control
+
+#-------------------------------------------------------------------------------
+
+def get_gene_seq_dict(conn, gene_id):
+    '''
+    Get the sequence corresponding to a gene identification.
+    '''
+
+    # select rows from the table "species_gene_seqs"
+    sentence = f'''
+                SELECT species_id, seq
+                    FROM species_gene_seqs
+                    WHERE gene_id = '{gene_id}';
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the gene data
+    for row in rows:
+        gene_seq_dict = {'species_id': row[0], 'seq': row[1]}
+        break
+
+    # return the gene data
+    return gene_seq_dict
+
+#-------------------------------------------------------------------------------
+# table "species_protein_seqs"
+#-------------------------------------------------------------------------------
+
+def drop_species_protein_seqs(conn):
+    '''
+    Drop the table "species_protein_seqs" (if it exists)
+    '''
+
+    sentence = '''
+               DROP TABLE IF EXISTS species_protein_seqs;
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_species_protein_seqs(conn):
+    '''
+    Create table "species_protein_seqs".
+    '''
+
+    sentence = '''
+               CREATE TABLE species_protein_seqs (
+                   protein_id    TEXT NOT NULL,
+                   species_id    TEXT NOT NULL,
+                   seq           TEXT NOT NULL);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_species_protein_seqs_index(conn):
+    '''
+    Create the index "species_protein_seqs_index" (if it does not exist) with the column "protein_id"
+    on the table "species_protein_seqs".
+    '''
+
+    sentence = '''
+               CREATE INDEX species_protein_seqs_index
+                   ON species_protein_seqs (protein_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def insert_species_protein_seqs_row(conn, row_dict):
+    '''
+    Insert a row into table "species_protein_seqs".
+    '''
+
+    sentence = f'''
+                INSERT INTO species_protein_seqs
+                    (protein_id, species_id, seq)
+                    VALUES ('{row_dict["protein_id"]}', '{row_dict["species_id"]}', '{row_dict["seq"]}');
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def delete_species_protein_seqs_rows(conn, species_id):
+    '''
+    Delete rows from table "species_protein_seqs" corresponding to a species_id.
+    '''
+
+    sentence = f'''
+                DELETE
+                    FROM species_protein_seqs
+                    WHERE species_id = '{species_id}';
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def check_species_protein_seqs(conn):
+    '''
+    Check if table "species_protein_seqs" exists and if there are rows.
+    '''
+
+    # check if table "species_protein_seqs" exists
+    sentence = '''
+               SELECT EXISTS
+                   (SELECT 1
+                       FROM sqlite_master
+                       WHERE type = 'table'
+                         AND tbl_name = 'species_protein_seqs'
+                       LIMIT 1);
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the row number
+    for row in rows:
+        control = int(row[0])
+        break
+
+    # check if there are rows when the table "species_protein_seqs" exists
+    if control == 1:
+
+        # select the row number
+        sentence = '''
+                   SELECT EXISTS
+                       (SELECT 1
+                           FROM species_protein_seqs
+                           LIMIT 1);
+                   '''
+        try:
+            rows = conn.execute(sentence)
+        except Exception as e:
+            raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+        # get the row number
+        for row in rows:
+            control = int(row[0])
+            break
+
+    # return the row number
+    return control
+
+#-------------------------------------------------------------------------------
+
+def get_protein_seq_dict(conn, protein_id):
+    '''
+    Get the sequence corresponding to a protein identification.
+    '''
+
+    # select rows from the table "species_protein_seqs"
+    sentence = f'''
+                SELECT species_id, seq
+                    FROM species_protein_seqs
+                    WHERE protein_id = '{protein_id}';
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the protein data
+    for row in rows:
+        protein_seq_dict = {'species_id': row[0], 'seq': row[1]}
+        break
+
+    # return the protein data
+    return protein_seq_dict
+
+#-------------------------------------------------------------------------------
+# table "liftoff_gff_gene_data"
+#-------------------------------------------------------------------------------
+
+def drop_liftoff_gff_gene_data(conn):
+    '''
+    Drop the table "liftoff_gff_gene_data" (if it exists)
+    '''
+
+    sentence = '''
+               DROP TABLE IF EXISTS liftoff_gff_gene_data;
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_gff_gene_data(conn):
+    '''
+    Create table "liftoff_gff_gene_data".
+    '''
+
+    sentence = '''
+               CREATE TABLE liftoff_gff_gene_data (
+                   reference_species_id      TEXT NOT NULL,
+                   target_species_id         TEXT NOT NULL,
+                   reference_gene_id         TEXT NOT NULL,
+                   target_seq_id             TEXT NOT NULL,
+                   target_start              INTEGER NOT NULL,
+                   target_end                INTEGER NOT NULL,
+                   target_strand             TEXT NOT NULL,
+                   reference_protein_id_list TEXT NOT NULL);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_gff_gene_data_index_1(conn):
+    '''
+    Create the index "liftoff_gff_gene_data_index_1" (if it does not exist) with the columns "reference_species_id",
+    "target_species_id" and "target_seq_id" on the table "liftoff_gff_gene_data".
+    '''
+
+    sentence = '''
+               CREATE INDEX liftoff_gff_gene_data_index_1
+                   ON liftoff_gff_gene_data (reference_species_id, target_species_id, target_seq_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_gff_gene_data_index_2(conn):
+    '''
+    Create the index "liftoff_gff_gene_data_index_2" (if it does not exist) with the column "reference_gene_id"
+    on the table "liftoff_gff_gene_data".
+    '''
+
+    sentence = '''
+               CREATE INDEX liftoff_gff_gene_data_index_2
+                   ON liftoff_gff_gene_data (reference_gene_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def insert_liftoff_gff_gene_data_row(conn, row_dict):
+    '''
+    Insert a row into table "liftoff_gff_gene_data".
+    '''
+
+    sentence = f'''
+                INSERT INTO liftoff_gff_gene_data
+                    (reference_species_id, target_species_id, reference_gene_id, target_seq_id, target_start, target_end, target_strand, reference_protein_id_list)
+                    VALUES ('{row_dict["reference_species_id"]}', '{row_dict["target_species_id"]}', '{row_dict["reference_gene_id"]}', '{row_dict["target_seq_id"]}', {row_dict["target_start"]}, {row_dict["target_end"]}, '{row_dict["target_strand"]}', '{row_dict["reference_protein_id_list"]}');
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def delete_liftoff_gff_gene_data_rows(conn, reference_species_id, target_species_id):
+    '''
+    Delete rows from table "liftoff_gff_gene_data" corresponding to a reference_species_id and target_species_id.
+    '''
+
+    sentence = f'''
+                DELETE
+                    FROM liftoff_gff_gene_data
+                    WHERE reference_species_id = '{reference_species_id}'
+                      AND target_species_id = '{target_species_id}';
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def check_liftoff_gff_gene_data(conn):
+    '''
+    Check if table "liftoff_gff_gene_data" exists and if there are rows.
+    '''
+
+    # check if table "liftoff_gff_gene_data" exists
+    sentence = '''
+               SELECT EXISTS
+                   (SELECT 1
+                       FROM sqlite_master
+                       WHERE type = 'table'
+                         AND tbl_name = 'liftoff_gff_gene_data'
+                       LIMIT 1);
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the row number
+    for row in rows:
+        control = int(row[0])
+        break
+
+    # check if there are rows when the table "liftoff_gff_gene_data" exists
+    if control == 1:
+
+        # select the row number
+        sentence = '''
+                   SELECT EXISTS
+                       (SELECT 1
+                           FROM liftoff_gff_gene_data
+                           LIMIT 1);
+                   '''
+        try:
+            rows = conn.execute(sentence)
+        except Exception as e:
+            raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+        # get the row number
+        for row in rows:
+            control = int(row[0])
+            break
+
+    # return the row number
+    return control
+
+#-------------------------------------------------------------------------------
+
+def get_liftoff_gff_gene_data_list(conn, reference_species_code_list, target_species_code_list):
+    '''
+    Get the gene data list from the table "liftoff_gff_gene_data" for a list of reference species and
+    other list of target species.
+    '''
+
+    # get text literals of species codes with simple quote and separated by comma
+    refence_species_code_list_text = xlib.join_text_list_to_literal(reference_species_code_list)
+    target_species_code_list_text = xlib.join_text_list_to_literal(target_species_code_list)
+
+    # initialize the list
+    liftoff_gff_gene_data_list = []
+
+    # select rows from the table "liftoff_gff_gene_data"
+    sentence = f'''
+                SELECT reference_species_id, target_species_id, reference_gene_id, reference_protein_id_list
+                    FROM liftoff_gff_gene_data
+                    WHERE reference_species_id in ({refence_species_code_list_text})
+                      AND target_species_id in ({target_species_code_list_text});
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+
+    # add row data to the list
+    for row in rows:
+        liftoff_gff_gene_data_list.append({'reference_species_id': row[0], 'target_species_id': row[1], 'reference_gene_id': row[2], 'reference_protein_id_list': row[3]})
+
+    # return the list
+    return liftoff_gff_gene_data_list
+
+#-------------------------------------------------------------------------------
+# table "liftoff_gff_cds_data"
+#-------------------------------------------------------------------------------
+
+def drop_liftoff_gff_cds_data(conn):
+    '''
+    Drop the table "liftoff_gff_cds_data" (if it exists)
+    '''
+
+    sentence = '''
+               DROP TABLE IF EXISTS liftoff_gff_cds_data;
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_gff_cds_data(conn):
+    '''
+    Create table "liftoff_gff_cds_data".
+    '''
+
+    sentence = '''
+               CREATE TABLE liftoff_gff_cds_data (
+                   reference_species_id      TEXT NOT NULL,
+                   target_species_id         TEXT NOT NULL,
+                   reference_protein_id      TEXT NOT NULL,
+                   target_seq_id             TEXT NOT NULL,
+                   target_start              INTEGER NOT NULL,
+                   target_end                INTEGER NOT NULL,
+                   target_strand             TEXT NOT NULL);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_gff_cds_data_index_1(conn):
+    '''
+    Create the index "liftoff_gff_cds_data_index_1" (if it does not exist) with the columns "reference_species_id",
+    "target_species_id" and "target_seq_id" on the table "liftoff_gff_cds_data".
+    '''
+
+    sentence = '''
+               CREATE INDEX liftoff_gff_cds_data_index_1
+                   ON liftoff_gff_cds_data (reference_species_id, target_species_id, target_seq_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_gff_cds_data_index_2(conn):
+    '''
+    Create the index "liftoff_gff_cds_data_index_2" (if it does not exist) with the columns "reference_species_id",
+    "target_species_id" and  "reference_protein_id"
+    on the table "liftoff_gff_cds_data".
+    '''
+
+    sentence = '''
+               CREATE INDEX liftoff_gff_cds_data_index_2
+                   ON liftoff_gff_cds_data (reference_species_id, reference_protein_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def insert_liftoff_gff_cds_data_row(conn, row_dict):
+    '''
+    Insert a row into table "liftoff_gff_cds_data".
+    '''
+
+    sentence = f'''
+                INSERT INTO liftoff_gff_cds_data
+                    (reference_species_id, target_species_id, reference_protein_id, target_seq_id, target_start, target_end, target_strand)
+                    VALUES ('{row_dict["reference_species_id"]}', '{row_dict["target_species_id"]}', '{row_dict["reference_protein_id"]}', '{row_dict["target_seq_id"]}', {row_dict["target_start"]}, {row_dict["target_end"]}, '{row_dict["target_strand"]}');
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def delete_liftoff_gff_cds_data_rows(conn, reference_species_id, target_species_id):
+    '''
+    Delete rows from table "liftoff_gff_cds_data" corresponding to a reference_species_id and target_species_id.
+    '''
+
+    sentence = f'''
+                DELETE
+                    FROM liftoff_gff_cds_data
+                    WHERE reference_species_id = '{reference_species_id}'
+                      AND target_species_id = '{target_species_id}';
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def check_liftoff_gff_cds_data(conn):
+    '''
+    Check if table "liftoff_gff_cds_data" exists and if there are rows.
+    '''
+
+    # check if table "liftoff_gff_cds_data" exists
+    sentence = '''
+               SELECT EXISTS
+                   (SELECT 1
+                       FROM sqlite_master
+                       WHERE type = 'table'
+                         AND tbl_name = 'liftoff_gff_cds_data'
+                       LIMIT 1);
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the row number
+    for row in rows:
+        control = int(row[0])
+        break
+
+    # check if there are rows when the table "liftoff_gff_cds_data" exists
+    if control == 1:
+
+        # select the row number
+        sentence = '''
+                   SELECT EXISTS
+                       (SELECT 1
+                           FROM liftoff_gff_cds_data
+                           LIMIT 1);
+                   '''
+        try:
+            rows = conn.execute(sentence)
+        except Exception as e:
+            raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+        # get the row number
+        for row in rows:
+            control = int(row[0])
+            break
+
+    # return the row number
+    return control
+
+#-------------------------------------------------------------------------------
+
+def get_liftoff_protein_cds_data_list_1(conn, reference_species_id, target_species_id, reference_protein_id):
+    '''
+    Get the dictionary of the target CDS corresponding to a reference protein identification.
+    '''
+
+    # initialize the dictionary
+    protein_cds_data_list = []
+
+    # select rows from the table "liftoff_gff_cds_data"
+    sentence = f'''
+                SELECT target_seq_id, target_start, target_end, target_strand
+                FROM liftoff_gff_cds_data
+                WHERE reference_species_id = '{reference_species_id}'
+                  AND target_species_id = '{target_species_id}'
+                  AND reference_protein_id = '{reference_protein_id}';
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # add row data to the dictionary
+    for row in rows:
+        protein_cds_data_list.append({'target_seq_id': row[0], 'target_start': row[1], 'target_end': row[2],  'target_strand': row[3]})
+
+    # return the dictionary
+    return protein_cds_data_list
+
+#-------------------------------------------------------------------------------
+
+def get_liftoff_protein_cds_data_list_2(conn, reference_species_id, target_species_id, target_seq_id, target_start, target_end, target_strand):
+    '''
+    Get the dictionary of the target CDS corresponding to a sequence identification, start and end position.
+    '''
+
+    # initialize the dictionary
+    protein_cds_data_list = []
+
+    # select rows from the table "liftoff_gff_cds_data"
+    sentence = f'''
+                SELECT reference_protein_id, target_start, target_end, target_strand
+                FROM liftoff_gff_cds_data
+                WHERE reference_species_id = '{reference_species_id}'
+                  AND target_species_id = '{target_species_id}'
+                  AND target_seq_id = '{target_seq_id}'
+                  AND target_start >= {target_start}
+                  AND target_end <= {target_end}
+                  AND target_strand = '{target_strand}';
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # add row data to the dictionary
+    for row in rows:
+        protein_cds_data_list.append({'reference_protein_id': row[0], 'target_start': row[1], 'target_end': row[2],  'target_strand': row[3]})
+
+    # return the dictionary
+    return protein_cds_data_list
+
+#-------------------------------------------------------------------------------
+# table "liftoff_unmapped_genes"
+#-------------------------------------------------------------------------------
+
+def drop_liftoff_unmapped_genes(conn):
+    '''
+    Drop the table "liftoff_unmapped_genes" (if it exists)
+    '''
+
+    sentence = '''
+               DROP TABLE IF EXISTS liftoff_unmapped_genes;
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_unmapped_genes(conn):
+    '''
+    Create table "liftoff_unmapped_genes".
+    '''
+
+    sentence = '''
+               CREATE TABLE liftoff_unmapped_genes (
+                   reference_species_id TEXT NOT NULL,
+                   target_species_id    TEXT NOT NULL,
+                   reference_gene_id    TEXT NOT NULL);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_unmapped_genes_index_1(conn):
+    '''
+    Create the index "liftoff_unmapped_genes_index" (if it does not exist) with the columns "reference_species_id",
+    "target_species_id" and "reference_gene_id" on the table "liftoff_unmapped_genes".
+    '''
+
+    sentence = '''
+               CREATE INDEX liftoff_unmapped_genes_index_1
+                   ON liftoff_unmapped_genes (reference_species_id, target_species_id, reference_gene_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_unmapped_genes_index_2(conn):
+    '''
+    Create the index "liftoff_unmapped_genes_index_2" (if it does not exist) with the column "reference_gene_id"
+    on the table "liftoff_unmapped_genes".
+    '''
+
+    sentence = '''
+               CREATE INDEX liftoff_unmapped_genes_index_2
+                   ON liftoff_unmapped_genes (reference_gene_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def insert_liftoff_unmapped_genes_row(conn, row_dict):
+    '''
+    Insert a row into table "liftoff_unmapped_genes".
+    '''
+
+    sentence = f'''
+                INSERT INTO liftoff_unmapped_genes
+                    (reference_species_id, target_species_id, reference_gene_id)
+                    VALUES ('{row_dict["reference_species_id"]}', '{row_dict["target_species_id"]}', '{row_dict["reference_gene_id"]}');
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def delete_liftoff_unmapped_genes_rows(conn, reference_species_id, target_species_id):
+    '''
+    Delete rows from table "liftoff_unmapped_genes" corresponding to a reference_species_id and target_species_id.
+    '''
+
+    sentence = f'''
+                DELETE
+                    FROM liftoff_unmapped_genes
+                    WHERE reference_species_id =' {reference_species_id}'
+                      AND target_species_id = '{target_species_id}';
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def check_liftoff_unmapped_genes(conn):
+    '''
+    Check if table "liftoff_unmapped_genes" exists and if there are rows.
+    '''
+
+    # check if table "liftoff_unmapped_genes" exists
+    sentence = '''
+               SELECT EXISTS
+                   (SELECT 1
+                       FROM sqlite_master
+                       WHERE type = 'table'
+                         AND tbl_name = 'liftoff_unmapped_genes'
+                       LIMIT 1);
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the row number
+    for row in rows:
+        control = int(row[0])
+        break
+
+    # check if there are rows when the table "liftoff_unmapped_genes" exists
+    if control == 1:
+
+        # select the row number
+        sentence = '''
+                   SELECT EXISTS
+                       (SELECT 1
+                           FROM liftoff_unmapped_genes
+                           LIMIT 1);
+                   '''
+        try:
+            rows = conn.execute(sentence)
+        except Exception as e:
+            raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+        # get the row number
+        for row in rows:
+            control = int(row[0])
+            break
+
+    # return the row number
+    return control
+
+#-------------------------------------------------------------------------------
+# table "liftoff_homologous_proteins"
+#-------------------------------------------------------------------------------
+
+def drop_liftoff_homologous_proteins(conn):
+    '''
+    Drop the table "liftoff_homologous_proteins" (if it exists)
+    '''
+
+    sentence = '''
+               DROP TABLE IF EXISTS liftoff_homologous_proteins;
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_homologous_proteins(conn):
+    '''
+    Create table "liftoff_homologous_proteins".
+    '''
+
+    sentence = '''
+               CREATE TABLE liftoff_homologous_proteins (
+                   reference_species_id      TEXT NOT NULL,
+                   target_species_id         TEXT NOT NULL,
+                   reference_protein_id      TEXT NOT NULL,
+                   target_protein_id         TEXT NOT NULL);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_homologous_proteins_index_1(conn):
+    '''
+    Create the index "liftoff_homologous_proteins_index_1" (if it does not exist) with the columns "reference_species_id",
+    "target_species_id" and "reference_protein_id" on the table "liftoff_homologous_proteins".
+    '''
+
+    sentence = '''
+               CREATE INDEX liftoff_homologous_proteins_index_1
+                   ON liftoff_homologous_proteins (reference_species_id, target_species_id, reference_protein_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_liftoff_homologous_proteins_index_2(conn):
+    '''
+    Create the index "liftoff_homologous_proteins_index_2" (if it does not exist) with the column "reference_protein_id"
+    on the table "liftoff_homologous_proteins".
+    '''
+
+    sentence = '''
+               CREATE INDEX liftoff_homologous_proteins_index_2
+                   ON liftoff_homologous_proteins (reference_protein_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def insert_liftoff_homologous_proteins_row(conn, row_dict):
+    '''
+    Insert a row into table "liftoff_homologous_proteins".
+    '''
+
+    sentence = f'''
+                INSERT INTO liftoff_homologous_proteins
+                    (reference_species_id, target_species_id, reference_protein_id, target_protein_id)
+                    VALUES ('{row_dict["reference_species_id"]}', '{row_dict["target_species_id"]}', '{row_dict["reference_protein_id"]}', '{row_dict["target_protein_id"]}');
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def delete_liftoff_homologous_proteins_rows(conn, reference_species_id, target_species_id):
+    '''
+    Delete rows from table "liftoff_homologous_proteins" corresponding to a reference_species_id and target_species_id.
+    '''
+
+    sentence = f'''
+                DELETE
+                    FROM liftoff_homologous_proteins
+                    WHERE reference_species_id = '{reference_species_id}'
+                      AND target_species_id = '{target_species_id}';
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def check_liftoff_homologous_proteins(conn):
+    '''
+    Check if table "liftoff_homologous_proteins" exists and if there are rows.
+    '''
+
+    # check if table "liftoff_homologous_proteins" exists
+    sentence = '''
+               SELECT EXISTS
+                   (SELECT 1
+                       FROM sqlite_master
+                       WHERE type = 'table'
+                         AND tbl_name = 'liftoff_homologous_proteins'
+                       LIMIT 1);
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the row number
+    for row in rows:
+        control = int(row[0])
+        break
+
+    # check if there are rows when the table "liftoff_homologous_proteins" exists
+    if control == 1:
+
+        # select the row number
+        sentence = '''
+                   SELECT EXISTS
+                       (SELECT 1
+                           FROM liftoff_homologous_proteins
+                           LIMIT 1);
+                   '''
+        try:
+            rows = conn.execute(sentence)
+        except Exception as e:
+            raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+        # get the row number
+        for row in rows:
+            control = int(row[0])
+            break
+
+    # return the row number
+    return control
+
+#-------------------------------------------------------------------------------
+
+def get_liftoff_homologous_proteins_list(conn, reference_protein_ids_list):
+    '''
+    Get the target protein identifications list corresponding to a reference protein identifications
+    list from the table "liftoff_homologous_proteins".
+    '''
+
+    # get text literals of reference protein identifications with simple quote and separated by comma
+    reference_protein_ids_list_text = xlib.join_text_list_to_literal(reference_protein_ids_list)
+
+    # initialize the list
+    liftoff_homologous_proteins_list = []
+
+    # select rows from the table "liftoff_gff_gene_data"
+    sentence = f'''
+                SELECT target_species_id, target_protein_id
+                    FROM liftoff_homologous_proteins
+                    WHERE reference_protein_id in ({reference_protein_ids_list_text});
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+
+    # add row data to the list
+    for row in rows:
+        liftoff_homologous_proteins_list.append({'target_species_id': row[0], 'target_protein_id': row[1]})
+
+    # return the list
+    return liftoff_homologous_proteins_list
+
+#-------------------------------------------------------------------------------
+
+def get_orthologous_protein_data_list(conn, reference_protein_id):
+    '''
+    Get the orthologous protein data corresponding to a reference protein identifications
+    list from the tables "liftoff_homologous_proteins" and "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    # initialize the list
+    orthologous_protein_data_list = []
+
+    # select rows from the table "liftoff_gff_gene_data"
+    sentence = f'''
+                SELECT a.reference_species_id, a.reference_protein_id, a.target_species_id, a.target_protein_id, b.cluster_id, b.gene_id
+                FROM liftoff_homologous_proteins a
+                JOIN  mmseqs2_concatenated_cds_clusters b ON a.target_protein_id = b.protein_id
+                WHERE reference_protein_id = '{reference_protein_id}';
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # add row data to the list
+    for row in rows:
+        orthologous_protein_data_list.append({'reference_species_id': row[0], 'reference_protein_id': row[1], 'target_species_id': row[2], 'target_protein_id': row[3], 'cluster_id': row[4], 'gene_id': row[5]})
+
+    # return the list
+    return orthologous_protein_data_list
+
+#-------------------------------------------------------------------------------
+# table "mmseqs2_concatenated_cds_clusters"
+#-------------------------------------------------------------------------------
+
+def drop_mmseqs2_concatenated_cds_clusters(conn):
+    '''
+    Drop the table "mmseqs2_concatenated_cds_clusters" (if it exists)
+    '''
+
+    sentence = '''
+               DROP TABLE IF EXISTS mmseqs2_concatenated_cds_clusters;
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_mmseqs2_concatenated_cds_clusters(conn):
+    '''
+    Create table "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    sentence = '''
+               CREATE TABLE mmseqs2_concatenated_cds_clusters (
+                   species_id TEXT NOT NULL,
+                   cluster_id TEXT NOT NULL,
+                   seq_id     TEXT NOT NULL,
+                   gene_id    TEXT NOT NULL,
+                   protein_id TEXT NOT NULL);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_mmseqs2_concatenated_cds_clusters_index_1(conn):
+    '''
+    Create the index "mmseqs2_concatenated_cds_clusters_index_1" (if it does not exist) with the columns "species_id"
+    and "cluster_id" on the table "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    sentence = '''
+               CREATE INDEX mmseqs2_concatenated_cds_clusters_index_1
+                   ON mmseqs2_concatenated_cds_clusters (species_id, cluster_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_mmseqs2_concatenated_cds_clusters_index_2(conn):
+    '''
+    Create the index "mmseqs2_concatenated_cds_clusters_index_2" (if it does not exist) with the columns
+    "species_id" and "seq_id" on the table "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    sentence = '''
+               CREATE UNIQUE INDEX mmseqs2_concatenated_cds_clusters_index_2
+                   ON mmseqs2_concatenated_cds_clusters (species_id, seq_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def create_mmseqs2_concatenated_cds_clusters_index_3(conn):
+    '''
+    Create the index "mmseqs2_concatenated_cds_clusters_index_3" (if it does not exist) with the columns
+    "species_id" and "seq_id" on the table "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    sentence = '''
+               CREATE INDEX mmseqs2_concatenated_cds_clusters_index_3
+                   ON mmseqs2_concatenated_cds_clusters (species_id, protein_id);
+               '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def insert_mmseqs2_concatenated_cds_clusters_row(conn, row_dict):
+    '''
+    Insert a row into table "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    sentence = f'''
+                INSERT INTO mmseqs2_concatenated_cds_clusters
+                    (species_id, cluster_id, seq_id, gene_id, protein_id)
+                    VALUES ('{row_dict["species_id"]}', '{row_dict["cluster_id"]}', '{row_dict["seq_id"]}', '{row_dict["gene_id"]}', '{row_dict["protein_id"]}');
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def delete_mmseqs2_concatenated_cds_clusters_rows(conn, species_id):
+    '''
+    Delete rows from table "mmseqs2_concatenated_cds_clusters" corresponding to a species identification.
+    '''
+
+    sentence = f'''
+                DELETE
+                    FROM mmseqs2_concatenated_cds_clusters
+                    WHERE species_id = '{species_id}';
+                '''
+    try:
+        conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+#-------------------------------------------------------------------------------
+
+def check_mmseqs2_concatenated_cds_clusters(conn):
+    '''
+    Check if table "mmseqs2_concatenated_cds_clusters" exists and if there are rows.
+    '''
+
+    # check if table "mmseqs2_concatenated_cds_clusters" exists
+    sentence = '''
+               SELECT EXISTS
+                   (SELECT 1
+                       FROM sqlite_master
+                       WHERE type = 'table'
+                         AND tbl_name = 'mmseqs2_concatenated_cds_clusters'
+                       LIMIT 1);
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the row number
+    for row in rows:
+        control = int(row[0])
+        break
+
+    # check if there are rows when the table "mmseqs2_concatenated_cds_clusters" exists
+    if control == 1:
+
+        # select the row number
+        sentence = '''
+                   SELECT EXISTS
+                       (SELECT 1
+                           FROM mmseqs2_concatenated_cds_clusters
+                           LIMIT 1);
+                   '''
+        try:
+            rows = conn.execute(sentence)
+        except Exception as e:
+            raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+        # get the row number
+        for row in rows:
+            control = int(row[0])
+            break
+
+    # return the row number
+    return control
+
+#-------------------------------------------------------------------------------
+
+def get_mmseqs2_concatenated_cds_cluster_id_1(conn, seq_id):
+    '''
+    Get the cluster identification of a concatenated CDS group identification.
+    '''
+
+    # initialize the cluster identification
+    cluster_id = xlib.get_na()
+
+    # query
+    sentence = f'''
+                SELECT cluster_id
+                    FROM mmseqs2_concatenated_cds_clusters
+                    where seq_id = '{seq_id}';
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the row number
+    for row in rows:
+        cluster_id = row[0]
+        break
+
+    # return the cluster identification
+    return cluster_id
+
+#-------------------------------------------------------------------------------
+
+def get_mmseqs2_concatenated_cds_cluster_id_2(conn, species_id, protein_id):
+    '''
+    Get the cluster identification of a protein identification.
+    '''
+
+    # initialize the cluster identification
+    cluster_id = xlib.get_na()
+
+    # query
+    sentence = f'''
+                SELECT cluster_id
+                    FROM mmseqs2_concatenated_cds_clusters
+                    WHERE species_id = '{species_id}'
+                      AND protein_id = '{protein_id}';
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # get the row number
+    for row in rows:
+        cluster_id = row[0]
+        break
+
+    # return the cluster identification
+    return cluster_id
+
+#-------------------------------------------------------------------------------
+
+def get_mmseqs2_concatenated_cds_clusters_dict(conn, species_id):
+    '''
+    Get a dictionary with the cluster identifications of concatenated CDS from the table
+    "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    # initialize the dictionary
+    clusters_dict = {}
+
+    # initialize the index
+    i = 0
+
+    # select rows from the table "mmseqs2_concatenated_cds_clusters"
+    sentence = f'''
+                SELECT cluster_id, seq_id, gene_id, protein_id
+                    FROM mmseqs2_concatenated_cds_clusters
+                    WHERE species_id = '{species_id}'
+                    ORDER BY gene_id, cluster_id, seq_id;
+                '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # add row data to the dictionary
+    for row in rows:
+        clusters_dict[i] = {'cluster_id': row[0], 'seq_id': row[1], 'gene_id': row[2], 'protein_id': row[3]}
+        i += 1
+
+    # return the dictionary
+    return clusters_dict
+
+#-------------------------------------------------------------------------------
+
+def get_protein_per_genes_dict(conn):
+    '''
+    Get a dictionary with genes corresponding to proteins from the table
+    "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    # initialize the dictionary
+    clusters_dict = {}
+
+    # select rows from the table "mmseqs2_concatenated_cds_clusters"
+    sentence = '''
+               SELECT species_id, protein_id, gene_id
+                   FROM mmseqs2_concatenated_cds_clusters;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # add row data to the dictionary
+    for row in rows:
+        key = f'{row[0]}-{row[1]}'
+        clusters_dict[key] = row[2]
+
+    # return the dictionary
+    return clusters_dict
+
+#-------------------------------------------------------------------------------
+
+def get_mmseqs2_protein_isoforms_list(conn, species_id, protein_ids_list):
+    '''
+    Get the list of protein isoforms corresponding to a protein identification from the table
+    "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    # get text literals of protein identifications with simple quote and separated by comma
+    protein_ids_list_text = xlib.join_text_list_to_literal(protein_ids_list)
+
+    # initialize the list
+    protein_isoforms_list = []
+
+    # select rows from the table "mmseqs2_concatenated_cds_clusters"
+    if species_id == '':
+        sentence = f'''
+                    SELECT species_id, cluster_id, gene_id, protein_id
+                        FROM mmseqs2_concatenated_cds_clusters
+                        WHERE gene_id IN (SELECT gene_id
+                                            FROM mmseqs2_concatenated_cds_clusters
+                                            WHERE protein_id in ({protein_ids_list_text}));
+                    '''
+    else:
+        sentence = f'''
+                    SELECT species_id, cluster_id, gene_id, protein_id
+                        FROM mmseqs2_concatenated_cds_clusters
+                        WHERE species_id = '{species_id}'
+                          AND gene_id IN (SELECT gene_id
+                                            FROM mmseqs2_concatenated_cds_clusters
+                                            WHERE species_id = '{species_id}'
+                                              AND protein_id in ({protein_ids_list_text}));
+                    '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # add row data to the list
+    for row in rows:
+        protein_isoforms_list.append({'species_id': row[0], 'cluster_id': row[1], 'gene_id': row[2], 'protein_id': row[3]})
+
+    # return the list
+    return protein_isoforms_list
+
+#-------------------------------------------------------------------------------
+
+def get_mmseqs2_protein_data_dict(conn, protein_id):
+    '''
+    Get the protein data dictionary corresponding to a protein identification from the table
+    "mmseqs2_concatenated_cds_clusters".
+    '''
+
+    # initialize the dictionary
+    protein_data_dict = {}
+
+    # select rows from the table "mmseqs2_concatenated_cds_clusters"
+    sentence = f'''
+                SELECT species_id, cluster_id, seq_id, gene_id
+                    FROM mmseqs2_concatenated_cds_clusters
+                    WHERE protein_id = '{protein_id}';
+                    '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # add row data to the list
+    for row in rows:
+        protein_data_dict = {'species_id': row[0], 'cluster_id': row[1], 'seq_id': row[2], 'gene_id': row[3]}
+
+    # return the dictionary
+    return protein_data_dict
+
+#-------------------------------------------------------------------------------
+# Statistics of the database xxxTOA
+#-------------------------------------------------------------------------------
+
+def get_db_stats(conn):
+    '''
+    Get the statistics of the database xxxTOA.
+    '''
+
+    # count the sequences number
+    sentence = '''
+               SELECT COUNT(*)
+                   FROM mmseqs2_protein_clusters;
+               '''
+    try:
+        rows = conn.execute(sentence)
+    except Exception as e:
+        raise xlib.ProgramException(e, 'B002', sentence, conn)
+
+    # set the sequences number
+    seqnum = 0
+    for row in rows:
+        seqnum = int(row[0])
         break
 
     # count the total of clusters
     sentence = '''
                SELECT COUNT(DISTINCT cluster_id)
-                   FROM mmseqs2_relationships;
-               '''
-    try:
-        rows = conn.execute(sentence)
-    except Exception as e:
-        raise xlib.ProgramException(e, 'B002', sentence, conn)
-
-    # set the total of clusters
-    clusternum_total = 0
-    for row in rows:
-        clusternum_total = int(row[0])
-        break
-
-    # count the clusters number with InterProScan annotations
-    sentence = '''
-               SELECT COUNT(*)
-                   FROM interproscan_annotations;
-               '''
-    try:
-        rows = conn.execute(sentence)
-    except Exception as e:
-        raise xlib.ProgramException(e, 'B002', sentence, conn)
-
-    # set the clusters number with InterProScan annotations
-    clusternum_interproscan_annotations = 0
-    for row in rows:
-        clusternum_interproscan_annotations = int(row[0])
-        break
-
-    # count the clusters number with eggNOG-mapper annotations
-    sentence = '''
-               SELECT COUNT(*)
-                   FROM emapper_annotations;
-               '''
-    try:
-        rows = conn.execute(sentence)
-    except Exception as e:
-        raise xlib.ProgramException(e, 'B002', sentence, conn)
-
-    # set the clusters number with eggNOG-mapper annotations
-    clusternum_emapper_annotations = 0
-    for row in rows:
-        clusternum_emapper_annotations = int(row[0])
-        break
-
-    # count the clusters number with TAIR10 orthologs
-    sentence = '''
-               SELECT COUNT(*)
-                   FROM tair10_orthologs;
-               '''
-    try:
-        rows = conn.execute(sentence)
-    except Exception as e:
-        raise xlib.ProgramException(e, 'B002', sentence, conn)
-
-    # set the clusters number with TAIR10 orthologs
-    clusternum_tair10_ortologs = 0
-    for row in rows:
-        clusternum_tair10_ortologs = int(row[0])
-        break
-
-    # get the cluster identifications with InterProScan annotations
-    sentence = '''
-               SELECT cluster_id
-                   FROM interproscan_annotations;
-               '''
-    try:
-        rows = conn.execute(sentence)
-    except Exception as e:
-        raise xlib.ProgramException(e, 'B002', sentence, conn)
-
-    # build the set of clusters identifications with InterProScan annotations
-    interproscan_cluster_id_set = set()
-    for row in rows:
-        interproscan_cluster_id_set.add(row[0])
-
-    # get the cluster identifications with eggNOG-mapper annotations
-    sentence = '''
-               SELECT cluster_id
-                   FROM emapper_annotations;
-               '''
-    try:
-        rows = conn.execute(sentence)
-    except Exception as e:
-        raise xlib.ProgramException(e, 'B002', sentence, conn)
-
-    # build the set of clusters identifications with eggNOG-mapper annotations
-    emapper_cluster_id_set = set()
-    for row in rows:
-        emapper_cluster_id_set.add(row[0])
-
-    # get the cluster identifications with TAIR10 orthologs
-    sentence = '''
-               SELECT cluster_id
-                   FROM tair10_orthologs;
-               '''
-    try:
-        rows = conn.execute(sentence)
-    except Exception as e:
-        raise xlib.ProgramException(e, 'B002', sentence, conn)
-
-    # build the set of clusters identifications with TAIR10 orthologs
-    tair10_cluster_id_set = set()
-    for row in rows:
-        tair10_cluster_id_set.add(row[0])
-
-    # calculate the clusters number without annotations
-    union_cluster_id_set = interproscan_cluster_id_set | emapper_cluster_id_set | tair10_cluster_id_set
-    clusternum_with_annotations = len(union_cluster_id_set)
-    clusternum_without_annotations = clusternum_total - clusternum_with_annotations
-
-
-    # return the ortholog sequence identification
-    return seqnum_acrogymnospermae, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations
-
-#-------------------------------------------------------------------------------
-# Statistics of quercusTOA database
-#-------------------------------------------------------------------------------
-
-def get_quercustoa_db_stats(conn):
-    '''
-    Get the statistics of quercusTOA database.
-    '''
-
-    # count the sequences number of Quercus
-    sentence = '''
-               SELECT COUNT(*)
-                   FROM mmseqs2_relationships;
-               '''
-    try:
-        rows = conn.execute(sentence)
-    except Exception as e:
-        raise xlib.ProgramException(e, 'B002', sentence, conn)
-
-    # set the sequences number of Quercus
-    seqnum_quercus = 0
-    for row in rows:
-        seqnum_quercus = int(row[0])
-        break
-
-    # count the total of clusters
-    sentence = '''
-               SELECT COUNT(DISTINCT cluster_id)
-                   FROM mmseqs2_relationships;
+                   FROM mmseqs2_protein_clusters;
                '''
     try:
         rows = conn.execute(sentence)
@@ -4285,10 +5805,10 @@ def get_quercustoa_db_stats(conn):
     # initialize the dictionary
     ids_without_annotations_list = []
 
-    # select rows with identifications without annotations from the table "mmseqs2_relationships"
+    # select rows with identifications without annotations from the table "mmseqs2_protein_clusters"
     sentence = f'''
                 SELECT cluster_id, seq_id
-                    FROM mmseqs2_relationships
+                    FROM mmseqs2_protein_clusters
                     WHERE cluster_id not in ({union_cluster_id_txt})
                     ORDER BY cluster_id, seq_id;
                 '''
@@ -4302,7 +5822,7 @@ def get_quercustoa_db_stats(conn):
         ids_without_annotations_list.append([row[0], row[1]])
 
     # return the ortholog sequence identification
-    return seqnum_quercus, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations, ids_without_annotations_list
+    return seqnum, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations, ids_without_annotations_list
 
 #-------------------------------------------------------------------------------
 # General classes

@@ -22,9 +22,9 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 SEP="#########################################"
 
-DATA_DIR=/home/fmm/Documents/Trabajo/ProyectosVScode/quercusTOA/data
-LIFTOFF_OUTPUT_DIR=/home/fmm/Documents/Trabajo/ProyectosVScode/quercusTOA/output/liftoff
-LIFTOFTOOLS_OUTPUT_DIR=/home/fmm/Documents/Trabajo/ProyectosVScode/quercusTOA/output/liftofftools
+DATA_DIR=$QUERCUSTOA/data
+LIFTOFF_OUTPUT_DIR=$QUERCUSTOA/output/liftoff
+LIFTOFTOOLS_OUTPUT_DIR=$QUERCUSTOA/output/liftofftools
 # AWS
 # -- DATA_DIR=/ngscloud2/gymnotoa/output-test
 # -- LIFTOFF_OUTPUT_DIR=/ngscloud2/gymnotoa/output-test/liftoff

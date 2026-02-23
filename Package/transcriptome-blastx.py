@@ -5,6 +5,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
+# pylint: disable=unnecessary-pass
 
 #-------------------------------------------------------------------------------
 
@@ -544,7 +545,7 @@ def build_blastx_process_script(blastx_process_script, blastx_thread_number, bla
         with open(blastx_process_script, mode='w', encoding='utf8', newline='\n') as file_id:
             file_id.write( '#!/bin/bash\n')
             file_id.write( '#-------------------------------------------------------------------------------\n')
-            file_id.write( 'export BLASTPLUS_DIR=/apps/Miniconda3/envs/blast/bin\n')
+            file_id.write( 'export BLASTPLUS_DIR=/apps/Miniforge3/envs/blast/bin\n')
             file_id.write( 'export PATH=$BLASTPLUS_DIR:$PATH\n')
             file_id.write(f'export BLASTDB={blast_db}\n')
             file_id.write( 'SEP="#########################################"\n')

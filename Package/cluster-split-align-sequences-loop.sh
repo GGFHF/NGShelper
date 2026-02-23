@@ -52,10 +52,10 @@ if [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
 
 elif [ "$ENVIRONMENT" = "$ENV_AWS" ]; then
 
-    source /ngscloud2/apps/Miniconda3/envs/mmseqs2/util/bash-completion.sh
+    source /ngscloud2/apps/Miniforge3/envs/mmseqs2/util/bash-completion.sh
 
     NGSHELPER_DIR=/ngscloud2/apps/NGShelper
-    MMSEQS2_DIR=/ngscloud2/apps/Miniconda3/envs/mmseqs2/bin
+    MMSEQS2_DIR=/ngscloud2/apps/Miniforge3/envs/mmseqs2/bin
     DATA_DIR=/ngscloud2/gymnotoa/test-data
     TEST_DIR=/ngscloud2/gymnotoa/test-results
 
@@ -175,14 +175,14 @@ function split_clusters
     echo "$SEP"
     echo 'Spliting clusters ...'
     /usr/bin/time \
-        split-mmseqs2-clusters.py \
+        split-mmseqs2-protein-clusters.py \
             --allseqs=$1 \
-            --relationships=$2 \
+            --clusters=$2 \
             --outdir=$3 \
             --verbose=N \
             --trace=N
     RC=$?
-    if [ $RC -ne 0 ]; then manage_error split-mmseqs2-clusters.py $RC; fi
+    if [ $RC -ne 0 ]; then manage_error split-mmseqs2-protein-clusters.py $RC; fi
 
 }
 
@@ -306,7 +306,7 @@ function unify_consensus_seqs
 {
 
     echo "$SEP"
-    echo 'Unifying sequences (sequences "cluster.*-$ALIGNER.fasta" used by MMSEQ2-benchmarking) ...'
+    echo 'Unifying sequences (sequences "cluster.*-$ALIGNER.fasta" used by MMSEQS2-benchmarking) ...'
     /usr/bin/time \
         unify-consensus-seqs.py \
             --indir=$1 \

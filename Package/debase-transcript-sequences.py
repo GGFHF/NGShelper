@@ -5,6 +5,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
+# pylint: disable=unnecessary-pass
 
 #-------------------------------------------------------------------------------
 
@@ -245,11 +246,12 @@ def debase_sequences(fasta_file, output_file, fragmentation_probability, max_fra
     # while there are records in FASTA file
     while record != '':
 
-        # process the head record
+        # process the header record
         if record.startswith('>'):
 
             # extract the identification
-            id = record[1:].strip('\n')
+            identification = record[1:].strip('\n')
+            # identification = record[1:].replace('=', '_').replace(' ', '_').strip('\n')
 
             # initialize the sequence
             seq = ''
@@ -277,7 +279,7 @@ def debase_sequences(fasta_file, output_file, fragmentation_probability, max_fra
         # initialize the sequence list
         seq_list = []
 
-        xlib.Message.print('trace', f'\nid: {id}')
+        xlib.Message.print('trace', f'\nid: {identification}')
 
         # determine the fragmentation of the sequence
         if fragmentation_probability > random.random():
@@ -345,9 +347,13 @@ def debase_sequences(fasta_file, output_file, fragmentation_probability, max_fra
 
                 # write the header record
                 if len(seq_list) == 1:
-                    output_file_id.write(f'>{id}\n')
+                    output_file_id.write(f'>{identification}\n')
                 else:
-                    output_file_id.write(f'>{id}-FRAGMENT{i + 1}\n')
+                    pos = identification.find(' ')
+                    if pos > -1:
+                        output_file_id.write(f'>{identification[:pos]}-FRAGMENT{i + 1}{identification[pos:]}\n')
+                    else:
+                        output_file_id.write(f'>{identification}-FRAGMENT{i + 1}\n')
 
                 # write the sequence
                 j = 0

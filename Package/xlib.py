@@ -5,6 +5,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
+# pylint: disable=unnecessary-pass
 
 #-------------------------------------------------------------------------------
 
@@ -33,6 +34,9 @@ import subprocess
 import sys
 import requests
 
+from Bio import Entrez
+from Bio import SeqIO
+
 #-------------------------------------------------------------------------------
 
 def get_project_code():
@@ -58,7 +62,7 @@ def get_project_version():
     Get the project version.
     '''
 
-    return '0.84'
+    return '0.86'
 
 #-------------------------------------------------------------------------------
 
@@ -75,7 +79,7 @@ def check_os():
 
 def check_startswith(literal, text_list, case_sensitive=False):
     '''
-    Check if a literal starts with a text in a list.
+    Check if a text literal starts with a text in a list.
     '''
 
     # initialize the control variable
@@ -110,7 +114,7 @@ def check_startswith(literal, text_list, case_sensitive=False):
 
 def check_code(literal, code_list, case_sensitive=False):
     '''
-    Check if a literal is in a code list.
+    Check if a text literal is in a code list.
     '''
 
     # initialize the working list
@@ -139,7 +143,7 @@ def check_code(literal, code_list, case_sensitive=False):
 
 def check_int(literal, minimum=(-sys.maxsize - 1), maximum=sys.maxsize):
     '''
-    Check if a numeric or string literal is an integer number.
+    Check if a numeric or text literal is an integer number.
     '''
 
     # initialize the control variable
@@ -163,7 +167,7 @@ def check_int(literal, minimum=(-sys.maxsize - 1), maximum=sys.maxsize):
 
 def check_float(literal, minimum=float(-sys.maxsize - 1), maximum=float(sys.maxsize), mne=0.0, mxe=0.0):
     '''
-    Check if a numeric or string literal is a float number.
+    Check if a numeric or text literal is a float number.
     '''
 
     # initialize the control variable
@@ -189,7 +193,7 @@ def check_float(literal, minimum=float(-sys.maxsize - 1), maximum=float(sys.maxs
 
 def split_literal_to_integer_list(literal):
     '''
-    Split a text literal with values are separated by comma in a integer list.
+    Split a text literal with values separated by comma in a integer list.
     '''
 
     # initialize the text list and interger list
@@ -199,7 +203,7 @@ def split_literal_to_integer_list(literal):
     # split the text literal in a text list
     text_list = split_literal_to_text_list(literal)
 
-    # convert each item from text to integer
+    # convert items of text list to integer
     for text in text_list:
         try:
             integer_list.append(int(text))
@@ -207,7 +211,7 @@ def split_literal_to_integer_list(literal):
             integer_list = []
             break
 
-    # return the integer values list
+    # return the integer list
     return integer_list
 
 #-------------------------------------------------------------------------------
@@ -224,7 +228,7 @@ def split_literal_to_float_list(literal):
     # split the text literal in a text list
     text_list = split_literal_to_text_list(literal)
 
-    # convert each value from text to float
+    # convert items of text list to float
     for text in text_list:
         try:
             float_list.append(float(text))
@@ -232,43 +236,39 @@ def split_literal_to_float_list(literal):
             float_list = []
             break
 
-    # return the float values list
+    # return the float list
     return float_list
 
 #-------------------------------------------------------------------------------
 
 def split_literal_to_text_list(literal):
     '''
-    Split a text literal with values are separated by comma in a text list.
+    Split a text literal with texts are separated by comma in a text list.
     '''
-
-    # initialize the new text list
-    new_text_list = []
 
     # split the text literal in a text list
     text_list = literal.split(',')
 
     # remove the leading and trailing whitespaces in each value
-    # and add text item to the new text list
-    for item in text_list:
-        new_text_list.append(item.strip())
+    for i, text in enumerate(text_list):
+        text_list[i] = text.strip()
 
-    # return the text list
-    return new_text_list
+    # return the string values list
+    return text_list
 
 #-------------------------------------------------------------------------------
 
-def join_string_list_to_string(string_list):
+def join_text_list_to_literal(text_list):
     '''
-    Join a string value list in a literal (strings with simple quote and separated by comma).
+    Join a text list in a literal of texts with simple quote and separated by comma.
     '''
 
-    # initialize the literal
+    # initialize the text literal
     literal = ''
 
-    # concat the string items of string_list
-    for string in string_list:
-        literal = f"'{string}'" if literal == '' else f"{literal},'{string}'"
+    # concat the items of text list
+    for text in text_list:
+        literal = f"'{text}'" if literal == '' else f"{literal},'{text}'"
 
     # return the literal
     return literal
@@ -381,6 +381,24 @@ def get_nucleotide_list_symbol(nucleotide_list):
 
 #-------------------------------------------------------------------------------
 
+def get_genome_seq(genome_dict, seq_id, start, end, strand):
+    '''
+    Get the sequence corresponding to a sequuence identification and start and end positions
+    from a genome dictionary yielded by Biopython SeqIO.to_dict().
+    '''
+
+    # the the nucleotide sequence
+    seq = genome_dict[seq_id].seq[start - 1:end]
+
+    # when the strand is '-', get the reverse complement sequence
+    if strand =='-':
+        seq = seq.reverse_complement()
+
+    # return the sequence
+    return seq
+
+#-------------------------------------------------------------------------------
+
 def windows_path_2_wsl_path(path):
     '''
     Change a Windows format path to a WSL format path.
@@ -459,6 +477,59 @@ def get_wsl_envvar(envvar):
 
     # return the environment variable value
     return envvar_value
+
+#-------------------------------------------------------------------------------
+
+def read_gff_file(gff_file_id):
+    '''
+    Read a GFF file record.
+    '''
+
+    # initialize the data dictionary
+    data_dict = {}
+
+    # initialize the key
+    key = None
+
+    # read record
+    record = gff_file_id.readline()
+
+    # if it is a metadata records
+    if record != '' and record.startswith('#'):
+
+        pass
+
+    # if it is a feature record
+    elif record != '' and not record.startswith('#') and record != '\n':
+
+        # extract data
+        # record format: seq_id <field_sep> source <field_sep> seq_type <field_sep> start <field_sep> end <field_sep> score <field_sep> strand <field_sep> phase <field_sep> attributes <record_sep>
+        field_sep = '\t'
+        record_sep = '\n'
+        data_list = re.split(field_sep, record.replace(record_sep,''))
+        seq_id = data_list[0]
+        source = data_list[1]
+        seq_type = data_list[2]
+        start = data_list[3]
+        end = data_list[4]
+        score = data_list[5]
+        strand = data_list[6]
+        phase = data_list[7]
+        attributes = data_list[8]
+        # set the key
+        key = f'{seq_id}-{int(start):09d}-{int(end):09d}-{seq_type}'
+
+        # get the record data dictionary
+        data_dict = {'seq_id': seq_id, 'source': source, 'seq_type': seq_type, 'start': start, 'end': end, 'score': score, 'strand': strand, 'phase': phase, 'attributes': attributes}
+
+    # if there is not any record
+    else:
+
+        # set the key
+        key = bytes.fromhex('7E').decode('utf-8')
+
+    # return the record, key and data dictionary
+    return record, key, data_dict
 
 #-------------------------------------------------------------------------------
 
@@ -754,6 +825,98 @@ def get_taxonomy_dict(type, value):
 
     # return taxonomy dictionary
     return taxonomy_dict
+
+#-------------------------------------------------------------------------------
+
+def get_fasta_seq_dict(fasta_seq_file, cutting_char=' '):
+    '''
+    Get the FASTA sequence dictionary from the corresponding alignment file.
+    '''
+
+    # initialize the FASTA sequence dictionary
+    fasta_seq_dict = {}
+
+    # open the FASTA sequence file
+    if fasta_seq_file.endswith('.gz'):
+        try:
+            fasta_seq_file_id = gzip.open(fasta_seq_file, mode='rt', encoding='iso-8859-1')
+        except Exception as e:
+            raise ProgramException(e, 'F002', fasta_seq_file) from e
+    else:
+        try:
+            fasta_seq_file_id = open(fasta_seq_file, mode='r', encoding='iso-8859-1')
+        except Exception as e:
+            raise ProgramException(e, 'F001', fasta_seq_file) from e
+
+    # initialize record counters
+    fasta_seq_counter = 0
+
+    # read the first record of FASTA sequnece file
+    record = fasta_seq_file_id.readline()
+
+    # while there are records in FASTA sequnece file
+    while record != '':
+
+        # process the head record
+        if record.startswith('>'):
+
+            # extract the identification
+            blank_space_pos = record.find(cutting_char)
+            seq_id = record[1:blank_space_pos].strip('\n')
+
+            # initialize the sequence
+            seq = ''
+
+            # read the next record
+            record = fasta_seq_file_id.readline()
+
+        else:
+
+            # control the FASTA format
+            raise ProgramException('', 'F006', fasta_seq_file, 'FASTA')
+
+        # while there are records and they are sequence
+        while record != '' and not record.startswith('>'):
+
+            # concatenate the record to the sequence
+            seq += record.strip()
+
+            # read the next record of FASTA sequnece file
+            record = fasta_seq_file_id.readline()
+
+        # add 1 to the read sequence counter
+        fasta_seq_counter += 1
+
+        # insert data in the FASTA sequence dictionary
+        fasta_seq_dict[seq_id] = seq
+
+        # print the counters
+        Message.print('verbose', f'\r{os.path.basename(fasta_seq_file)} processed seqs ... {fasta_seq_counter:8d}')
+
+    Message.print('verbose', '\n')
+
+    # close the FASTA sequence file
+    fasta_seq_file_id.close()
+
+    # return the FASTA sequence dictionary
+    return fasta_seq_dict
+
+#-------------------------------------------------------------------------------
+
+def get_ncbi_protein_seq(protein_id):
+    '''
+    Get the protein sequence of the NCBI.
+    '''
+
+    Entrez.email = 'email@example.com'
+
+    # get the protein sequence
+    try:
+        with Entrez.efetch(db='protein', id=protein_id, rettype='fasta', retmode='text') as handle:
+            record = SeqIO.read(handle, 'fasta')
+        return record.seq
+    except Exception as e:
+        return f'*** ERROR: {e}'
 
 #-------------------------------------------------------------------------------
 
@@ -1926,6 +2089,41 @@ def get_fdr_method_text_list():
 
 #-------------------------------------------------------------------------------
 
+def get_ncbi_server_code():
+    '''
+    Get the NCBI server code.
+    '''
+
+    return 'NCBI'
+
+#-------------------------------------------------------------------------------
+
+def get_cncb_ngdc_server_code():
+    '''
+    Get the CNCB-NGDC server code.
+    '''
+
+    return 'CNCB-NGDC'
+#-------------------------------------------------------------------------------
+
+def get_bioinformatics_server_code_list():
+    '''
+    Get the code list of bioinformatics servers.
+    '''
+
+    return [get_ncbi_server_code(), get_cncb_ngdc_server_code()]
+
+#-------------------------------------------------------------------------------
+
+def get_bioinformatics_server_code_list_text():
+    '''
+    Get the code list of bioinformatics servers as text.
+    '''
+
+    return f'{get_ncbi_server_code()} or {get_cncb_ngdc_server_code()}'
+
+#-------------------------------------------------------------------------------
+
 def get_trace_code_list():
     '''
     Get the code list of "trace".
@@ -1956,6 +2154,24 @@ def get_verbose_code_list():
 def get_verbose_code_list_text():
     '''
     Get the code list of "verbose" as text.
+    '''
+
+    return 'Y (yes) or N (no)'
+
+#-------------------------------------------------------------------------------
+
+def get_yn_code_list():
+    '''
+    Get the list of codes "yes" and "no".
+    '''
+
+    return ['Y', 'N']
+
+#-------------------------------------------------------------------------------
+
+def get_yn_code_list_text():
+    '''
+    Get the list of codes "yes" and "no" as text.
     '''
 
     return 'Y (yes) or N (no)'
@@ -2034,6 +2250,7 @@ class Const():
     DEFAULT_R_ESTIMATOR = 'ru'
     DEFAULT_STRUCTURE_INFO_COL_NUMBER = 2
     DEFAULT_TRACE = 'N'
+    DEFAULT_TREE_GENERATION = 'N'
     DEFAULT_VARIANT_NUMBER_PER_FILE = 1000
     DEFAULT_VCF_FILTERING_ACTION = 'MM'
     DEFAULT_VERBOSE = 'N'
@@ -2227,6 +2444,8 @@ class ProgramException(Exception):
             Message.print('error', f'\n*** ERROR {code_exception}: The variant {param1} has more than one alternative allele.')
         elif code_exception == 'L022':
             Message.print('error', f'\n*** ERROR {code_exception}: The genotype number does not correspond to variant number in the sample {param1}.')
+        elif code_exception == 'M001':
+            Message.print('error', f'*** ERROR {code_exception}: Module {param1} - {param2}.')
         elif code_exception == 'P001':
             Message.print('error', f'*** ERROR {code_exception}: The program has parameters with invalid values.')
         elif code_exception == 'P002':

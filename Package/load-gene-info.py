@@ -5,6 +5,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
+# pylint: disable=unnecessary-pass
 
 #-------------------------------------------------------------------------------
 
@@ -227,12 +228,12 @@ def load_gene_info(conn, gene_info_file):
 
     xlib.Message.print('verbose', '\n')
 
-    # create the index "vcf_genomic_features_index_1" on the table "gene_info"
+    # create the index "gene_info_index_1" on the table "gene_info"
     xlib.Message.print('verbose', 'Creating the index_1 on the table "gene_info" ...\n')
     xsqlite.create_gene_info_index_1(conn)
     xlib.Message.print('verbose', 'The index is created.\n')
 
-    # create the index_2 on the table "gene_info"
+    # create the  "gene_info_index_2" on the table "gene_info"
     xlib.Message.print('verbose', 'Creating the index_2 on the table "gene_info" ...\n')
     xsqlite.create_gene_info_index_2(conn)
     xlib.Message.print('verbose', 'The index is created.\n')

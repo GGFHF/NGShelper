@@ -16,7 +16,21 @@
 
 #-------------------------------------------------------------------------------
 
-# AWS machine type: r5.4xlarge (vCPUs: 16 - Memory: 128 GiB).
+# WARNINGS:
+#
+# AWS machine type requerided: r5.8xlarge (vCPUs: 32 - Memory: 256 GiB).
+#
+# This script requires the software detailed below to be previously installed.
+#
+# Before running this Bash script:
+#
+#    * Check that the file "/ngscloud2/apps/InterProScan/interproscan.sh" has
+#      the CPUs number and the initial and maximum sizes of the Java heap indicated
+#      in the InterProScan installation.
+#
+#    * Activate the Miniforge3 environment typing:
+#
+#      $ /ngscloud2/apps/Miniforge3/condabin/conda init    (reset the console)
 
 #-------------------------------------------------------------------------------
 
@@ -32,7 +46,7 @@
 #    $ ./Miniforge3-Linux-x86_64.sh -b -p Miniforge3
 #    $ rm Miniforge3-Linux-x86_64.sh
 
-#    $ Miniforge3/condabin/conda init bash   (reinicializar la consola)
+#    $ Miniforge3/condabin/conda init bash    (reset the console)
 
 #    $ conda config --add channels bioconda
 #    $ conda config --add channels conda-forge
@@ -53,7 +67,7 @@
 #    $ mamba install --yes --name base pandas
 #    $ mamba install --yes --name base pandasql
 #    $ mamba install --yes --name base paramiko
-#    $ mamba install --yes --name base plotyy
+#    $ mamba install --yes --name base plotly
 #    $ mamba install --yes --name base plotnine
 #    $ mamba install --yes --name base psutil
 #    $ mamba install --yes --name base requests
@@ -94,6 +108,9 @@
 
 #    $ [conda env remove --yes --name eggnog-mapper]
 #    $ mamba create --yes --name eggnog-mapper eggnog-mapper
+
+#    Check URLs in the file /ngscloud2/apps/Miniforge3/envs/eggnog-mapper/bin/download_eggnog_data.py: http://eggnog5.embl.de is OK
+
 #    $ mkdir /ngscloud2/apps/Miniforge3/envs/eggnog-mapper/lib/python3.11/site-packages/data/ (depending on eggnog-mapper Python version)
 #    $ conda activate eggnog-mapper
 #    $ mamba install --yes setuptools
@@ -133,8 +150,8 @@
 # InterProScan
 # ============
 #
-#    $ [OLD_VERSION=5.70-102.0]
-#    $ NEW_VERSION=5.71-102.0
+#    $ [OLD_VERSION=5.76-107.0]
+#    $ NEW_VERSION=5.77-108.0
 #    $ sudo apt install libgomp1 (if Ubuntu 20.04) 
 #    $ cd /ngscloud2/apps
 #    $ wget http://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/$NEW_VERSION/interproscan-$NEW_VERSION-64-bit.tar.gz
@@ -147,8 +164,8 @@
 #    $ ./setup.py -f interproscan.properties
 
 #    Modify lines 58 and 59 of the file "interproscan.sh" in InterProScan directory:
-#        (58): -XX:ParallelGCThreads=8   --->   -XX:ParallelGCThreads=16
-#        (59): -Xms2028M -Xmx9216M       --->   -Xms64G -Xmx64G
+#        (58): -XX:ParallelGCThreads=8   --->   -XX:ParallelGCThreads=32
+#        (59): -Xms2028M -Xmx9216M       --->   -Xms64G -Xmx160G
 
 #-------------------------------------------------------------------------------
 
@@ -170,16 +187,16 @@ ENVIRONMENT=$ENV_AWS
 
 if [ "$ENVIRONMENT" = "$ENV_AWS" ]; then
 
-    source /ngscloud2/apps/Miniconda3/envs/mmseqs2/util/bash-completion.sh
+    source /ngscloud2/apps/Miniforge3/envs/mmseqs2/util/bash-completion.sh
 
     NGSHELPER_DIR=/ngscloud2/apps/NGShelper
-    MMSEQS2_DIR=/ngscloud2/apps/Miniconda3/envs/mmseqs2/bin
+    MMSEQS2_DIR=/ngscloud2/apps/Miniforge3/envs/mmseqs2/bin
     INTERPROSCAN_DIR=/ngscloud2/apps/InterProScan
     OUTPUT_DIR=/ngscloud2/gymnotoa
 
-    FASTA_FILE=$CLADE-protein-sequences.fasta
+    PROTEIN_FASTA_FILE=$CLADE-protein-sequences.fasta
 
-    THREADS=16
+    THREADS=32
 
 elif [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
 
@@ -190,7 +207,7 @@ elif [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
     INTERPROSCAN_DIR=$APPS/InterProScan
     OUTPUT_DIR=$GYMNOTOA/output
 
-    FASTA_FILE=$CLADE-protein-sequences-seq1000.fasta
+    PROTEIN_FASTA_FILE=protein-pinus-taeda-1000seqs.fasta
 
     THREADS=4
 
@@ -206,16 +223,16 @@ OUTPUT_PREFIX=$TEMP_DIR/$CLADE-mmseqs2
 CLUSTER_DIR=$TEMP_DIR/clusters
 DB_FILE=$DB_NAME.db
 DB_PATH=$DB_DIR/$DB_FILE
-FASTA_PATH=$TEMP_DIR/$FASTA_FILE
+PROTEIN_FASTA_PATH=$DB_DIR/$PROTEIN_FASTA_FILE
 ALLSEQS_FILE=$CLADE-mmseqs2_all_seqs.fasta
 ALLSEQS_PATH=$TEMP_DIR/$ALLSEQS_FILE
-RELATIONSHIP_FILE=$CLADE-relationships.csv
-RELATIONSHIP_PATH=$TEMP_DIR/$RELATIONSHIP_FILE
+CLUSTER_FILE=$CLADE-clusters.csv
+CLUSTER_PATH=$TEMP_DIR/$CLUSTER_FILE
 IDENTITIES_FILE=$CLADE-identities.csv
 IDENTITIES_PATH=$TEMP_DIR/$IDENTITIES_FILE
 CONSEQS_PREFIX=$CLADE-consensus
 CONSEQS_FILE=$CONSEQS_PREFIX-seqs.fasta
-CONSEQS_PATH=$TEMP_DIR/$CONSEQS_FILE
+CONSEQS_PATH=$DB_DIR/$CONSEQS_FILE
 CONSEQS_BLAST_DB_NAME=$CONSEQS_PREFIX-blastplus-db
 CONSEQS_BLAST_DB_DIR=$DB_DIR/$CONSEQS_PREFIX-blastplus-db
 CONSEQS_BLAST_DB_PATH=$CONSEQS_BLAST_DB_DIR/$CONSEQS_BLAST_DB_NAME
@@ -229,15 +246,18 @@ EMAPPER_ANNOTATIONS_PATH=$TEMP_DIR/$CONSEQS_PREFIX-annotations-emapper.tsv
 ANNOTATIONS_FILE=$CONSEQS_PREFIX-seqs-annotations.csv
 STATS_FILE=$DB_NAME-stats.ini
 STATS_PATH=$DB_DIR/$STATS_FILE
+NOANNOT_FILE=$DB_NAME-noannot.csv
+# -- NOANNOT_PATH=$TEMP_DIR/$NOANNOT_FILE
+NOANNOT_PATH=NONE
 
 # NCBI Taxonomy
-TAXONOMY_TAXDMP_FTP=ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdmp.zip
+TAXONOMY_TAXDMP_URL=ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdmp.zip
 TAXONOMY_TAXDMP_PATH=$TEMP_DIR/taxdmp.zip
 TAXONOMY_TAXONNAMES_PATH=$TEMP_DIR/names.dmp
 
 # BUSCO gymnosperm dataset
 BUSCO_DATASET=Gymnosperm_odb10
-BUSCO_DATASET_FTP=https://github.com/jjwujay/Gymnosperm_odb10/raw/main/Gymnosperm_odb10.tar.gz
+BUSCO_DATASET_URL=https://github.com/jjwujay/Gymnosperm_odb10/raw/main/Gymnosperm_odb10.tar.gz
 BUSCO_DATASET_PATH=$TEMP_DIR/$BUSCO_DATASET.tar.gz
 BUSCO_DATASET_DIR=$TEMP_DIR/$BUSCO_DATASET
 BUSCO_ASSESSMENT_PATTERN=busco-assessment
@@ -258,7 +278,7 @@ TAIR10_CONSEQS_ALIGNMENT_FILE=$CONSEQS_PREFIX-tair10-alignments.csv
 TAIR10_CONSEQS_ALIGNMENT_PATH=$TEMP_DIR/$TAIR10_CONSEQS_ALIGNMENT_FILE
 
 # Gene Ontology
-GO_ONTOLOGY_FTP=http://purl.obolibrary.org/obo/go.obo
+GO_ONTOLOGY_URL=http://purl.obolibrary.org/obo/go.obo
 GO_ONTOLOGY_FILE=$TEMP_DIR/go.obo
 
 # CANTATA data
@@ -282,12 +302,13 @@ LNCRNAS_BLAST_DB_DIR=$DB_DIR/$LNCRNAS_PREFIX-blastplus-db
 LNCRNAS_BLAST_DB_PATH=$LNCRNAS_BLAST_DB_DIR/$LNCRNAS_BLAST_DB_NAME
 
 # MMseqs2 params
-S=4.0        # s (sensitivity)
-C=1.0        # c (list matches above this fraction of aligned -covered- residue)
-CM=0         # cov-mode: 0 (coverage of query and target)
-MSI=1.000    # min-seq-id
-ST=2         # similarity-type: 2 (sequence identity)
-TYPE=1       # dbtype: 1 (amino acid)
+S=4.0        # s (sensitivity): 1.0 (faster), 4.0 (fast), 7.5 (sensitive) [5.700]
+MASK=1       # mask (mask sequences in prefilter stage with tantan): 0 (w/o low complexity masking), 1 (with low complexity masking) [1]
+MSI=1.000    # min-seq-id (sequence identity threshold for clustering) [0.000]
+C=1.0        # c (list matches above this fraction of aligned -covered- residue) [0.000]
+CM=0         # cov-mode (coverage mode): 0 (coverage of query and target), 1 (coverage of target), 2 (coverage of query), ... [0]
+ST=2         # similarity-type (score used for clustering): 1 (alignment score), 2 (sequence identity) [2]
+TYPE=0       # dbtype: 0 (auto), 1 (amino acids), 2 (nucleotides) [0]
 
 # InterProScan params
 FASTA_TYPE=p
@@ -363,27 +384,6 @@ function create_database
 
 #-------------------------------------------------------------------------------
 
-function download_ncbi_taxonomy_data
-{
-
-    echo "$SEP"
-    echo 'Downloading and decompressing NCBI Taxonomy database dump file ...'
-    /usr/bin/time \
-        wget \
-            --quiet \
-            --output-document $TAXONOMY_TAXDMP_PATH \
-            $TAXONOMY_TAXDMP_FTP
-    RC=$?
-    if [ $RC -ne 0 ]; then manage_error wget $RC; fi
-    unzip -o -d $TEMP_DIR $TAXONOMY_TAXDMP_PATH
-    RC=$?
-    if [ $RC -ne 0 ]; then manage_error tar $RC; fi
-    echo 'File is downloaded and decompressed.'
-
-}
-
-#-------------------------------------------------------------------------------
-
 function download_ncbi_protein_sequences
 {
 
@@ -392,16 +392,39 @@ function download_ncbi_protein_sequences
     if [ "$ENVIRONMENT" = "$ENV_AWS" ]; then
         source activate entrez-direct
         /usr/bin/time \
-            esearch -db protein -query "$CLADE [Organism]" | efetch -format fasta >$FASTA_PATH
+            esearch -db protein -query "$CLADE [Organism]" | efetch -format fasta >$PROTEIN_FASTA_PATH
         RC=$?
         if [ $RC -ne 0 ]; then manage_error esearch $RC; fi
         conda deactivate
     elif [ "$ENVIRONMENT" = "$ENV_LOCAL" ]; then
-        cp /home/fmm/Documents/Trabajo/ProyectosVScode/gymnoTOA/data/$FASTA_FILE $TEMP_DIR
+        cp $GYMNOTOA/data/$PROTEIN_FASTA_FILE $PROTEIN_FASTA_PATH
+        RC=$?
+        if [ $RC -ne 0 ]; then manage_error cp $RC; fi
     else
         echo 'Environment error'; exit 3
     fi
     echo 'Sequences are downloaded.'
+
+}
+
+#-------------------------------------------------------------------------------
+
+function download_taxonomy_data
+{
+
+    echo "$SEP"
+    echo 'Downloading and decompressing NCBI Taxonomy database dump file ...'
+    /usr/bin/time \
+        wget \
+            --quiet \
+            --output-document $TAXONOMY_TAXDMP_PATH \
+            $TAXONOMY_TAXDMP_URL
+    RC=$?
+    if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+    unzip -o -d $TEMP_DIR $TAXONOMY_TAXDMP_PATH
+    RC=$?
+    if [ $RC -ne 0 ]; then manage_error wget $RC; fi
+    echo 'File is downloaded and decompressed.'
 
 }
 
@@ -417,9 +440,10 @@ function cluster_sequences
     /usr/bin/time \
         mmseqs \
             easy-cluster \
-            $FASTA_PATH \
+            $PROTEIN_FASTA_PATH \
             $OUTPUT_PREFIX \
-            tmp \
+            $TEMP_DIR/mmseqs2-tmp \
+            -v 0 \
             --threads $THREADS \
             -s $S \
             -c $C \
@@ -442,34 +466,34 @@ function split_clusters
     echo "$SEP"
     echo 'Splitting clusters ...'
     /usr/bin/time \
-        split-mmseqs2-clusters.py \
+        split-mmseqs2-protein-clusters.py \
             --allseqs=$ALLSEQS_PATH \
-            --relationships=$RELATIONSHIP_PATH \
+            --clusters=$CLUSTER_PATH \
             --outdir=$CLUSTER_DIR \
             --verbose=N \
             --trace=N
     RC=$?
-    if [ $RC -ne 0 ]; then manage_error split-mmseqs2-clusters.py $RC; fi
+    if [ $RC -ne 0 ]; then manage_error split-mmseqs2-protein-clusters.py $RC; fi
     echo 'Clusters are splitted.'
 
 }
 
 #-------------------------------------------------------------------------------
 
-function load_cluster_sequence_relationships
+function load_clusters
 {
 
     echo "$SEP"
-    echo 'Loading cluster-sequence relationships into gymnoTOA database ...'
+    echo 'Loading clusters into the quercusTOA database ...'
     /usr/bin/time \
-        load-mmseqs2-relationships.py \
+        load-mmseqs2-protein-clusters.py \
             --db=$DB_PATH \
-            --relationships=$RELATIONSHIP_PATH \
+            --clusters=$CLUSTER_PATH \
             --verbose=N \
             --trace=N
     RC=$?
-    if [ $RC -ne 0 ]; then manage_error load-mmseqs2-relationships.py $RC; fi
-    echo 'Relationships are loaded.'
+    if [ $RC -ne 0 ]; then manage_error load-mmseqs2-protein-clusters.py $RC; fi
+    echo 'Clusters are loaded.'
 
 }
 
@@ -501,6 +525,7 @@ function align_clusters
             if [ $NLIN -gt 1 ]; then
                 /usr/bin/time \
                     muscle \
+                        -quiet \
                         -align $FILE_1 \
                         -output $FILE_2
                 RC=$?
@@ -604,7 +629,7 @@ function download_busco_dataset
         wget \
             --quiet \
             --output-document $BUSCO_DATASET_PATH \
-            $BUSCO_DATASET_FTP
+            $BUSCO_DATASET_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
     tar -xzvf $BUSCO_DATASET_PATH --directory=$TEMP_DIR
@@ -748,20 +773,21 @@ function run_eggnog_mapper_analysis
     echo "$SEP"
     echo 'Running eggNOG-mapper analysis ...'
     if [ "$EMAPPER_SEARCH_OPTION" = "$DIAMOND" ]; then
+        # -- /usr/bin/time \
+        # --     emapper.py \
+        # --         --cpu $THREADS \
+        # --         -i $CONSEQS_PATH \
+        # --         --itype $EMAPPER_ITYPE \
+        # --         -m $DIAMOND \
+        # --         --dmnd_algo $EMAPPER_DMND_ALGO \
+        # --         --sensmode $EMAPPER_SENSMODE \
+        # --         --dmnd_iterate $EMAPPER_DMND_ITERATE \
+        # --         --pident $EMAPPER_PIDENT \
+        # --         --evalue $EMAPPER_EVALUE \
+        # --         --query_cover $EMAPPER_QUERY_COVER \
+        # --         --output_dir $TEMP_DIR \
+        # --         --output $CONSEQS_PREFIX
         /usr/bin/time \
-            # -- emapper.py \
-            # --     --cpu $THREADS \
-            # --     -i $CONSEQS_PATH \
-            # --     --itype $EMAPPER_ITYPE \
-            # --     -m $DIAMOND \
-            # --     --dmnd_algo $EMAPPER_DMND_ALGO \
-            # --     --sensmode $EMAPPER_SENSMODE \
-            # --     --dmnd_iterate $EMAPPER_DMND_ITERATE \
-            # --     --pident $EMAPPER_PIDENT \
-            # --     --evalue $EMAPPER_EVALUE \
-            # --     --query_cover $EMAPPER_QUERY_COVER \
-            # --     --output_dir $TEMP_DIR \
-            # --     --output $CONSEQS_PREFIX
             emapper.py \
                 --cpu $THREADS \
                 -i $CONSEQS_PATH \
@@ -776,31 +802,32 @@ function run_eggnog_mapper_analysis
         RC=$?
         if [ $RC -ne 0 ]; then manage_error emapper.py $RC; fi
     elif [ "$EMAPPER_SEARCH_OPTION" = "$MMSEQS" ]; then
+        # -- /usr/bin/time \
+        # --     emapper.py \
+        # --         --cpu $THREADS \
+        # --         -i $CONSEQS_PATH \
+        # --         --itype $EMAPPER_ITYPE \
+        # --         -m $MMSEQS \
+        # --         --start_sens $EMAPPER_START_SENS \
+        # --         --sens_steps $EMAPPER_SENS_STEPS \
+        # --         --final_sens $EMAPPER_FINAL_SENS \
+        # --         --pident $EMAPPER_PIDENT \
+        # --         --evalue $EMAPPER_EVALUE \
+        # --         --query_cover $EMAPPER_QUERY_COVER \
+        # --         --output_dir $TEMP_DIR \
+        # --         --output $CONSEQS_PREFIX
         /usr/bin/time \
-        # -- emapper.py \
-        # --     --cpu $THREADS \
-        # --     -i $CONSEQS_PATH \
-        # --     --itype $EMAPPER_ITYPE \
-        # --     -m $MMSEQS \
-        # --     --start_sens $EMAPPER_START_SENS \
-        # --     --sens_steps $EMAPPER_SENS_STEPS \
-        # --     --final_sens $EMAPPER_FINAL_SENS \
-        # --     --pident $EMAPPER_PIDENT \
-        # --     --evalue $EMAPPER_EVALUE \
-        # --     --query_cover $EMAPPER_QUERY_COVER \
-        # --     --output_dir $TEMP_DIR \
-        # --     --output $CONSEQS_PREFIX
-        emapper.py \
-            --cpu $THREADS \
-            -i $CONSEQS_PATH \
-            --itype $EMAPPER_ITYPE \
-            -m $MMSEQS \
-            --start_sens $EMAPPER_START_SENS \
-            --sens_steps $EMAPPER_SENS_STEPS \
-            --final_sens $EMAPPER_FINAL_SENS \
-            --evalue $EMAPPER_EVALUE \
-            --output_dir $TEMP_DIR \
-            --output $CONSEQS_PREFIX
+            emapper.py \
+                --cpu $THREADS \
+                -i $CONSEQS_PATH \
+                --itype $EMAPPER_ITYPE \
+                -m $MMSEQS \
+                --start_sens $EMAPPER_START_SENS \
+                --sens_steps $EMAPPER_SENS_STEPS \
+                --final_sens $EMAPPER_FINAL_SENS \
+                --evalue $EMAPPER_EVALUE \
+                --output_dir $TEMP_DIR \
+                --output $CONSEQS_PREFIX
         RC=$?
         if [ $RC -ne 0 ]; then manage_error emapper.py $RC; fi
     else
@@ -936,7 +963,7 @@ function download_gene_ontology
         wget \
             --quiet \
             --output-document $GO_ONTOLOGY_FILE \
-            $GO_ONTOLOGY_FTP
+            $GO_ONTOLOGY_URL
     RC=$?
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
     echo 'File is downloaded.'
@@ -1033,15 +1060,8 @@ function download_lncrna_sequences
     if [ $RC -ne 0 ]; then manage_error wget $RC; fi
     echo 'File is downloaded.'
 
-}
-
-#-------------------------------------------------------------------------------
-
-function concat_lncrna_sequences
-{
-
     echo "$SEP"
-    echo 'Concating the lncRNA FASTAS ...'
+    echo 'Concatenating the lncRNA FASTAs ...'
     /usr/bin/time \
         cat \
             $CANTATA_ARABIDOPSIS_THALIANA_FASTA_PATH \
@@ -1050,7 +1070,7 @@ function concat_lncrna_sequences
             > $LNCRNAS_PATH
     RC=$?
     if [ $RC -ne 0 ]; then manage_error cat $RC; fi
-    echo 'Files are concated.'
+    echo 'Files are concatenated.'
 
 }
 
@@ -1084,11 +1104,12 @@ function calculate_gymnotoa_db_stats
 {
 
     echo "$SEP"
-    echo 'Calculating stats of gymnoTOA database ...'
+    echo 'Calculating statistics of gymnoTOA database ...'
     /usr/bin/time \
         calculate-gymnotoadb-stats.py \
             --db=$DB_PATH \
             --stats=$STATS_PATH \
+            --noannot=$NOANNOT_PATH \
             --verbose=N \
             --trace=N
     RC=$?
@@ -1167,11 +1188,11 @@ function manage_error
 init
 create_directories
 create_database
-download_ncbi_taxonomy_data
 download_ncbi_protein_sequences
+download_taxonomy_data
 cluster_sequences
 split_clusters
-load_cluster_sequence_relationships
+load_clusters
 align_clusters
 calculate_clusters_identity
 calculate_consensus_seqs
@@ -1191,7 +1212,6 @@ load_tair10_orthologs
 download_gene_ontology
 load_gene_ontology
 download_lncrna_sequences
-concat_lncrna_sequences
 build_lncrna_blast_db
 calculate_gymnotoa_db_stats
 compress_gymnotoa_db

@@ -26,8 +26,8 @@ CLUSTER_FILE=interproscan-test-Acrogymnospermae-protein-sequences-seq1000-cluste
 ALIGNMENT_FILE=interproscan-test-Acrogymnospermae-protein-sequences-seq1000-cluster1-mafft.fasta
 
 # local
-DATA_DIR=/home/fmm/Documents/Trabajo/ProyectosVScode/gymnoTOA/output
-OUTPUT_DIR=/home/fmm/Documents/Trabajo/ProyectosVScode/gymnoTOA/output
+DATA_DIR=$GYMNOTOA/output
+OUTPUT_DIR=$GYMNOTOA/output
 # AWS
 # -- DATA_DIR=/ngscloud2/gymnotoa/output-test
 # -- OUTPUT_DIR=/ngscloud2/gymnotoa/output-test

@@ -22,8 +22,8 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 
 SEP="#########################################"
 
-DATA_DIR=$TRABAJO/ProyectosVScode/gymnoTOA/data
-OUTPUT_DIR=$TRABAJO/ProyectosVScode/gymnoTOA/output
+DATA_DIR=$GYMNOTOA/data
+OUTPUT_DIR=$GYMNOTOA/output
 
 if [ ! -d "$OUTPUT_DIR" ]; then mkdir --parents $OUTPUT_DIR; fi
 

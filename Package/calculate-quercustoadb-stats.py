@@ -5,6 +5,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
+# pylint: disable=unnecessary-pass
 
 #-------------------------------------------------------------------------------
 
@@ -145,8 +146,8 @@ def calculate_quercustoadb_stats(conn, stats_file, noannot_file):
         except Exception as e:
             raise xlib.ProgramException(e, 'F003', stats_file)
 
-    # get the statistics of the quercusTOA database
-    (seqnum_quercus, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations, ids_without_annotations_list) = xsqlite.get_quercustoa_db_stats(conn)
+    # get the statistics
+    (seqnum_quercus, clusternum_total, clusternum_interproscan_annotations, clusternum_emapper_annotations, clusternum_tair10_ortologs, clusternum_without_annotations, ids_without_annotations_list) = xsqlite.get_db_stats(conn)
 
     # write records in the statistics file
     stats_file_id.write( '[statistics]\n')
@@ -157,7 +158,7 @@ def calculate_quercustoadb_stats(conn, stats_file, noannot_file):
     stats_file_id.write(f'clusternum_tair10_ortologs = {clusternum_tair10_ortologs}\n')
     stats_file_id.write(f'clusternum_without_annotations = {clusternum_without_annotations}\n')
 
-    # close statistics file
+    # close the statistics file
     stats_file_id.close()
 
     # write sequences without annotations if necessary

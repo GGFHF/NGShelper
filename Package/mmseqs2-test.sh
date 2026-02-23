@@ -23,7 +23,7 @@ if [ -n "$*" ]; then echo 'This script does not have parameters'; exit 1; fi
 # local
 source $BIOCONDA/mmseqs2/util/bash-completion.sh
 # AWS
-# -- source /ngscloud2/apps/Miniconda3/envs/mmseqs2/util/bash-completion.sh
+# -- source /ngscloud2/apps/Miniforge3/envs/mmseqs2/util/bash-completion.sh
 
 SEP="#########################################"
 
@@ -31,7 +31,7 @@ SEP="#########################################"
 MMSEQS2_DIR=$BIOCONDA/mmseqs2/bin
 DATA_DIR=$GYMNOTOA/data
 # AWS
-# -- MMSEQS2_DIR=/ngscloud2/apps/Miniconda3/envs/mmseqs2/bin
+# -- MMSEQS2_DIR=/ngscloud2/apps/Miniforge3/envs/mmseqs2/bin
 # -- DATA_DIR=/ngscloud2/gymnotoa/data-test
 
 FASTA_FILE=Acrogymnospermae-protein-sequences-seq1000.fasta

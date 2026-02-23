@@ -5,12 +5,13 @@
 # pylint: disable=line-too-long
 # pylint: disable=multiple-statements
 # pylint: disable=too-many-lines
+# pylint: disable=unnecessary-pass
 
 #-------------------------------------------------------------------------------
 
 '''
 This program builds statistics of an InterProScan analysis used by the
-MMSEQ2-benchmarking software.
+MMSEQS2-benchmarking software.
 
 This software has been developed by:
 
@@ -60,7 +61,7 @@ def build_parser():
 
     # create the parser and add arguments
     description = 'Description: This program builds statistics of an InterProScan analysis used by/n' \
-         'the MMSEQ2-benchmarking software.'
+         'the MMSEQS2-benchmarking software.'
     text = f'{xlib.get_project_name()} v{xlib.get_project_version()} - {os.path.basename(__file__)}\n\n{description}\n'
     usage = f'\r{text.ljust(len("usage:"))}\nUsage: {os.path.basename(__file__)} arguments'
     parser = argparse.ArgumentParser(usage=usage)
